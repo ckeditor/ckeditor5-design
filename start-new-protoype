@@ -1,0 +1,30 @@
+#!/bin/bash
+
+set -e	# Stop on errors
+
+if [[ -z "$1" ]]
+then
+	echo "Give your prototype a branch name (empty to abort):"
+	read NEWBRANCH
+
+	if [[ -z "$NEWBRANCH" ]]
+	then
+		exit
+	fi
+else
+	NEWBRANCH="$1"
+fi
+
+echo "Branch: $NEWBRANCH"
+
+git checkout --orphan $NEWBRANCH
+
+git rm -rf .
+
+echo "CKEditor 5 Feature Prototype" >> README.md
+echo "============================" >> README.md
+echo "" >> README.md
+echo "[TODO: Describe the feature here]" >> README.md
+
+git add README.md
+git commit -m "Initial commit"
