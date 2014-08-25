@@ -1,13 +1,43 @@
 // Bootstrap file for the dev version of CKEditor.
 
 ( function() {
-	if ( typeof CKEDITOR != 'undefined' && CKEDITOR.define ) {
-		bootstrap();
-		return;
+	// Calculate the CKEditor installation path.
+	var baseUrl = getBaseUrl();
+
+	if ( !baseUrl )
+		throw 'The CKEditor installation url could not be automatically detected. Please set the global variable "CKEDITOR_BASEURL" before creating editor instances.';
+
+	// On build, the following line is not needed as RequireJS is included.
+	loadScript( getUrl( 'src/lib/require/require.js' ), bootstrap );	// %REMOVE_LINE%
+	/*																	// %REMOVE_LINE%
+	// On build, we call bootstrap straight as RequireJS is already available.
+	bootstrap();
+	*/																	// %REMOVE_LINE%
+
+	function bootstrap() {
+		require.config( {												// %REMOVE_LINE%
+			baseUrl: getUrl( 'src/' )									// %REMOVE_LINE%
+		} );															// %REMOVE_LINE%
+		require( [ 'ckeditor' ], function( CKEDITOR ) {
+			CKEDITOR.baseUrl = baseUrl;
+			CKEDITOR.getUrl = getUrl;
+			CKEDITOR.init();
+		} );
 	}
 
-	// Calculate the CKEditor installation path.
-	var baseUrl = ( function() {
+	function getUrl( resource ) {
+		// If this is not a full or absolute path.
+		if ( resource.indexOf( ':/' ) == -1 && resource.indexOf( '/' ) !== 0 )
+			resource = baseUrl + resource;
+
+		// Add the timestamp, except for directories.
+		if ( this.timestamp && resource.charAt( resource.length - 1 ) != '/' && !( /[&?]t=/ ).test( resource ) )
+			resource += ( resource.indexOf( '?' ) >= 0 ? '&' : '?' ) + 't=' + this.timestamp;
+
+		return resource;
+	}
+
+	function getBaseUrl() {
 		var path = window.CKEDITOR_BASEPATH || '';
 
 		if ( !path ) {
@@ -35,36 +65,7 @@
 				path = location.href.match( /^[^\?]*\/(?:)/ )[ 0 ] + path;
 		}
 
-		if ( !path )
-			throw 'The CKEditor installation path could not be automatically detected. Please set the global variable "CKEDITOR_BASEPATH" before creating editor instances.';
-
 		return path;
-	} )();
-
-	var getUrl = function( resource ) {
-		// If this is not a full or absolute path.
-		if ( resource.indexOf( ':/' ) == -1 && resource.indexOf( '/' ) !== 0 )
-			resource = baseUrl + resource;
-
-		// Add the timestamp, except for directories.
-		if ( this.timestamp && resource.charAt( resource.length - 1 ) != '/' && !( /[&?]t=/ ).test( resource ) )
-			resource += ( resource.indexOf( '?' ) >= 0 ? '&' : '?' ) + 't=' + this.timestamp;
-
-		return resource;
-	};
-
-	// Initialize the AMD support in the CKEditor API.
-	loadScript( getUrl( 'src/lib/require/require.js' ), bootstrap );
-
-	function bootstrap() {
-		require.config( {
-			baseUrl: getUrl( 'src/' )
-		} );
-		require( [ 'ckeditor' ], function( CKEDITOR ) {
-			CKEDITOR.baseUrl = baseUrl;
-			CKEDITOR.getUrl = getUrl;
-			CKEDITOR.init();
-		} );
 	}
 
 	// Minimal script loader implementation.

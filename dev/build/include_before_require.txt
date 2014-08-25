@@ -1,0 +1,11 @@
+( function() {
+	var ckeditor_amd = {
+		define: ( typeof define == 'function' && define.amd ) && define,
+		require: ( typeof require == 'function' ) && require
+	};
+
+	if ( !ckeditor_amd.define || !ckeditor_amd.require ) {
+		( function() {
+			// The original RequireJS code is included here.
+
+			// Continues at  include_after_require.txt

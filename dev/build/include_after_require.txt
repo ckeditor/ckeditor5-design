@@ -1,0 +1,13 @@
+			ckeditor_amd.define = define;
+			ckeditor_amd.require = require;
+		} )();
+	}
+
+	var define = ckeditor_amd.define,
+		require = ckeditor_amd.require;
+
+	// The (r.js) compiled code of CKEditor goes here. At this point, "define"
+	// and "require" are either pointing to the global functions or to the
+	// CKEditor copy of RequireJS.
+
+	// Continues at  include_after_ckeditor.txt
