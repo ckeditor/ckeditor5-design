@@ -1,3 +1,8 @@
+/**
+ * Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+ * See LICENSE.md for license information.
+ */
+
 // Bootstrap file for both the dev and build versions of CKEditor.
 //
 // 1. Figures out the "base URL" of CKEditor.
