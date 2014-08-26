@@ -3,9 +3,21 @@
 <head lang="en">
 	<meta charset="UTF-8">
 	<title>CKEditor AMD Prototype</title>
-	<script src="../ckeditor.js"></script>
 </head>
 <body>
-	<p>Check the console.</p>
+	<script src="../ckeditor.js"></script>
+	<script>
+
+	CKEDITOR.on( 'loaded', function() {
+		document.body.innerHTML =
+			'<p>' +
+				'Testing CKEditor ' + CKEDITOR.version +
+			'</p>' +
+			'<p>' +
+				CKEDITOR.tools.checkWebkit() +
+			'</p>';
+	} );
+
+	</script>
 </body>
 </html>

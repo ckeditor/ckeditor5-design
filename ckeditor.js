@@ -5,56 +5,42 @@
 
 // Bootstrap file for both the dev and build versions of CKEditor.
 //
-// 1. Figures out the "base URL" of CKEditor.
-// 2. Loads RequireJS (on dev version only).
-// 3. Loads (requires) the "ckeditor" module, which registers the CKEDITOR global.
+// 1. Defines the CKEDITOR global.
+// 2. Figures out the "base URL" of CKEditor.
+// 3. Loads RequireJS (on dev version only).
+// 4. Loads the "ckeditor" module, initializing the API.
 
 'use strict';
 
-( function() {
-	// Figures out the "base URL" of CKEditor.
-	var baseUrl = getBaseUrl();
+// Register the CKEDITOR global. In this file we have the "minimal" version of
+// it, which can be referenced while the rest of the code is loaded. It'll be
+// replaced by require('ckeditor') later in this file.
+window.CKEDITOR = {
+	version: '5.0.0',
+	status: 'unloaded',
 
-	if ( !baseUrl ) {
-		throw 'The CKEditor installation url could not be automatically detected.' +
-			'Please set the global variable "CKEDITOR_BASEURL" before creating' +
-			'editor instances.';
-	}
+	// This is a temporary on() support, so users can have a callback once the
+	// API is available => CKEDITOR.on('loaded')
+	on: function() {
+		var queue = this._onQueue || ( this._onQueue = [] );
+		queue.push( arguments );
+	},
 
-	// On build, the following line is not needed as RequireJS is included.
-	loadScript( getUrl( 'src/lib/require/require.js' ), bootstrap );			// %REMOVE_LINE%
-	/*																			// %REMOVE_LINE%
-	// On build, we call bootstrap straight as RequireJS is already available.
-	bootstrap();
-	*/																			// %REMOVE_LINE%
-
-	// Initializes the "ckeditor" module and the CKEDITOR namespace.
-	function bootstrap() {
-		require.config( {														// %REMOVE_LINE%
-			baseUrl: getUrl( 'src/' )											// %REMOVE_LINE%
-		} );																	// %REMOVE_LINE%
-		require( [ 'ckeditor' ], function( CKEDITOR ) {
-			CKEDITOR.baseUrl = baseUrl;
-			CKEDITOR.getUrl = getUrl;
-			CKEDITOR.init();
-		} );
-	}
-
-	// The same as v4.getUrl().
-	function getUrl( resource ) {
+	// Same as v4.getUrl()	// TODO: review the code
+	getUrl: function( resource ) {
 		// If this is not a full or absolute path.
 		if ( resource.indexOf( ':/' ) == -1 && resource.indexOf( '/' ) !== 0 )
-			resource = baseUrl + resource;
+			resource = this.baseUrl + resource;
 
 		// Add the timestamp, except for directories.
 		if ( this && this.timestamp && resource.charAt( resource.length - 1 ) != '/' && !( /[&?]t=/ ).test( resource ) )
 			resource += ( resource.indexOf( '?' ) >= 0 ? '&' : '?' ) + 't=' + this.timestamp;
 
 		return resource;
-	}
+	},
 
-	// The same as v4.getBasePath()		// TODO: Document the name change.
-	function getBaseUrl() {
+	// Same as v4.basePath	// TODO: review the code	// TODO: document the name change
+	baseUrl: ( function() {
 		var path = window.CKEDITOR_BASEPATH || '';
 
 		if ( !path ) {
@@ -82,7 +68,37 @@
 				path = location.href.match( /^[^\?]*\/(?:)/ )[ 0 ] + path;
 		}
 
+		if ( !path ) {
+			throw 'The CKEditor installation url could not be automatically detected.' +
+				'Please set the global variable "CKEDITOR_BASEURL" before creating' +
+				'editor instances.';
+		}
+
 		return path;
+	} )()
+};
+
+( function() {
+	// On build, the following line is not needed as RequireJS is included.
+	loadScript( CKEDITOR.getUrl( 'src/lib/require/require.js' ), bootstrap );	// %REMOVE_LINE%
+	/*																			// %REMOVE_LINE%
+	// On build, we call bootstrap straight as RequireJS is already available.
+	// Because of the building process, setTimeout is needed to ensure that
+	// window.CKEDITOR is available.
+	setTimeout( bootstrap, 0 );
+	*/																			// %REMOVE_LINE%
+
+	// Initialize the "ckeditor" module.
+	function bootstrap() {
+		require.config( {														// %REMOVE_LINE%
+			baseUrl: CKEDITOR.getUrl( 'src/' )									// %REMOVE_LINE%
+		} );																	// %REMOVE_LINE%
+
+		// Require the "ckeditor" module so the API gets initialized.
+		require( [ 'ckeditor' ], function( CKEDITOR ) {
+			CKEDITOR.status = 'loaded';
+			CKEDITOR.fire( 'loaded' );
+		} );
 	}
 
 	// Minimal script loader implementation, used in dev only, to load RequireJS.

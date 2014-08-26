@@ -6,18 +6,28 @@
 'use strict';
 
 define( [ 'env', 'tools' ], function( env, tools ) {
-	var CKEDITOR = window.CKEDITOR || ( window.CKEDITOR = {
-		version: '5.0.0',
+	var CKEDITOR = window.CKEDITOR;
 
-		init: function() {
-			console.log( 'Initializing CKEditor ' + this.version );
-			tools.checkWebkit();
-		},
+	if ( CKEDITOR.status == 'unloaded' ) {
+		tools.extend( CKEDITOR, {
+			// Expose the CKEditor API in the namespace.
+			env: env,
+			tools: tools,
 
-		// Expose the CKEditor API in the namespace.
-		env: env,
-		tools: tools
-	} );
+			// Fake fire, for demo purposes.
+			fire: function ( eventName ) {
+				var queue = this._onQueue;
+
+				if ( queue ) {
+					for ( var i = 0; i < queue.length; i++ ) {
+						if ( queue[ i ][ 0 ] == eventName ) {
+							queue[ i ][ 1 ].call( this, { name: eventName } );
+						}
+					}
+				}
+			}
+		} );
+	}
 
 	return CKEDITOR;
 } );

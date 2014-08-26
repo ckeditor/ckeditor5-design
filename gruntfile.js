@@ -62,11 +62,11 @@ function build() {
 		function ( buildResponse ) {
 			try {
 				var code =
-					// CKEditor code.
-					fs.readFileSync( config.out, 'utf8' ) + '\n' +
-
 					// CKEditor bootstrap code.
-					preProcess( fs.readFileSync( 'ckeditor.js', 'utf8' ) ) + '\n';
+					preProcess( fs.readFileSync( 'ckeditor.js', 'utf8' ) ) + '\n' +
+
+					// CKEditor code.
+					fs.readFileSync( config.out, 'utf8' ) + '\n';
 
 				// AMDClean, to remove define/require from the code.
 				var amdclean = require('amdclean');
