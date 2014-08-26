@@ -1,25 +1,33 @@
-// Bootstrap file for the dev version of CKEditor.
+// Bootstrap file for both the dev and build versions of CKEditor.
+//
+// 1. Figures out the "base URL" of CKEditor.
+// 2. Loads RequireJS (on dev version only).
+// 3. Loads (requires) the "ckeditor" module, which registers the CKEDITOR global.
 
 'use strict';
 
 ( function() {
-	// Calculate the CKEditor installation path.
+	// Figures out the "base URL" of CKEditor.
 	var baseUrl = getBaseUrl();
 
-	if ( !baseUrl )
-		throw 'The CKEditor installation url could not be automatically detected. Please set the global variable "CKEDITOR_BASEURL" before creating editor instances.';
+	if ( !baseUrl ) {
+		throw 'The CKEditor installation url could not be automatically detected.' +
+			'Please set the global variable "CKEDITOR_BASEURL" before creating' +
+			'editor instances.';
+	}
 
 	// On build, the following line is not needed as RequireJS is included.
-	loadScript( getUrl( 'src/lib/require/require.js' ), bootstrap );	// %REMOVE_LINE%
-	/*																	// %REMOVE_LINE%
+	loadScript( getUrl( 'src/lib/require/require.js' ), bootstrap );			// %REMOVE_LINE%
+	/*																			// %REMOVE_LINE%
 	// On build, we call bootstrap straight as RequireJS is already available.
 	bootstrap();
-	*/																	// %REMOVE_LINE%
+	*/																			// %REMOVE_LINE%
 
+	// Initializes the "ckeditor" module and the CKEDITOR namespace.
 	function bootstrap() {
-		require.config( {												// %REMOVE_LINE%
-			baseUrl: getUrl( 'src/' )									// %REMOVE_LINE%
-		} );															// %REMOVE_LINE%
+		require.config( {														// %REMOVE_LINE%
+			baseUrl: getUrl( 'src/' )											// %REMOVE_LINE%
+		} );																	// %REMOVE_LINE%
 		require( [ 'ckeditor' ], function( CKEDITOR ) {
 			CKEDITOR.baseUrl = baseUrl;
 			CKEDITOR.getUrl = getUrl;
@@ -27,6 +35,7 @@
 		} );
 	}
 
+	// The same as v4.getUrl().
 	function getUrl( resource ) {
 		// If this is not a full or absolute path.
 		if ( resource.indexOf( ':/' ) == -1 && resource.indexOf( '/' ) !== 0 )
@@ -39,6 +48,7 @@
 		return resource;
 	}
 
+	// The same as v4.getBasePath()		// TODO: Document the name change.
 	function getBaseUrl() {
 		var path = window.CKEDITOR_BASEPATH || '';
 
@@ -70,7 +80,7 @@
 		return path;
 	}
 
-	// Minimal script loader implementation.
+	// Minimal script loader implementation, used in dev only, to load RequireJS.
 	function loadScript( path, callback ) {
 		var script = document.createElement( 'script' ),
 			head = document.getElementsByTagName( 'head' )[ 0 ],
