@@ -34,17 +34,13 @@ module.exports = function( grunt ) {
 
 function build() {
 	var requirejs = require( 'requirejs' ),
-		uglifyJS = require("uglify-js"),
 		fs = require('fs');
 
 	var config = {
 		baseUrl: 'src/',
 		name: 'ckeditor',
 		out: 'build/ckeditor.js',
-		uglify: {
-//			beautify: true,
-			max_line_length: 1000
-		}
+		optimize: 'none'	// Do not minify because of AMDClean.
 	};
 
 	// Make grunt wait because requirejs.optimize is a async method.
@@ -53,29 +49,30 @@ function build() {
 	requirejs.optimize( config,
 		function ( buildResponse ) {
 			try {
-				var contents =
-					// Copyright notices.
-					'/*\n' +
-					' Copyright (c) 2003-' + ( new Date() ).getFullYear() + ', CKSource - Frederico Knabben. All rights reserved.\n' +
-					' For licensing, see LICENSE.md or http://ckeditor.com/license\n' +
-					'*/\n\n' +
-
-					// Closure start.
-					'(function(){\n' +
-
-					// RequireJS.
-					fs.readFileSync( 'src/lib/require/require.js', 'utf8' ) + '\n' +
-
+				var code =
 					// CKEditor code.
 					fs.readFileSync( config.out, 'utf8' ) + '\n' +
 
 					// CKEditor bootstrap code.
-					minify( fs.readFileSync( 'ckeditor.js', 'utf8' ) ) + '\n' +
+					preProcess( fs.readFileSync( 'ckeditor.js', 'utf8' ) ) + '\n';
 
-					// Closure end.
-					'})();\n';
+				// AMDClean, to remove define/require from the code.
+				var amdclean = require('amdclean');
+				code = amdclean.clean( code );
 
-				fs.writeFileSync( config.out, contents )
+				// Finally, minify the whole code.
+				code = minify( code );
+
+				// Add copyright notices.
+				code =
+					'/*\n' +
+					' Copyright (c) 2003-' + ( new Date() ).getFullYear() + ', CKSource - Frederico Knabben. All rights reserved.\n' +
+					' For licensing, see LICENSE.md or http://ckeditor.com/license\n' +
+					'*/\n\n' +
+					code;
+
+				// Overwrite the output file with the new code.
+				fs.writeFileSync( config.out, code );
 			} catch( e ) {
 				console.log( e );
 			}
@@ -83,31 +80,34 @@ function build() {
 
 		},
 		function( err ) {
-			throw err;
+			console.log( err );
 			done( false );
 		}
 	);
-}
 
-function minify( code ) {
-	code = code.replace( /[^\n]*\%REMOVE_LINE%[^\n]*\n?/g, '' );
+	function preProcess( code ) {
+		code = code.replace( /[^\n]*\%REMOVE_LINE%[^\n]*\n?/g, '' );
+		return code;
+	}
 
-	var UglifyJS = require("uglify-js");
+	function minify( code ) {
+		var uglifyJS = require("uglify-js");
 
-	var toplevel = UglifyJS.parse( code );
-	toplevel.figure_out_scope();
+		var toplevel = uglifyJS.parse( code );
+		toplevel.figure_out_scope();
 
-	var compressor = UglifyJS.Compressor();
-	var compressed_ast = toplevel.transform(compressor);
+		var compressor = uglifyJS.Compressor();
+		var compressed_ast = toplevel.transform(compressor);
 
-	compressed_ast.figure_out_scope();
-	compressed_ast.compute_char_frequency();
-	compressed_ast.mangle_names();
+		compressed_ast.figure_out_scope();
+		compressed_ast.compute_char_frequency();
+		compressed_ast.mangle_names();
 
-	return compressed_ast.print_to_string( {
-//		beautify: true,
-		max_line_len: 1000
-	} );
+		return compressed_ast.print_to_string( {
+//			beautify: true,
+			max_line_len: 1000
+		} );
+	}
 }
 
 // Configurations for JSHint
