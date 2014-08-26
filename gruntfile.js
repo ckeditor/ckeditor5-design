@@ -18,6 +18,12 @@ module.exports = function( grunt ) {
 			all: {
 				'pre-commit': 'default'
 			}
+		},
+
+		build: {
+			options: {
+				beautify: false
+			}
 		}
 	} );
 
@@ -34,7 +40,8 @@ module.exports = function( grunt ) {
 
 function build() {
 	var requirejs = require( 'requirejs' ),
-		fs = require('fs');
+		fs = require('fs' ),
+		options = this.options();
 
 	var config = {
 		baseUrl: 'src/',
@@ -104,7 +111,7 @@ function build() {
 		compressed_ast.mangle_names();
 
 		return compressed_ast.print_to_string( {
-//			beautify: true,
+			beautify: !!options.beautify,
 			max_line_len: 1000
 		} );
 	}
