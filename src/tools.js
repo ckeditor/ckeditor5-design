@@ -1,3 +1,5 @@
+'use strict';
+
 define( [ 'env' ], function( env ) {
 	return {
 		checkWebkit: function() {

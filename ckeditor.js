@@ -1,5 +1,7 @@
 // Bootstrap file for the dev version of CKEditor.
 
+'use strict';
+
 ( function() {
 	// Calculate the CKEditor installation path.
 	var baseUrl = getBaseUrl();
@@ -31,7 +33,7 @@
 			resource = baseUrl + resource;
 
 		// Add the timestamp, except for directories.
-		if ( this.timestamp && resource.charAt( resource.length - 1 ) != '/' && !( /[&?]t=/ ).test( resource ) )
+		if ( this && this.timestamp && resource.charAt( resource.length - 1 ) != '/' && !( /[&?]t=/ ).test( resource ) )
 			resource += ( resource.indexOf( '?' ) >= 0 ? '&' : '?' ) + 't=' + this.timestamp;
 
 		return resource;
