@@ -30,12 +30,14 @@ window.CKEDITOR = {
 	// Same as v4.getUrl()	// TODO: review the code
 	getUrl: function( resource ) {
 		// If this is not a full or absolute path.
-		if ( resource.indexOf( ':/' ) == -1 && resource.indexOf( '/' ) !== 0 )
+		if ( resource.indexOf( ':/' ) == -1 && resource.indexOf( '/' ) !== 0 ) {
 			resource = this.baseUrl + resource;
+		}
 
 		// Add the timestamp, except for directories.
-		if ( this && this.timestamp && resource.charAt( resource.length - 1 ) != '/' && !( /[&?]t=/ ).test( resource ) )
+		if ( this && this.timestamp && resource.charAt( resource.length - 1 ) != '/' && !( /[&?]t=/ ).test( resource ) ) {
 			resource += ( resource.indexOf( '?' ) >= 0 ? '&' : '?' ) + 't=' + this.timestamp;
+		}
 
 		return resource;
 	},
@@ -62,11 +64,12 @@ window.CKEDITOR = {
 		// HTML source. Other browsers return the full resolved URL instead.
 		if ( path.indexOf( ':/' ) == -1 && path.slice( 0, 2 ) != '//' ) {
 			// Absolute path.
-			if ( path.indexOf( '/' ) === 0 )
+			if ( path.indexOf( '/' ) === 0 ) {
 				path = location.href.match( /^.*?:\/\/[^\/]*/ )[ 0 ] + path;
-			// Relative path.
-			else
+			} else {
+				// Relative path.
 				path = location.href.match( /^[^\?]*\/(?:)/ )[ 0 ] + path;
+			}
 		}
 
 		if ( !path ) {
@@ -109,7 +112,7 @@ window.CKEDITOR = {
 			head = document.getElementsByTagName( 'head' )[ 0 ],
 			loaded;
 
-		script.onload = script.onreadystatechange = function () {
+		script.onload = script.onreadystatechange = function() {
 			if ( ( script.readyState && script.readyState != 'complete' && script.readyState != 'loaded' ) || loaded ) {
 				return;
 			}

@@ -75,7 +75,7 @@ function build() {
 	var done = this.async();
 
 	requirejs.optimize( config,
-		function ( buildResponse ) {
+		function( buildResponse ) {
 			try {
 				var code =
 					// CKEditor bootstrap code.
@@ -101,7 +101,7 @@ function build() {
 
 				// Overwrite the output file with the new code.
 				fs.writeFileSync( config.out, code );
-			} catch( e ) {
+			} catch ( e ) {
 				console.log( e );
 			}
 			done();
@@ -119,7 +119,7 @@ function build() {
 	}
 
 	function minify( code ) {
-		var uglifyJS = require("uglify-js");
+		var uglifyJS = require( 'uglify-js' );
 
 		var toplevel = uglifyJS.parse( code );
 		toplevel.figure_out_scope();
