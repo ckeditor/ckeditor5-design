@@ -27,6 +27,7 @@ module.exports = function( grunt ) {
 
 		build: {
 			options: {
+				// Enable this to make the build code "kind of" readable.
 				beautify: false
 			}
 		}
@@ -44,6 +45,16 @@ module.exports = function( grunt ) {
 };
 
 function build() {
+	// The intention of this build process is showcasing the possibility of
+	// using AMD during development and avoid having to use a AMD library (RequireJS)
+	// on build. The real build will be much more complex than this, ofc.
+	//
+	// 1. Merge the CKEditor src code, which is based on RequireJS, using r.js.
+	// 2. Merge the above code with ./ckeditor.js, the boostrap code of the API.
+	// 3. Removes define/require from the code, making it pure js (AMDClean).
+	// 4. Minify the code with uglify.
+	// 5. Append the copyright notices and save to build/ckeditor.js.
+
 	var requirejs = require( 'requirejs' ),
 		fs = require('fs' ),
 		options = this.options();

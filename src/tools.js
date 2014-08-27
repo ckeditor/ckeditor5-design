@@ -5,6 +5,8 @@
 
 'use strict';
 
+// This is an example of a module tha doesn't care about CKEDITOR.
+
 define( [ 'env' ], function( env ) {
 	return {
 		checkWebkit: function() {

@@ -13,8 +13,7 @@
 'use strict';
 
 // Register the CKEDITOR global. In this file we have the "minimal" version of
-// it, which can be referenced while the rest of the code is loaded. It'll be
-// replaced by require('ckeditor') later in this file.
+// it, which can be referenced while the rest of the code is loaded.
 window.CKEDITOR = {
 	version: '5.0.0',
 	status: 'unloaded',
@@ -22,6 +21,8 @@ window.CKEDITOR = {
 	// This is a temporary on() support, so users can have a callback once the
 	// API is available => CKEDITOR.on('loaded')
 	on: function() {
+		// For now we just queue the on() requests. They'll be registered as
+		// soon as the real Event API is available.
 		var queue = this._onQueue || ( this._onQueue = [] );
 		queue.push( arguments );
 	},
@@ -79,10 +80,10 @@ window.CKEDITOR = {
 };
 
 ( function() {
-	// On build, the following line is not needed as RequireJS is included.
+	// On build, the following line is not needed as RequireJS will not be needed.
 	loadScript( CKEDITOR.getUrl( 'src/lib/require/require.js' ), bootstrap );	// %REMOVE_LINE%
 	/*																			// %REMOVE_LINE%
-	// On build, we call bootstrap straight as RequireJS is already available.
+	// On build, we call bootstrap straight as RequireJS is not needed.
 	// Because of the building process, setTimeout is needed to ensure that
 	// window.CKEDITOR is available.
 	setTimeout( bootstrap, 0 );
@@ -90,6 +91,7 @@ window.CKEDITOR = {
 
 	// Initialize the "ckeditor" module.
 	function bootstrap() {
+		// Config require to find our modules.
 		require.config( {														// %REMOVE_LINE%
 			baseUrl: CKEDITOR.getUrl( 'src/' )									// %REMOVE_LINE%
 		} );																	// %REMOVE_LINE%

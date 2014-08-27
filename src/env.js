@@ -5,6 +5,8 @@
 
 'use strict';
 
+// This is an example of "zero dependency" module.
+
 define( function() {
 	return {
 		ie: false,

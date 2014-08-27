@@ -5,6 +5,10 @@
 
 'use strict';
 
+// This module is a bit more complicated than others, because it is based on the
+// CKEDITOR namespace, created in ../ckeditor.js. It then extends it with the
+// full API.
+
 define( [ 'env', 'tools' ], function( env, tools ) {
 	var CKEDITOR = window.CKEDITOR;
 
@@ -16,6 +20,9 @@ define( [ 'env', 'tools' ], function( env, tools ) {
 
 			// Fake fire, for demo purposes.
 			fire: function ( eventName ) {
+				// For now we're using the queue create in on() at ../ckeditor.js.
+				// In the real implementation, on() will be replaced with the
+				// real on() the the queue will be registered again and removed.
 				var queue = this._onQueue;
 
 				if ( queue ) {
