@@ -3,6 +3,9 @@
  * See LICENSE.md for license information.
  */
 
+// File specific JSHint configs.
+/* global module */
+
 'use strict';
 
 module.exports = function( grunt ) {
@@ -45,6 +48,8 @@ module.exports = function( grunt ) {
 };
 
 function build() {
+	/* jshint validthis:true */
+
 	// The intention of this build process is showcasing the possibility of
 	// using AMD during development and avoid having to use a AMD library (RequireJS)
 	// on build. The real build will be much more complex than this, ofc.
@@ -135,6 +140,16 @@ function build() {
 
 // Configurations for JSHint
 var jshintConfig = {
+	globalstrict: true,
+	predef: [
+		'window',
+		'document',
+		'location',
+		'CKEDITOR',
+		'deine',
+		'require',
+		'console'	// Just for prototyping purposes. Must be removed.
+	]
 };
 
 // Configurations for JSCS (JavaScript Code Style checker)
