@@ -1,4 +1,4 @@
 CKEditor 5 Feature Prototype
 ============================
 
-[TODO: Describe the feature here]
+A prototype of MV* pattern implementation for CKEditor 5.
