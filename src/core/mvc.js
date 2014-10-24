@@ -74,7 +74,6 @@ define( [
 
 	MVC.Model = function( attrs ) {
 		Object.defineProperty( this, 'attrs', {
-			enumerable: false,
 			value: {}
 		} );
 
@@ -89,6 +88,7 @@ define( [
 			if ( !this[ attr ] ) {
 				Object.defineProperty( this, attr, {
 					enumerable: true,
+
 					get: function() {
 						return this.attrs[ attr ];
 					},
@@ -96,11 +96,10 @@ define( [
 					set: function( value ) {
 						var oldValue = this.attrs[ attr ];
 
-						this.attrs[ attr ] = value;
-
 						if ( oldValue !== value ) {
+							this.attrs[ attr ] = value;
 							this.trigger( 'change', this );
-							this.trigger( 'change:' + attr, this );
+							this.trigger( 'change:' + attr, this, value, oldValue );
 						}
 					}
 				} );
