@@ -4,7 +4,9 @@ define( function() {
 	var CommandsMixin = {
 		command: function( name, cmd, ctx ) {
 			if ( !this._commands ) {
-				this._commands = {};
+				Object.defineProperty( this, '_commands', {
+					value: {}
+				} );
 			}
 
 			this._commands[ name ] = {

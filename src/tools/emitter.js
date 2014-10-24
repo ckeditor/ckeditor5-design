@@ -8,7 +8,10 @@ define( [
 	var EmitterMixin = {
 		on: function( type, callback, ctx ) {
 			if ( !this._events ) {
-				this._events = {};
+				Object.defineProperty( this, '_events', {
+					configurable: true,
+					value: {}
+				} );
 			}
 
 			if ( !this._events[ type ] ) {
@@ -43,7 +46,9 @@ define( [
 
 		listenTo: function( target, type, callback, ctx ) {
 			if ( !this._listeningTo ) {
-				this._listeningTo = {};
+				Object.defineProperty( this, '_listeningTo', {
+					value: {}
+				} );
 			}
 
 			if ( !target._emitterId ) {
@@ -61,7 +66,9 @@ define( [
 
 		listenToOnce: function( target, type, callback, ctx ) {
 			if ( !this._listeningTo ) {
-				this._listeningTo = {};
+				Object.defineProperty( this, '_listeningTo', {
+					value: {}
+				} );
 			}
 
 			if ( !target._emitterId ) {
@@ -70,12 +77,14 @@ define( [
 
 			this._listeningTo[ target._emitterId ] = target;
 
+			target.once( type, callback, ctx );
+
 			return this;
 		},
 
 		stopListening: function( target, type, callback ) {
 			if ( !this._listeningTo ) {
-				return;
+				return this;
 			}
 
 			Object.keys( this._listeningTo ).forEach( function( uid ) {
@@ -92,7 +101,10 @@ define( [
 			}
 
 			if ( !type && !callback ) {
-				delete this._events;
+				Object.defineProperty( this, '_events', {
+					configurable: true,
+					value: {}
+				} );
 				return this;
 			}
 
