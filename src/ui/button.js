@@ -8,7 +8,7 @@ define( [
 	_
 ) {
 	var Button = MVC.View.extend( {
-		bindings: {
+		events: {
 			'click': 'onClick'
 		},
 
@@ -28,8 +28,9 @@ define( [
 			if ( !this.model ) {
 				this.model = new MVC.Model( options );
 			}
-			// TODO replace it with listenTo(this.model...
-			this.model.on( 'change:active', this.toggle, this );
+
+			// TODO cover it using bindings
+			this.listenTo( this.model, 'change:active', this.toggle, this );
 		},
 
 		onClick: function() {

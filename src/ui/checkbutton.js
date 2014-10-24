@@ -10,7 +10,7 @@ define( [
 	_
 ) {
 	var CheckButton = Button.extend( {
-		bindings: {
+		events: {
 			'change input': 'onClick'
 		},
 

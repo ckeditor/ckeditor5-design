@@ -73,7 +73,11 @@ define( [
 	 *************************************************************************/
 
 	MVC.Model = function( attrs ) {
-		this.attrs = {};
+		Object.defineProperty( this, 'attrs', {
+			enumerable: false,
+			value: {}
+		} );
+
 		this._initAttrs( attrs || {} );
 		this.initialize.apply( this, arguments );
 	};
@@ -84,6 +88,7 @@ define( [
 		set: function( attr, value ) {
 			if ( !this[ attr ] ) {
 				Object.defineProperty( this, attr, {
+					enumerable: true,
 					get: function() {
 						return this.attrs[ attr ];
 					},
@@ -142,7 +147,7 @@ define( [
 		initialize: nop,
 
 		render: function() {
-			this.trigger( 'before:render' );
+			this.trigger( 'before:render', this );
 
 			if ( this.el || this.$el ) {
 				this._unbindUIEvents();
@@ -153,7 +158,7 @@ define( [
 
 			this._bindUIEvents();
 
-			this.trigger( 'render' );
+			this.trigger( 'render', this );
 
 			return this;
 		},
@@ -161,19 +166,26 @@ define( [
 		_bindUIEvents: function() {
 			var sepPattern = /\s+/;
 
-			if ( !this.bindings ) {
+			if ( !this.events ) {
 				return;
 			}
 
-			Object.keys( this.bindings ).forEach( function( key ) {
+			Object.keys( this.events ).forEach( function( key ) {
 				var selectors = key.trim().split( sepPattern ),
-					type = selectors.shift();
+					type = selectors.shift(),
+					handler;
+
+				handler = utils.isFunction( this.events[ key ] ) ?
+					this.events[ key ] :
+					this[ this.events[ key ] ];
+
+				handler = handler.bind( this );
 
 				if ( !selectors.length ) {
-					this.$el.on( type, this[ this.bindings[ key ] ].bind( this ) );
+					this.$el.on( type, handler );
 				} else {
 					selectors.forEach( function( selector ) {
-						this.$el.find( selector ).on( type, this[ this.bindings[ key ] ].bind( this ) );
+						this.$el.find( selector ).on( type, handler );
 					}, this );
 				}
 			}, this );
@@ -200,7 +212,9 @@ define( [
 	utils.extend( MVC.Space.prototype, Emitter, {
 		initialize: nop,
 
-		// TODO space element creation using the dom builder
+		setEl: function( el ) {
+			this.el = el;
+		},
 
 		show: function( view ) {
 			this.trigger( 'before:show', view );
@@ -211,7 +225,7 @@ define( [
 
 			view.once( 'destroy', this.clear, this );
 			view.render();
-			this.el.html( view.el.html() );
+			this._setContent( view.el );
 
 			this.currentView = view;
 
@@ -236,6 +250,11 @@ define( [
 			delete this.currentView;
 
 			return this;
+		},
+
+		_setContent: function( el ) {
+			this.el.innerHTML = '';
+			this.el.appendChild( el );
 		}
 	} );
 
@@ -245,9 +264,15 @@ define( [
 	/**************************************************************************
 	 * SpaceManager
 	 *************************************************************************/
+
 	MVC.SpaceManager = function( options ) {
 		this.options = options;
 		utils.extend( this, options );
+
+		Object.defineProperty( this, 'spaces', {
+			value: {}
+		} );
+
 		this.initialize.apply( this, arguments );
 	};
 
@@ -255,11 +280,35 @@ define( [
 		initialize: nop,
 
 		addSpace: function( name, space ) {
+			this.spaces[ name ] = space;
 
+			this.trigger( 'add:space', name, space );
+
+			return this;
 		},
 
-		removeSpace: function() {
+		destroy: function() {
+			Object.keys( spaces ).forEach( function( name ) {
+				this.removeSpace( name );
+			}, this );
 
+			return this;
+		},
+
+		getSpace: function( name ) {
+			return this.spaces[ name ];
+		},
+
+		removeSpace: function( name ) {
+			var space = this.spaces[ name ];
+
+			if ( !space ) {
+				return;
+			}
+
+			this.trigger( 'add:space', name, space );
+
+			return this;
 		}
 	} );
 
@@ -269,6 +318,7 @@ define( [
 	/**************************************************************************
 	 * FocusManager
 	 *************************************************************************/
+
 	MVC.FocusManager = function( options ) {
 		this.options = options;
 		utils.extend( this, options );

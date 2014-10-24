@@ -1,4 +1,8 @@
-define( function() {
+define( [
+	'tools/utils'
+], function(
+	utils
+) {
 	'use strict';
 
 	var EmitterMixin = {
@@ -38,25 +42,57 @@ define( function() {
 		},
 
 		listenTo: function( target, type, callback, ctx ) {
-			// TODO
+			if ( !this._listeningTo ) {
+				this._listeningTo = {};
+			}
+
+			if ( !target._emitterId ) {
+				Object.defineProperty( target, '_emitterId', {
+					value: utils.uid( 'emitter' )
+				} );
+			}
+
+			this._listeningTo[ target._emitterId ] = target;
+
+			target.on( type, callback, ctx );
 
 			return this;
 		},
 
 		listenToOnce: function( target, type, callback, ctx ) {
-			// TODO
+			if ( !this._listeningTo ) {
+				this._listeningTo = {};
+			}
+
+			if ( !target._emitterId ) {
+				target._emitterId = utils.uid( 'emitter' );
+			}
+
+			this._listeningTo[ target._emitterId ] = target;
 
 			return this;
 		},
 
 		stopListening: function( target, type, callback ) {
-			// TODO
+			if ( !this._listeningTo ) {
+				return;
+			}
+
+			Object.keys( this._listeningTo ).forEach( function( uid ) {
+				this._listeningTo[ uid ].off();
+				delete this._listeningTo[ uid ];
+			}, this );
 
 			return this;
 		},
 
 		off: function( type, callback, ctx ) {
 			if ( !this._events ) {
+				return this;
+			}
+
+			if ( !type && !callback ) {
+				delete this._events;
 				return this;
 			}
 

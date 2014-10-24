@@ -7,6 +7,8 @@ define( function() {
 		};
 	}
 
+	var uids = {};
+
 	var utils = {
 		extend: function( target, source ) {
 			if ( !this.isObject( source ) && !this.isFunction( source ) ) {
@@ -76,6 +78,14 @@ define( function() {
 
 		isUndefined: function( obj ) {
 			return obj === void 0;
+		},
+
+		uid: function( name ) {
+			if ( !uids[ name ] ) {
+				uids[ name ] = 1;
+			}
+
+			return uids[ name ]++;
 		}
 	};
 

@@ -39,7 +39,7 @@ define( [
 		},
 
 		html: function( html ) {
-			if ( html ) {
+			if ( html !== undefined ) {
 				dom.html( this._el, html );
 				return this;
 			} else {
