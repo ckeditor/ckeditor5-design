@@ -1,11 +1,11 @@
 define( [
-	'tools/dom',
 	'tools/utils'
 ], function(
-	dom,
 	utils
 ) {
 	'use strict';
+
+	var sepPattern = /\s+/;
 
 	function Element( selector ) {
 		if ( utils.isString( selector ) ) {
@@ -17,19 +17,33 @@ define( [
 
 	Element.prototype = {
 		addClass: function( value ) {
-			dom.addClass( this._el, value );
+			this._el.classList.add( value.split( sepPattern ) );
+
+			return this;
+		},
+
+		append: function( child ) {
+			this._el.appendChild( child );
 
 			return this;
 		},
 
 		attr: function( name, value ) {
-			dom.attr( this._el, name, value );
+			this._el.setAttribute( name, value );
 
 			return this;
 		},
 
 		find: function( selector ) {
-			var elem = dom.find( this._el, selector );
+			var elems = this._el.querySelectorAll( selector );
+
+			return Array.prototype.map.call( elems, function( elem ) {
+				return new Element( elem );
+			} );
+		},
+
+		findOne: function( selector ) {
+			var elem = this._el.querySelector( selector );
 
 			return elem ? new Element( elem ) : null;
 		},
@@ -38,55 +52,89 @@ define( [
 			return this._el;
 		},
 
+		hasClass: function( value ) {
+			return this._el.classList.contains( value );
+		},
+
 		html: function( html ) {
 			if ( html !== undefined ) {
-				dom.html( this._el, html );
+				this._el.innerHTML = html;
 				return this;
 			} else {
 				return this._el.innerHTML;
 			}
 		},
 
+		insertAfter: function( sibling ) {
+			this._el.parentNode.insertBefore( sibling, this._el.nextSibling );
+
+			return this;
+		},
+
+		insertBefore: function( sibling ) {
+			this._el.parentNode.insertBefore( sibling, this._el );
+
+			return this;
+		},
+
 		off: function( type, handler ) {
-			dom.off( this._el, type, handler );
+			this._el.removeEventListener( type, handler );
 
 			return this;
 		},
 
 		on: function( type, handler ) {
-			dom.on( this._el, type, handler );
+			this._el.addEventListener( type, handler );
 
 			return this;
 		},
 
 		remove: function() {
-			dom.remove( this._el );
+			this._el.parentNode.removeChild( this._el );
 
 			return this;
 		},
 
 		removeClass: function( value ) {
-			dom.removeClass( this._el, value );
+			this._el.classList.remove( value.split( sepPattern ) );
 
 			return this;
 		},
 
 		setStyle: function( prop, value ) {
-			dom.setStyle( this._el, prop, value );
+			if ( utils.isString( prop ) ) {
+				this._el.style[ prop ] = value;
+			} else if ( utils.isObject( prop ) ) {
+				Object.keys( prop ).forEach( function( key ) {
+					this._el.style[ key ] = prop[ key ];
+				} );
+			}
 
 			return this;
 		},
 
 		text: function( text ) {
-			if ( text ) {
-				dom.text( this._el, text );
+			if ( text !== undefined ) {
+				this._el.textContent = text;
 			} else {
 				return this._el.textContent;
 			}
 		},
 
 		toggleClass: function( value, state ) {
-			dom.toggleClass( this._el, value );
+			var hasClass = this.hasClass( value );
+
+			if ( state === undefined ) {
+				if ( hasClass ) {
+					this.removeClass( value );
+				} else {
+					this.addClass( value );
+				}
+			} else if ( state ) {
+				this.addClass( value );
+			} else {
+				this.removeClass( value );
+			}
 
 			return this;
 		}

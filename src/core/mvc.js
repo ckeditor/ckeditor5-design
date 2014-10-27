@@ -2,13 +2,11 @@ define( [
 	'tools/emitter',
 	'tools/element',
 	'tools/commands',
-	'tools/dom',
 	'tools/utils'
 ], function(
 	Emitter,
 	Element,
 	Commands,
-	dom,
 	utils
 ) {
 	'use strict';
@@ -150,7 +148,7 @@ define( [
 					this.$el.on( type, handler );
 				} else {
 					selectors.forEach( function( selector ) {
-						this.$el.find( selector ).on( type, handler );
+						this.$el.findOne( selector ).on( type, handler );
 					}, this );
 				}
 			}, this );
@@ -171,10 +169,33 @@ define( [
 	MVC.Space = function( options ) {
 		this.options = options;
 		utils.extend( this, options );
+
+		if ( options.el ) {
+			this.setEl( options.el );
+		}
+
 		this.initialize.apply( this, arguments );
 	};
 
 	utils.extend( MVC.Space.prototype, Emitter, {
+		clear: function() {
+			var view = this.currentView;
+
+			if ( !view ) {
+				return this;
+			}
+
+			this.trigger( 'before:clear', view );
+			if ( !view.isDestroyed ) {
+				view.destroy();
+			}
+			this.trigger( 'clear', view );
+
+			delete this.currentView;
+
+			return this;
+		},
+
 		initialize: nop,
 
 		setEl: function( el ) {
@@ -196,24 +217,6 @@ define( [
 			this.currentView = view;
 
 			this.trigger( 'show', view );
-
-			return this;
-		},
-
-		clear: function() {
-			var view = this.currentView;
-
-			if ( !view ) {
-				return this;
-			}
-
-			this.trigger( 'before:clear', view );
-			if ( !view.isDestroyed ) {
-				view.destroy();
-			}
-			this.trigger( 'clear', view );
-
-			delete this.currentView;
 
 			return this;
 		},
@@ -242,7 +245,11 @@ define( [
 				} );
 			}
 
-			this._spaces[ name ] = space;
+			this._spaces[ name ] = space instanceof MVC.Space ?
+				space :
+				new MVC.Space( {
+					el: space
+				} );
 
 			this.trigger( 'add:space', name, space );
 
@@ -289,7 +296,6 @@ define( [
 		}
 	}, Emitter );
 
-
 	MVC.SpaceManager = function( options ) {
 		this.options = options;
 		utils.extend( this, options );
@@ -299,6 +305,9 @@ define( [
 	utils.extend( MVC.SpaceManager.prototype, MVC.SpaceManagerMixin, {
 		initialize: nop
 	} );
+
+	MVC.SpaceManager.extend = extend;
+
 
 	/**************************************************************************
 	 * FocusManager

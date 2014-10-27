@@ -27,7 +27,7 @@ define( [
 
 		toggle: function( model ) {
 			Button.prototype.toggle.call( this, model );
-			this.$el.find( 'input' )._el.checked = model.active;
+			this.$el.findOne( 'input' )._el.checked = model.active;
 		}
 	} );
 
