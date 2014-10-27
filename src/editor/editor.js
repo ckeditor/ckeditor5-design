@@ -25,5 +25,12 @@ define( [
 
 	utils.inherit( Editor, MVC.Application );
 
+	// custom implementation part
+	utils.extend( Editor.prototype, {
+		initialize: function( options ) {
+			console.log( 'initialize editor', options );
+		}
+	} );
+
 	return Editor;
 } );

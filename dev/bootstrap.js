@@ -5,6 +5,7 @@ require.config( {
 require( [
 	'ui',
 	'core/mvc',
+	'editor/editor',
 	'ui/checkbutton',
 	'ui/linkbutton'
 ], function(
@@ -25,7 +26,6 @@ require( [
 
 	btn1.render();
 	buttonsEl.appendChild( btn1.el );
-
 
 	var btn2 = ui.linkButton( {
 		model: model

@@ -231,20 +231,18 @@ define( [
 	 * SpaceManager
 	 *************************************************************************/
 
-	MVC.SpaceManager = function( options ) {
-		this.options = options;
-		utils.extend( this, options );
-
-		Object.defineProperty( this, 'spaces', {
-			value: {}
-		} );
-	};
-
-	utils.extend( MVC.SpaceManager.prototype, Emitter, {
+	MVC.SpaceManagerMixin = utils.extend( {
 		addSpace: function( name, space ) {
 			this.trigger( 'before:add:space', name, space );
 
-			this.spaces[ name ] = space;
+			if ( !this._spaces ) {
+				Object.defineProperty( this, '_spaces', {
+					configurable: true,
+					value: {}
+				} );
+			}
+
+			this._spaces[ name ] = space;
 
 			this.trigger( 'add:space', name, space );
 
@@ -252,9 +250,13 @@ define( [
 		},
 
 		destroy: function() {
+			if ( !this._spaces ) {
+				return;
+			}
+
 			this.trigger( 'before:destroy' );
 
-			Object.keys( spaces ).forEach( function( name ) {
+			Object.keys( this._spaces ).forEach( function( name ) {
 				this.removeSpace( name );
 			}, this );
 
@@ -264,11 +266,11 @@ define( [
 		},
 
 		getSpace: function( name ) {
-			return this.spaces[ name ];
+			return this._spaces ? this._spaces[ name ] : null;
 		},
 
 		removeSpace: function( name ) {
-			var space = this.spaces[ name ];
+			var space = this._spaces && this._spaces[ name ];
 
 			if ( !space ) {
 				return;
@@ -279,16 +281,24 @@ define( [
 			space.clear();
 			space.stopListening();
 
-			delete this.spaces[ name ];
+			delete this._spaces[ name ];
 
 			this.trigger( 'remove:space', name, space );
 
 			return this;
 		}
+	}, Emitter );
+
+
+	MVC.SpaceManager = function( options ) {
+		this.options = options;
+		utils.extend( this, options );
+		this.initialize.apply( this, arguments );
+	};
+
+	utils.extend( MVC.SpaceManager.prototype, MVC.SpaceManagerMixin, {
+		initialize: nop
 	} );
-
-	MVC.SpaceManager.extend = extend;
-
 
 	/**************************************************************************
 	 * FocusManager
@@ -314,16 +324,10 @@ define( [
 	MVC.Application = function( options ) {
 		this.options = options;
 		utils.extend( this, options );
-
-		this._spaceManager = new MVC.SpaceManager( options );
-		this._focusManager = new MVC.FocusManager( options );
-
-		this._initSpaceManager();
-
 		this.initialize.apply( this, arguments );
 	};
 
-	utils.extend( MVC.Application.prototype, Emitter, Commands, {
+	utils.extend( MVC.Application.prototype, Emitter, Commands, MVC.SpaceManagerMixin, {
 		destroy: function() {
 			this.trigger( 'before:destroy' );
 			this._spaceManager.destroy();
@@ -343,25 +347,6 @@ define( [
 			this.trigger( 'create', this );
 
 			return this;
-		},
-
-		_initSpaceManager: function() {
-			var apis = [ 'addSpace', 'getSpace', 'removeSpace' ],
-				events = [ 'before:add:space', 'add:space', 'before:remove:space', 'remove:space' ];
-
-			// expose Space Manager API
-			apis.forEach( function( api ) {
-				this[ api ] = function() {
-					return this._spaceManager[ api ].apply( this._spaceManager, arguments );
-				};
-			}, this );
-
-			// bind to the Space Manager's events
-			events.forEach( function( event ) {
-				this.listenTo( this._spaceManager, event, function() {
-					this.trigger.apply( this, [ event ].concat( arguments ) );
-				}, this );
-			}, this );
 		}
 	} );
 
