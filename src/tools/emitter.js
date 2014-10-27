@@ -88,7 +88,8 @@ define( [
 			}
 
 			Object.keys( this._listeningTo ).forEach( function( uid ) {
-				this._listeningTo[ uid ].off();
+				this._listeningTo[ uid ].off( type, callback, this );
+
 				delete this._listeningTo[ uid ];
 			}, this );
 
@@ -105,6 +106,7 @@ define( [
 					configurable: true,
 					value: {}
 				} );
+
 				return this;
 			}
 
@@ -113,7 +115,10 @@ define( [
 			this._events[ type ] = [];
 
 			events.forEach( function( event ) {
-				if ( event.callback !== callback || event.ctx !== ctx ) {
+				if (
+					( callback && event.callback !== callback && event.callback._original !== callback ) ||
+					( ctx && event.ctx !== ctx )
+				) {
 					this._events[ type ].push( event );
 				}
 			}, this );
