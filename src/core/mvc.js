@@ -35,40 +35,6 @@ define( [
 
 
 	/**************************************************************************
-	 * Application
-	 *************************************************************************/
-
-	MVC.Application = function( options ) {
-		this.options = options;
-		utils.extend( this, options );
-
-		this._spaceManager = new MVC.SpaceManager( options );
-		this._focusManager = new MVC.FocusManager( options );
-
-		this.initialize.apply( this, arguments );
-	};
-
-	utils.extend( MVC.Application.prototype, Emitter, Commands, {
-		getOption: function( name ) {
-			return this.options && this.options[ name ] !== undefined ?
-				this.options[ name ] :
-				this[ name ];
-		},
-
-		initialize: nop,
-
-		start: function() {
-			this.trigger( 'before:start' );
-			this.trigger( 'start' );
-
-			return this;
-		}
-	} );
-
-	MVC.Application.extend = extend;
-
-
-	/**************************************************************************
 	 * Model
 	 *************************************************************************/
 
@@ -213,6 +179,7 @@ define( [
 
 		setEl: function( el ) {
 			this.el = el;
+			this.$el = new Element( el );
 		},
 
 		show: function( view ) {
@@ -252,7 +219,7 @@ define( [
 		},
 
 		_setContent: function( el ) {
-			this.el.innerHTML = '';
+			this.$el.html( '' );
 			this.el.appendChild( el );
 		}
 	} );
@@ -271,14 +238,12 @@ define( [
 		Object.defineProperty( this, 'spaces', {
 			value: {}
 		} );
-
-		this.initialize.apply( this, arguments );
 	};
 
 	utils.extend( MVC.SpaceManager.prototype, Emitter, {
-		initialize: nop,
-
 		addSpace: function( name, space ) {
+			this.trigger( 'before:add:space', name, space );
+
 			this.spaces[ name ] = space;
 
 			this.trigger( 'add:space', name, space );
@@ -287,9 +252,13 @@ define( [
 		},
 
 		destroy: function() {
+			this.trigger( 'before:destroy' );
+
 			Object.keys( spaces ).forEach( function( name ) {
 				this.removeSpace( name );
 			}, this );
+
+			this.trigger( 'destroy' );
 
 			return this;
 		},
@@ -305,7 +274,14 @@ define( [
 				return;
 			}
 
-			this.trigger( 'add:space', name, space );
+			this.trigger( 'before:remove:space', name, space );
+
+			space.clear();
+			space.stopListening();
+
+			delete this.spaces[ name ];
+
+			this.trigger( 'remove:space', name, space );
 
 			return this;
 		}
@@ -327,6 +303,69 @@ define( [
 	utils.extend( MVC.FocusManager.prototype, Emitter, {
 		initialize: nop
 	} );
+
+	MVC.FocusManager.extend = extend;
+
+
+	/**************************************************************************
+	 * Application
+	 *************************************************************************/
+
+	MVC.Application = function( options ) {
+		this.options = options;
+		utils.extend( this, options );
+
+		this._spaceManager = new MVC.SpaceManager( options );
+		this._focusManager = new MVC.FocusManager( options );
+
+		this._initSpaceManager();
+
+		this.initialize.apply( this, arguments );
+	};
+
+	utils.extend( MVC.Application.prototype, Emitter, Commands, {
+		destroy: function() {
+			this.trigger( 'before:destroy' );
+			this._spaceManager.destroy();
+			this.trigger( 'destroy' );
+		},
+
+		getOption: function( name ) {
+			return this.options && this.options[ name ] !== undefined ?
+				this.options[ name ] :
+				this[ name ];
+		},
+
+		initialize: nop,
+
+		create: function() {
+			this.trigger( 'before:create', this );
+			this.trigger( 'create', this );
+
+			return this;
+		},
+
+		_initSpaceManager: function() {
+			var apis = [ 'addSpace', 'getSpace', 'removeSpace' ],
+				events = [ 'before:add:space', 'add:space', 'before:remove:space', 'remove:space' ];
+
+			// expose Space Manager API
+			apis.forEach( function( api ) {
+				this[ api ] = function() {
+					return this._spaceManager[ api ].apply( this._spaceManager, arguments );
+				};
+			}, this );
+
+			// bind to the Space Manager's events
+			events.forEach( function( event ) {
+				this.listenTo( this._spaceManager, event, function() {
+					this.trigger.apply( this, [ event ].concat( arguments ) );
+				}, this );
+			}, this );
+		}
+	} );
+
+	MVC.Application.extend = extend;
 
 	return MVC;
 } );
