@@ -12,15 +12,15 @@ define( [
 			'click': 'onClick'
 		},
 
-		template: function( options ) {
+		template: function( model ) {
 			return _( 'button', {
 				className: 'cke_button',
-				title: options.title
+				title: model.title
 			}, [
 				_( 'span', {
 					className: 'cke_button_icon'
 				} ),
-				_( 'text', options.text )
+				_( 'text', model.text )
 			] );
 		},
 

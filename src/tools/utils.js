@@ -58,6 +58,10 @@ define( function() {
 
 		isDate: makeIs( 'Date' ),
 
+		isElement: function( obj ) {
+			return obj instanceof HTMLElement;
+		},
+
 		isFunction: function( obj ) {
 			return typeof obj == 'function';
 		},

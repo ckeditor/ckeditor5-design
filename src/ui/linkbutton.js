@@ -10,11 +10,11 @@ define( [
 	_
 ) {
 	var LinkButton = Button.extend( {
-		template: function( options ) {
+		template: function( model ) {
 			return _( 'a', {
 				href: 'javascript:;',
-				title: options.title,
-				text: options.text
+				title: model.title,
+				text: model.text
 			} );
 		}
 	} );

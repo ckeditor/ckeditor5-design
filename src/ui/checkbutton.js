@@ -14,14 +14,14 @@ define( [
 			'change input': 'onClick'
 		},
 
-		template: function( options ) {
+		template: function( model ) {
 			return _( 'label', {
-				title: options.title
+				title: model.title
 			}, [
 				_( 'input', {
 					type: 'checkbox'
 				} ),
-				_( 'text', options.text )
+				_( 'text', model.text )
 			] );
 		},
 

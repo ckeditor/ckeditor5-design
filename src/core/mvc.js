@@ -1,12 +1,12 @@
 define( [
-	'tools/emitter',
-	'tools/element',
 	'tools/commands',
+	'tools/element',
+	'tools/emitter',
 	'tools/utils'
 ], function(
-	Emitter,
-	Element,
 	Commands,
+	Element,
+	Emitter,
 	utils
 ) {
 	'use strict';
@@ -36,12 +36,12 @@ define( [
 	 * Model
 	 *************************************************************************/
 
-	MVC.Model = function( attrs ) {
-		Object.defineProperty( this, 'attrs', {
+	MVC.Model = function( attributes ) {
+		Object.defineProperty( this, 'attributes', {
 			value: {}
 		} );
 
-		this._initAttrs( attrs || {} );
+		this._initAttributes( attributes || {} );
 		this.initialize.apply( this, arguments );
 	};
 
@@ -54,14 +54,14 @@ define( [
 					enumerable: true,
 
 					get: function() {
-						return this.attrs[ attr ];
+						return this.attributes[ attr ];
 					},
 
 					set: function( value ) {
-						var oldValue = this.attrs[ attr ];
+						var oldValue = this.attributes[ attr ];
 
 						if ( oldValue !== value ) {
-							this.attrs[ attr ] = value;
+							this.attributes[ attr ] = value;
 							this.trigger( 'change', this );
 							this.trigger( 'change:' + attr, this, value, oldValue );
 						}
@@ -69,12 +69,12 @@ define( [
 				} );
 			}
 
-			this.attrs[ attr ] = value;
+			this.attributes[ attr ] = value;
 		},
 
-		_initAttrs: function( attrs ) {
-			Object.keys( attrs ).forEach( function( attr ) {
-				this.set( attr, attrs[ attr ] );
+		_initAttributes: function( attributes ) {
+			Object.keys( attributes ).forEach( function( attr ) {
+				this.set( attr, attributes[ attr ] );
 			}, this );
 		}
 	} );
@@ -155,7 +155,27 @@ define( [
 		},
 
 		_unbindUIEvents: function() {
-			// TODO
+			// TODO store the event binding information in the Element data
+			// and use it to unbind
+			Object.keys( this.events ).forEach( function( key ) {
+				var selectors = key.trim().split( sepPattern ),
+					type = selectors.shift(),
+					handler;
+
+				handler = utils.isFunction( this.events[ key ] ) ?
+					this.events[ key ] :
+					this[ this.events[ key ] ];
+
+				handler = handler.bind( this );
+
+				if ( !selectors.length ) {
+					this.$el.off( type, handler );
+				} else {
+					selectors.forEach( function( selector ) {
+						this.$el.findOne( selector ).off( type, handler );
+					}, this );
+				}
+			}, this );
 		}
 	} );
 
@@ -167,13 +187,14 @@ define( [
 	 *************************************************************************/
 
 	MVC.Space = function( options ) {
-		this.options = options;
-		utils.extend( this, options );
-
-		if ( options.el ) {
-			this.setEl( options.el );
+		if ( options instanceof Element || utils.isElement( options ) ) {
+			this.options = {};
+			this.setEl( options );
+		} else {
+			this.options = options;
 		}
 
+		utils.extend( this, options );
 		this.initialize.apply( this, arguments );
 	};
 
@@ -199,8 +220,13 @@ define( [
 		initialize: nop,
 
 		setEl: function( el ) {
-			this.el = el;
-			this.$el = new Element( el );
+			if ( el instanceof Element ) {
+				this.$el = el;
+				this.el = this.$el._el;
+			} else if ( utils.isElement( el ) ) {
+				this.el = el;
+				this.$el = new Element( el );
+			}
 		},
 
 		show: function( view ) {
@@ -222,8 +248,7 @@ define( [
 		},
 
 		_setContent: function( el ) {
-			this.$el.html( '' );
-			this.el.appendChild( el );
+			this.$el.html( '' ).append( el );
 		}
 	} );
 
@@ -245,11 +270,11 @@ define( [
 				} );
 			}
 
-			this._spaces[ name ] = space instanceof MVC.Space ?
-				space :
-				new MVC.Space( {
-					el: space
-				} );
+			if ( space instanceof MVC.Space ) {
+				this._spaces[ name ] = space;
+			} else if ( space instanceof Element || utils.isElement( space ) ) {
+				this._spaces[ name ] = new MVC.Space( space );
+			}
 
 			this.trigger( 'add:space', name, space );
 
@@ -321,6 +346,8 @@ define( [
 
 	utils.extend( MVC.FocusManager.prototype, Emitter, {
 		initialize: nop
+
+		// TODO
 	} );
 
 	MVC.FocusManager.extend = extend;
