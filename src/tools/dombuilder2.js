@@ -100,6 +100,7 @@ define( [
 		};
 
 		return function( element, attr ) {
+			// TODO use listenTo for easier unbinding in future
 			target.on( 'change:' + name, function( model, newValue, oldValue ) {
 				setAttribute( element, attr, callback( newValue, oldValue ) );
 			} );

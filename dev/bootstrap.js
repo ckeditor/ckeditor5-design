@@ -6,9 +6,7 @@ require( [
 	'ui',
 	'core/mvc',
 	'tools/dombuilder2',
-	'editor/editor',
-	'ui/checkbutton',
-	'ui/linkbutton'
+	'ui/button'
 ], function(
 	ui,
 	MVC,
@@ -22,20 +20,12 @@ require( [
 		active: false
 	} );
 
-	var button = window.button = B( 'button.cke_button', {
-		className: B.watchProp( model, 'active', function( value ) {
-			return value ? 'active' : '';
-		} ),
-		onclick: function() {
-			model.active = !model.active;
-		}
-	}, [
-		B( 'span.cke_button_icon' ),
-		B( 'span', {
-			textContent: B.watchProp( model, 'text' )
-		} )
-	] );
+	var button = window.button = ui.button( {
+		model: model
+	} );
 
-	buttons.appendChild( button );
+	button.render();
+
+	buttonsEl.appendChild( button.el );
 
 } );

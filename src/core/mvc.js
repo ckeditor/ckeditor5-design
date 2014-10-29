@@ -112,70 +112,12 @@ define( [
 		render: function() {
 			this.trigger( 'before:render', this );
 
-			if ( this.el || this.$el ) {
-				this._unbindUIEvents();
-			}
-
-			this.el = this.template( this.model || {} );
+			this.el = this.template( this.model || new MVC.Model( {} ) );
 			this.$el = new Element( this.el );
-
-			this._bindUIEvents();
 
 			this.trigger( 'render', this );
 
 			return this;
-		},
-
-		_bindUIEvents: function() {
-			var sepPattern = /\s+/;
-
-			if ( !this.events ) {
-				return;
-			}
-
-			Object.keys( this.events ).forEach( function( key ) {
-				var selectors = key.trim().split( sepPattern ),
-					type = selectors.shift(),
-					handler;
-
-				handler = utils.isFunction( this.events[ key ] ) ?
-					this.events[ key ] :
-					this[ this.events[ key ] ];
-
-				handler = handler.bind( this );
-
-				if ( !selectors.length ) {
-					this.$el.on( type, handler );
-				} else {
-					selectors.forEach( function( selector ) {
-						this.$el.findOne( selector ).on( type, handler );
-					}, this );
-				}
-			}, this );
-		},
-
-		_unbindUIEvents: function() {
-			// TODO store the event binding information in the Element data
-			// and use it to unbind
-			Object.keys( this.events ).forEach( function( key ) {
-				var selectors = key.trim().split( sepPattern ),
-					type = selectors.shift(),
-					handler;
-
-				handler = utils.isFunction( this.events[ key ] ) ?
-					this.events[ key ] :
-					this[ this.events[ key ] ];
-
-				handler = handler.bind( this );
-
-				if ( !selectors.length ) {
-					this.$el.off( type, handler );
-				} else {
-					selectors.forEach( function( selector ) {
-						this.$el.findOne( selector ).off( type, handler );
-					}, this );
-				}
-			}, this );
 		}
 	} );
 

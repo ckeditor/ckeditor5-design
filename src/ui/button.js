@@ -1,44 +1,35 @@
 define( [
 	'ui',
 	'core/mvc',
-	'tools/dombuilder'
+	'tools/dombuilder2'
 ], function(
 	ui,
 	MVC,
 	_
 ) {
 	var Button = MVC.View.extend( {
-		events: {
-			'click': 'onClick'
-		},
-
-		template: function( model ) {
-			return _( 'button', {
-				className: 'cke_button',
-				title: model.title
-			}, [
-				_( 'span', {
-					className: 'cke_button_icon'
-				} ),
-				_( 'text', model.text )
-			] );
-		},
-
 		initialize: function( options ) {
 			if ( !this.model ) {
 				this.model = new MVC.Model( options );
 			}
-
-			// TODO cover it using bindings
-			this.listenTo( this.model, 'change:active', this.toggle, this );
 		},
 
-		onClick: function() {
+		template: function( model ) {
+			return _( 'button.cke_button', {
+				className: _.watchProp( model, 'active', function( value ) {
+					return value ? 'active' : '';
+				} ),
+				onclick: this.click.bind(this)
+			}, [
+				_( 'span.cke_button_icon' ),
+				_( 'span', {
+					textContent: _.watchProp( model, 'text' )
+				} )
+			] );
+		},
+
+		click: function() {
 			this.model.active = !this.model.active;
-		},
-
-		toggle: function( model ) {
-			this.$el.toggleClass( 'active', model.active );
 		}
 	} );
 
