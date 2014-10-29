@@ -108,7 +108,8 @@ define( [
 		};
 
 		return function( element, attr ) {
-			// TODO use listenTo for easier unbinding in future
+			// TODO use listenTo for easier unbinding in future,
+			// besides this guarantees a memory leak now...
 			target.on( 'change:' + name, function( model, newValue, oldValue ) {
 				setAttribute( element, attr, callback( newValue, oldValue ) );
 			}, this );
