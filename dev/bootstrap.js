@@ -15,10 +15,10 @@ require( [
 	var buttonsEl = document.getElementById( 'buttons' );
 
 	var model = window.model = new MVC.Model( {
-		text: 'Input text',
-		title: 'Input title',
+		text: 'Button text',
+		title: 'Button title',
 		active: false,
-		counter: 1
+		counter: 0
 	} );
 
 	var button = window.button = ui.button( {
@@ -29,11 +29,13 @@ require( [
 
 	buttonsEl.appendChild( button.el );
 
+	model.on( 'change:active', function() {
+		model.counter++;
+	} );
+
 	var text = B( 'p', [
 		'Current counter value is: ',
-		B( 'span', {
-			textContent: B.watchProp( model, 'counter' )
-		} ),
+		B( 'span', B.watchProp( model, 'counter' ) ),
 		'!'
 	] );
 

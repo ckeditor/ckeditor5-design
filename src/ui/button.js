@@ -19,12 +19,11 @@ define( [
 				className: _.watchProp( model, 'active', function( value ) {
 					return value ? 'active' : '';
 				} ),
-				onclick: this.click.bind(this)
+				onclick: this.click.bind( this ),
+				title: _.watchProp( model, 'title' )
 			}, [
 				_( 'span.icon' ),
-				_( 'span', {
-					textContent: _.watchProp( model, 'text' )
-				} )
+				_( 'span', _.watchProp( model, 'text' ) )
 			] );
 		},
 

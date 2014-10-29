@@ -71,6 +71,10 @@ define( [
 		if ( utils.isArray( attributes ) ) {
 			children = attributes;
 			attributes = {};
+		} else if ( attributes && !utils.isObject( attributes ) ) {
+			attributes = {
+				textContent: attributes
+			};
 		}
 
 		attributes = utils.extend( parsed.attributes, attributes );
