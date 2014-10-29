@@ -17,7 +17,8 @@ require( [
 	var model = window.model = new MVC.Model( {
 		text: 'Input text',
 		title: 'Input title',
-		active: false
+		active: false,
+		counter: 1
 	} );
 
 	var button = window.button = ui.button( {
@@ -28,4 +29,13 @@ require( [
 
 	buttonsEl.appendChild( button.el );
 
+	var text = B( 'p', [
+		'Current counter value is: ',
+		B( 'span', {
+			textContent: B.watchProp( model, 'counter' )
+		} ),
+		'!'
+	] );
+
+	buttonsEl.appendChild( text );
 } );

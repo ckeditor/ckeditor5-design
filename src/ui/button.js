@@ -15,13 +15,13 @@ define( [
 		},
 
 		template: function( model ) {
-			return _( 'button.cke_button', {
+			return _( 'button', {
 				className: _.watchProp( model, 'active', function( value ) {
 					return value ? 'active' : '';
 				} ),
 				onclick: this.click.bind(this)
 			}, [
-				_( 'span.cke_button_icon' ),
+				_( 'span.icon' ),
 				_( 'span', {
 					textContent: _.watchProp( model, 'text' )
 				} )

@@ -87,6 +87,10 @@ define( [
 
 		if ( utils.isArray( children ) ) {
 			children.forEach( function( child ) {
+				if ( !utils.isElement( child ) ) {
+					child = document.createTextNode( child );
+				}
+
 				element.appendChild( child );
 			} );
 		}
@@ -103,7 +107,7 @@ define( [
 			// TODO use listenTo for easier unbinding in future
 			target.on( 'change:' + name, function( model, newValue, oldValue ) {
 				setAttribute( element, attr, callback( newValue, oldValue ) );
-			} );
+			}, this );
 
 			setAttribute( element, attr, callback( target[ name ], target[ name ] ) );
 		};
