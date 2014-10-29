@@ -104,14 +104,12 @@ define( [
 				setAttribute( element, attr, callback( newValue, oldValue ) );
 			} );
 
-			setAttribute( element, attr, target[ name ] );
+			setAttribute( element, attr, callback( target[ name ], target[ name ] ) );
 		};
 	};
 
 	domBuilder.bindAttr = function( attribute, target, property ) {
 		return function( evt ) {
-			evt = evt || event;
-
 			var elem = evt.currentTarget || this,
 				value = attribute in elem ? elem[ attribute ] : elem.getAttribute( attribute );
 

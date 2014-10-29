@@ -22,7 +22,7 @@ require( [
 		active: false
 	} );
 
-	var button = B( 'button.cke_button', {
+	var button = window.button = B( 'button.cke_button', {
 		className: B.watchProp( model, 'active', function( value ) {
 			return value ? 'active' : '';
 		} ),

@@ -18,3 +18,11 @@ body {
 	background: #6c9;
 	border-color: green;
 }
+
+.cke_button_icon {
+	display: inline-block;
+	margin-right: 5px;
+	width: 16px;
+	height: 16px;
+	background: rgba(0, 0, 0, 0.2);
+}
