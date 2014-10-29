@@ -50,7 +50,7 @@ define( [
 		},
 
 		initialize: function( options ) {
-			this.el = this.template( options );
+			this.el = this.template();
 			this.$el = new Element( this.el );
 
 			this
@@ -59,7 +59,7 @@ define( [
 				.addSpace( 'footer', this.$el.findOne( '.footer' ) );
 		},
 
-		template: function( options ) {
+		template: function() {
 			return _( 'div', [
 				_( 'div', {
 					className: 'header'

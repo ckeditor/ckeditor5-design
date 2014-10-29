@@ -116,7 +116,7 @@ define( [
 				this._unbindUIEvents();
 			}
 
-			this.el = this.template( this.model );
+			this.el = this.template( this.model || {} );
 			this.$el = new Element( this.el );
 
 			this._bindUIEvents();

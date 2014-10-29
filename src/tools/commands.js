@@ -9,10 +9,7 @@ define( function() {
 				} );
 			}
 
-			this._commands[ name ] = {
-				cmd: cmd,
-				ctx: ctx || this
-			};
+			this._commands[ name ] = cmd.bind( ctx || this );
 
 			return this;
 		},
@@ -34,7 +31,7 @@ define( function() {
 
 			args = Array.prototype.slice.call( arguments, 1 );
 
-			return command.cmd.apply( command.ctx, args );
+			return command.apply( null, args );
 		}
 	};
 

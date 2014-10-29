@@ -15,6 +15,6 @@ body {
 }
 
 .buttons .active {
-	background: #fee;
-	border-color: red;
+	background: #6c9;
+	border-color: green;
 }

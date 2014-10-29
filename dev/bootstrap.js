@@ -5,40 +5,37 @@ require.config( {
 require( [
 	'ui',
 	'core/mvc',
+	'tools/dombuilder2',
 	'editor/editor',
 	'ui/checkbutton',
 	'ui/linkbutton'
 ], function(
 	ui,
-	MVC
+	MVC,
+	B
 ) {
 	var buttonsEl = document.getElementById( 'buttons' );
 
 	var model = window.model = new MVC.Model( {
-		text: 'Button',
-		title: 'Button title',
+		text: 'Input text',
+		title: 'Input title',
 		active: false
 	} );
 
-	var btn1 = ui.button( {
-		model: model
-	} );
+	var button = B( 'button.cke_button', {
+		className: B.watchProp( model, 'active', function( value ) {
+			return value ? 'active' : '';
+		} ),
+		onclick: function() {
+			model.active = !model.active;
+		}
+	}, [
+		B( 'span.cke_button_icon' ),
+		B( 'span', {
+			textContent: B.watchProp( model, 'text' )
+		} )
+	] );
 
-	btn1.render();
-	buttonsEl.appendChild( btn1.el );
-
-	var btn2 = ui.linkButton( {
-		model: model
-	} );
-
-	btn2.render();
-	buttonsEl.appendChild( btn2.el );
-
-	var btn3 = ui.checkButton( {
-		model: model
-	} );
-
-	btn3.render();
-	buttonsEl.appendChild( btn3.el );
+	buttons.appendChild( button );
 
 } );
