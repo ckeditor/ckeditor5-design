@@ -12,9 +12,7 @@ define( [
 	var CheckButton = Button.extend( {
 		template: function( model ) {
 			return _( 'label', {
-				className: _.watchProp( model, 'active', function( value ) {
-					return value ? 'active' : '';
-				} ),
+				className: _.watchProp( model, 'active', this.isActive ),
 				title: _.watchProp( model, 'title' )
 			}, [
 				_( 'input[type=checkbox]', {

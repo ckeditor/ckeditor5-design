@@ -12,9 +12,7 @@ define( [
 	var LinkButton = Button.extend( {
 		template: function( model ) {
 			return _( 'a', {
-				className: _.watchProp( model, 'active', function( value ) {
-					return value ? 'active' : '';
-				} ),
+				className: _.watchProp( model, 'active', this.isActive ),
 				href: 'javascript:;',
 				onclick: this.click.bind( this ),
 				title: _.watchProp( model, 'title' )
