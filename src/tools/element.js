@@ -122,19 +122,7 @@ define( [
 		},
 
 		toggleClass: function( value, state ) {
-			var hasClass = this.hasClass( value );
-
-			if ( state === undefined ) {
-				if ( hasClass ) {
-					this.removeClass( value );
-				} else {
-					this.addClass( value );
-				}
-			} else if ( state ) {
-				this.addClass( value );
-			} else {
-				this.removeClass( value );
-			}
+			this._el.classList.toggle( value, state );
 
 			return this;
 		}
