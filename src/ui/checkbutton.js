@@ -2,7 +2,7 @@ define( [
 	'ui',
 	'ui/button',
 	'core/mvc',
-	'tools/dombuilder'
+	'tools/dombuilder2'
 ], function(
 	ui,
 	Button,
@@ -10,24 +10,19 @@ define( [
 	_
 ) {
 	var CheckButton = Button.extend( {
-		events: {
-			'change input': 'onClick'
-		},
-
 		template: function( model ) {
 			return _( 'label', {
-				title: model.title
-			}, [
-				_( 'input', {
-					type: 'checkbox'
+				className: _.watchProp( model, 'active', function( value ) {
+					return value ? 'active' : '';
 				} ),
-				_( 'text', model.text )
+				title: _.watchProp( model, 'title' )
+			}, [
+				_( 'input[type=checkbox]', {
+					onchange: this.click.bind( this ),
+					checked: _.watchProp( model, 'active' )
+				} ),
+				_( 'span', _.watchProp( model, 'text' ) )
 			] );
-		},
-
-		toggle: function( model ) {
-			Button.prototype.toggle.call( this, model );
-			this.$el.findOne( 'input' )._el.checked = model.active;
 		}
 	} );
 

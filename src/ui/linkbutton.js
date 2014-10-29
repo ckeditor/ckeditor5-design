@@ -2,7 +2,7 @@ define( [
 	'ui',
 	'ui/button',
 	'core/mvc',
-	'tools/dombuilder'
+	'tools/dombuilder2'
 ], function(
 	ui,
 	Button,
@@ -12,10 +12,15 @@ define( [
 	var LinkButton = Button.extend( {
 		template: function( model ) {
 			return _( 'a', {
+				className: _.watchProp( model, 'active', function( value ) {
+					return value ? 'active' : '';
+				} ),
 				href: 'javascript:;',
-				title: model.title,
-				text: model.text
-			} );
+				onclick: this.click.bind( this ),
+				title: _.watchProp( model, 'title' )
+			}, [
+				_( 'span', _.watchProp( model, 'text' ) )
+			] );
 		}
 	} );
 

@@ -6,7 +6,9 @@ require( [
 	'ui',
 	'core/mvc',
 	'tools/dombuilder2',
-	'ui/button'
+	'ui/button',
+	'ui/linkbutton',
+	'ui/checkbutton'
 ], function(
 	ui,
 	MVC,
@@ -29,14 +31,28 @@ require( [
 
 	buttonsEl.appendChild( button.el );
 
+	var linkButton = window.linkButton = ui.linkButton( {
+		model: model
+	} );
+
+	linkButton.render();
+
+	buttonsEl.appendChild( linkButton.el );
+
+	var checkButton = window.checkButton = ui.checkButton( {
+		model: model
+	} );
+
+	checkButton.render();
+
+	buttonsEl.appendChild( checkButton.el );
+
 	model.on( 'change:active', function() {
 		model.counter++;
 	} );
 
-	var text = B( 'p', [
-		'Current counter value is: ',
-		B( 'span', B.watchProp( model, 'counter' ) ),
-		'!'
+	var text = B( 'p', 'Current counter value is: ', [
+		B( 'span', B.watchProp( model, 'counter' ) )
 	] );
 
 	buttonsEl.appendChild( text );
