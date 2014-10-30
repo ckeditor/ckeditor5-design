@@ -6,9 +6,9 @@ require( [
 	'ui',
 	'core/mvc',
 	'tools/dombuilder2',
-	'ui/button',
-	'ui/linkbutton',
-	'ui/checkbutton'
+	'ui/button'
+	// 'ui/linkbutton',
+	// 'ui/checkbutton'
 ], function(
 	ui,
 	MVC,
@@ -19,8 +19,7 @@ require( [
 	var model = window.model = new MVC.Model( {
 		text: 'Button text',
 		title: 'Button title',
-		active: false,
-		counter: 0
+		active: false
 	} );
 
 	var button = window.button = ui.button( {
@@ -31,29 +30,19 @@ require( [
 
 	buttonsEl.appendChild( button.el );
 
-	var linkButton = window.linkButton = ui.linkButton( {
-		model: model
-	} );
+	// var linkButton = window.linkButton = ui.linkButton( {
+	// 	model: model
+	// } );
 
-	linkButton.render();
+	// linkButton.render();
 
-	buttonsEl.appendChild( linkButton.el );
+	// buttonsEl.appendChild( linkButton.el );
 
-	var checkButton = window.checkButton = ui.checkButton( {
-		model: model
-	} );
+	// var checkButton = window.checkButton = ui.checkButton( {
+	// 	model: model
+	// } );
 
-	checkButton.render();
+	// checkButton.render();
 
-	buttonsEl.appendChild( checkButton.el );
-
-	model.on( 'change:active', function() {
-		model.counter++;
-	} );
-
-	var text = B( 'p', 'Current counter value is: ', [
-		B( 'span', B.watchProp( model, 'counter' ) )
-	] );
-
-	buttonsEl.appendChild( text );
+	// buttonsEl.appendChild( checkButton.el );
 } );

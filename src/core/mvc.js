@@ -2,11 +2,13 @@ define( [
 	'tools/commands',
 	'tools/element',
 	'tools/emitter',
+	'tools/dombuilder2',
 	'tools/utils'
 ], function(
 	Commands,
 	Element,
 	Emitter,
+	DOMBuilder,
 	utils
 ) {
 	'use strict';
@@ -90,7 +92,7 @@ define( [
 		this.initialize.apply( this, arguments );
 	};
 
-	utils.extend( MVC.View.prototype, Emitter, {
+	utils.extend( MVC.View.prototype, Emitter, DOMBuilder, {
 		destroy: function() {
 			if ( this.isDestroyed ) {
 				return this;
@@ -112,7 +114,7 @@ define( [
 		render: function() {
 			this.trigger( 'before:render', this );
 
-			this.el = this.template( this.model || new MVC.Model( {} ) );
+			this.el = this.build( this.template() );
 			this.$el = new Element( this.el );
 
 			this.trigger( 'render', this );

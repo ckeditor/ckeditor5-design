@@ -5,47 +5,6 @@ define( [
 ) {
 	'use strict';
 
-	var selectorPattern = /(^|#|\.)([^#\.\[\]]+)|(\[.+?\])/g,
-		attributePattern = /\[(.+?)(?:=("|'|)(.*)\2)?\]/;
-
-	function parseSelector( selector ) {
-		var attributes = {},
-			classes = [],
-			id, match, tag;
-
-		while ( ( match = selectorPattern.exec( selector ) ) ) {
-			if ( match[ 1 ] === '#' ) {
-				// ID
-				id = match[ 2 ];
-			} else if ( match[ 1 ] === '.' ) {
-				// classes
-				classes.push( match[ 2 ] );
-			} else if ( !match[ 1 ] ) {
-				if ( match[ 0 ].charAt( 0 ) === '[' ) {
-					// attribute
-					var arg = attributePattern.exec( match[ 0 ] );
-					attributes[ arg[ 1 ] ] = arg[ 3 ];
-				} else {
-					// tag
-					tag = match[ 2 ];
-				}
-			}
-		}
-
-		if ( classes.length ) {
-			attributes.className = classes.join( ' ' );
-		}
-
-		if ( id ) {
-			attributes.id = id;
-		}
-
-		return {
-			attributes: attributes,
-			tag: tag || 'div'
-		};
-	}
-
 	function bindEvent( element, name, handler ) {
 		var event = name.substr( 2 );
 
@@ -64,45 +23,62 @@ define( [
 		}
 	}
 
-	function domBuilder( selector, attributes, children ) {
-		var parsed = parseSelector( selector ),
-			element = document.createElement( parsed.tag );
+	function build( elem ) {
+		if ( !elem ) {
+			return null;
+		}
 
+		// just create a text node
+		if ( !utils.isArray( elem ) ) {
+			return document.createTextNode( elem );
+		}
+
+		var tag = elem[ 0 ],
+			attributes = elem[ 1 ],
+			children = elem[ 2 ],
+			element = document.createElement( tag );
+
+		// only children were passed
 		if ( utils.isArray( attributes ) ) {
 			children = attributes;
 			attributes = {};
-		} else if ( attributes && !utils.isObject( attributes ) ) {
-			attributes = {
-				textContent: attributes
-			};
 		}
 
-		attributes = utils.extend( parsed.attributes, attributes );
+		// add the attributes
+		if ( utils.isObject( attributes ) ) {
+			Object.keys( attributes ).forEach( function( name ) {
+				var value = attributes[ name ];
 
-		Object.keys( attributes ).forEach( function( name ) {
-			var value = attributes[ name ];
+				if ( !name.indexOf( 'on' ) ) {
+					bindEvent( element, name, value );
+				} else {
+					setAttribute( element, name, value );
+				}
+			} );
+		}
 
-			if ( !name.indexOf( 'on' ) ) {
-				bindEvent( element, name, value );
-			} else {
-				setAttribute( element, name, value );
-			}
-		} );
-
+		// build and add the children
 		if ( utils.isArray( children ) ) {
 			children.forEach( function( child ) {
-				if ( !utils.isElement( child ) ) {
-					child = document.createTextNode( child );
+				if ( ( child = build( child ) ) ) {
+					element.appendChild( child );
 				}
-
-				element.appendChild( child );
 			} );
 		}
 
 		return element;
 	}
 
-	domBuilder.watchProp = function( target, name, callback ) {
+	function bindAttr( attribute, target, property ) {
+		return function( evt ) {
+			var elem = evt.currentTarget || this,
+				value = attribute in elem ? elem[ attribute ] : elem.getAttribute( attribute );
+
+			target[ property ] = value;
+		};
+	}
+
+	function watchProp( target, name, callback ) {
 		callback = callback || function( newValue ) {
 			return newValue;
 		};
@@ -110,22 +86,17 @@ define( [
 		return function( element, attr ) {
 			// TODO use listenTo for easier unbinding in future,
 			// besides this guarantees a memory leak now...
-			target.on( 'change:' + name, function( model, newValue, oldValue ) {
+			this.listenTo( target, 'change:' + name, function( model, newValue, oldValue ) {
 				setAttribute( element, attr, callback( newValue, oldValue ) );
 			}, this );
 
 			setAttribute( element, attr, callback( target[ name ], target[ name ] ) );
-		};
+		}.bind( this );
+	}
+
+	return {
+		bindAttr: bindAttr,
+		build: build,
+		watchProp: watchProp
 	};
-
-	domBuilder.bindAttr = function( attribute, target, property ) {
-		return function( evt ) {
-			var elem = evt.currentTarget || this,
-				value = attribute in elem ? elem[ attribute ] : elem.getAttribute( attribute );
-
-			target[ property ] = value;
-		};
-	};
-
-	return domBuilder;
 } );

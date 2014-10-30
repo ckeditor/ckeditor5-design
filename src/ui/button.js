@@ -1,11 +1,9 @@
 define( [
 	'ui',
-	'core/mvc',
-	'tools/dombuilder2'
+	'core/mvc'
 ], function(
 	ui,
-	MVC,
-	_
+	MVC
 ) {
 	var Button = MVC.View.extend( {
 		click: function() {
@@ -22,15 +20,22 @@ define( [
 			return value ? 'active' : '';
 		},
 
-		template: function( model ) {
-			return _( 'button', {
-				className: _.watchProp( model, 'active', this.isActive ),
-				onclick: this.click.bind( this ),
-				title: _.watchProp( model, 'title' )
-			}, [
-				_( 'span.icon' ),
-				_( 'span', _.watchProp( model, 'text' ) )
-			] );
+		template: function() {
+			return [
+				'button', {
+					className: this.watchProp( this.model, 'active', this.isActive ),
+					onclick: this.click.bind( this ),
+					title: this.watchProp( this.model, 'title' )
+				},
+				[
+					[ 'span', {
+						className: 'icon'
+					} ],
+					[ 'span', {
+						textContent: this.watchProp( this.model, 'text' )
+					} ]
+				]
+			];
 		}
 	} );
 
