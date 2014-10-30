@@ -114,7 +114,7 @@ define( [
 		render: function() {
 			this.trigger( 'before:render', this );
 
-			this.el = this.build( this.template() );
+			this.el = this.build( this.template );
 			this.$el = new Element( this.el );
 
 			this.trigger( 'render', this );

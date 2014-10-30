@@ -20,23 +20,22 @@ define( [
 			return value ? 'active' : '';
 		},
 
-		template: function() {
-			return [
-				'button', {
-					className: this.watchProp( this.model, 'active', this.isActive ),
-					onclick: this.click.bind( this ),
-					title: this.watchProp( this.model, 'title' )
-				},
-				[
+		template: [
+			'button', {
+				className: 'model.active:isActive', // TODO how to pass a mutation function
+				id: 'foo',
+				onclick: 'click',
+				title: 'model.title',
+				children: [
 					[ 'span', {
 						className: 'icon'
 					} ],
 					[ 'span', {
-						textContent: this.watchProp( this.model, 'text' )
+						textContent: 'model.text'
 					} ]
 				]
-			];
-		}
+			}
+		]
 	} );
 
 	ui.button = function( options ) {
