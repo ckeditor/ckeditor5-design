@@ -30,19 +30,24 @@ require( [
 
 	buttonsEl.appendChild( button.el );
 
-	// var linkButton = window.linkButton = ui.linkButton( {
-	// 	model: model
-	// } );
+	var Input = MVC.View.extend( {
+		template: [
+			'input', {
+				onchange: MVC.View.bindAttr( 'value', 'model.text', 'trim' ),
+				value: MVC.View.bindProp( 'model.text' )
+			}
+		],
 
-	// linkButton.render();
+		trim: function( value ) {
+			return value.trim();
+		}
+	} );
 
-	// buttonsEl.appendChild( linkButton.el );
+	var input = window.input = new Input( {
+		model: model
+	} );
 
-	// var checkButton = window.checkButton = ui.checkButton( {
-	// 	model: model
-	// } );
+	input.render();
 
-	// checkButton.render();
-
-	// buttonsEl.appendChild( checkButton.el );
+	document.body.appendChild( input.el );
 } );

@@ -5,7 +5,24 @@ define( [
 	ui,
 	MVC
 ) {
+	'use strict';
+
 	var Button = MVC.View.extend( {
+		template: [
+			'button', {
+				className: MVC.View.bindProp( 'model.active', 'isActive' ),
+				id: 'foo',
+				onclick: 'click',
+				title: MVC.View.bindProp( 'model.title' ),
+				children: [
+					[ 'span', {
+						className: 'icon'
+					} ],
+					[ 'span', MVC.View.bindProp( 'model.text' ) ]
+				]
+			}
+		],
+
 		click: function() {
 			this.model.active = !this.model.active;
 		},
@@ -18,24 +35,7 @@ define( [
 
 		isActive: function( value ) {
 			return value ? 'active' : '';
-		},
-
-		template: [
-			'button', {
-				className: 'model.active:isActive', // TODO how to pass a mutation function
-				id: 'foo',
-				onclick: 'click',
-				title: 'model.title',
-				children: [
-					[ 'span', {
-						className: 'icon'
-					} ],
-					[ 'span', {
-						textContent: 'model.text'
-					} ]
-				]
-			}
-		]
+		}
 	} );
 
 	ui.button = function( options ) {

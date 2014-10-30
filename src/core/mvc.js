@@ -92,7 +92,9 @@ define( [
 		this.initialize.apply( this, arguments );
 	};
 
-	utils.extend( MVC.View.prototype, Emitter, DOMBuilder, {
+	utils.extend( MVC.View, DOMBuilder.helpers );
+
+	utils.extend( MVC.View.prototype, Emitter, DOMBuilder.mixin, {
 		destroy: function() {
 			if ( this.isDestroyed ) {
 				return this;
