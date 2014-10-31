@@ -87,13 +87,13 @@ define( [
 	 *************************************************************************/
 
 	MVC.View = function( options ) {
-		this.options = options;
+		this.options = options || {};
 
-		if ( options.model ) {
+		if ( options && options.model ) {
 			this.model = options.model;
 		}
 
-		if ( options.el ) {
+		if ( options && options.el ) {
 			this.el = options.el;
 		}
 
