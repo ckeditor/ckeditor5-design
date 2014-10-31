@@ -1,25 +1,20 @@
 define( [
 	'ui',
-	'ui/button',
-	'core/mvc',
-	'tools/dombuilder2'
+	'ui/button'
 ], function(
 	ui,
-	Button,
-	MVC,
-	_
+	Button
 ) {
 	var LinkButton = Button.extend( {
-		template: function( model ) {
-			return _( 'a', {
-				className: _.watchProp( model, 'active', this.isActive ),
-				href: 'javascript:;',
-				onclick: this.click.bind( this ),
-				title: _.watchProp( model, 'title' )
-			}, [
-				_( 'span', _.watchProp( model, 'text' ) )
-			] );
-		}
+		template: [ 'a', {
+			className: Button.bindProp( 'model.active', 'isActive' ),
+			href: 'javascript:;',
+			onclick: 'click',
+			title: Button.bindProp( 'model.title' ),
+			children: [
+				[ 'span', Button.bindProp( 'model.text' ) ]
+			]
+		} ]
 	} );
 
 	ui.linkButton = function( options ) {

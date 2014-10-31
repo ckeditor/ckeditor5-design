@@ -6,9 +6,9 @@ require( [
 	'ui',
 	'core/mvc',
 	'tools/dombuilder2',
-	'ui/button'
-	// 'ui/linkbutton',
-	// 'ui/checkbutton'
+	'ui/button',
+	'ui/linkbutton',
+	'ui/checkbutton'
 ], function(
 	ui,
 	MVC,
@@ -30,10 +30,26 @@ require( [
 
 	buttonsEl.appendChild( button.el );
 
+	var linkButton = window.linkButton = ui.linkButton( {
+		model: model
+	} );
+
+	linkButton.render();
+
+	buttonsEl.appendChild( linkButton.el );
+
+	var checkButton = window.checkButton = ui.checkButton( {
+		model: model
+	} );
+
+	checkButton.render();
+
+	buttonsEl.appendChild( checkButton.el );
+
 	var Input = MVC.View.extend( {
 		template: [
 			'input', {
-				onchange: MVC.View.bindAttr( 'value', 'model.text', 'trim' ),
+				oninput: MVC.View.bindAttr( 'value', 'model.text', 'trim' ),
 				value: MVC.View.bindProp( 'model.text' )
 			}
 		],
