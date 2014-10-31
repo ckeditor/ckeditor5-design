@@ -7,7 +7,7 @@ define( [
 
 	var propPattern = /(\w+)(?:\.(\w+))?/;
 
-	var DOMBuilderHelpers = {
+	var helpers = {
 		bindProp: function( property, mutator ) {
 			var parsed = propPattern.exec( property );
 
@@ -18,9 +18,8 @@ define( [
 					target = parsed[ 2 ] ? this[ parsed[ 1 ] ] : this,
 					name = parsed[ 2 ] || parsed[ 1 ];
 
-
 				function handler( model, newValue, oldValue ) {
-					DOMBuilderMixin._setAttribute( element, attr, callback( newValue, oldValue ) );
+					bob._setAttribute( element, attr, callback( newValue, oldValue ) );
 				}
 
 				if ( target === this ) {
@@ -29,7 +28,7 @@ define( [
 					this.listenTo( target, 'change:' + name, handler, this );
 				}
 
-				DOMBuilderMixin._setAttribute( element, attr, callback( target[ name ], target[ name ] ) );
+				bob._setAttribute( element, attr, callback( target[ name ], target[ name ] ) );
 			};
 		},
 
@@ -50,7 +49,7 @@ define( [
 		}
 	};
 
-	var DOMBuilderMixin = {
+	var bob = {
 		build: function( elem ) {
 			if ( !elem ) {
 				return null;
@@ -128,7 +127,7 @@ define( [
 	};
 
 	return {
-		helpers: DOMBuilderHelpers,
-		mixin: DOMBuilderMixin
+		helpers: helpers,
+		mixin: bob
 	};
 } );
