@@ -282,7 +282,7 @@ define( [
 		this.options = options;
 
 		if ( properties ) {
-			utils.extend( this, options );
+			utils.extend( this, properties );
 		}
 
 		this.initialize.apply( this, arguments );
@@ -303,7 +303,7 @@ define( [
 		this.options = options;
 
 		if ( properties ) {
-			utils.extend( this, options );
+			utils.extend( this, properties );
 		}
 
 		this.initialize.apply( this, arguments );
