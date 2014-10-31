@@ -19,7 +19,12 @@ require( [
 	var model = window.model = new MVC.Model( {
 		text: 'Button text',
 		title: 'Button title',
-		active: false
+		active: false,
+		counter: 0
+	} );
+
+	model.on( 'change:active', function( model ) {
+		model.counter++;
 	} );
 
 	var button = window.button = ui.button( {
@@ -66,4 +71,26 @@ require( [
 	input.render();
 
 	document.body.appendChild( input.el );
+
+	var Counter = MVC.View.extend( {
+		length: function( value ) {
+			return value.length;
+		},
+
+		template: [
+			'p', {
+				children: [
+					'Input length: ', [ 'span', MVC.View.bindProp( 'model.text', 'length' ) ]
+				]
+			}
+		]
+	} );
+
+	var counter = new Counter( {
+		model: model
+	} );
+
+	counter.render();
+
+	document.body.appendChild( counter.el );
 } );
