@@ -7,7 +7,7 @@ require( [ 'core/mvc' ], function( mvc ) {
 		template: [
 			'button', {
 				onclick: 'click',
-				className: mvc.View.bindProp( 'model.active', 'isActive' ),
+				className: mvc.View.bindProp( 'model.active', 'getActiveClass' ),
 				text: mvc.View.bindProp( 'model.text' )
 			}
 		],
@@ -17,7 +17,7 @@ require( [ 'core/mvc' ], function( mvc ) {
 			this.model.active = !this.model.active;
 		},
 
-		isActive: function( value ) {
+		getActiveClass: function( value ) {
 			return value ? 'active' : '';
 		}
 	} );
@@ -25,7 +25,7 @@ require( [ 'core/mvc' ], function( mvc ) {
 	var LinkButton = Button.extend( {
 		template: [
 			'a', {
-				className: Button.bindProp( 'model.active', 'isActive' ),
+				className: Button.bindProp( 'model.active', 'getActiveClass' ),
 				onclick: 'click',
 				href: 'javascript:;',
 				children: [
