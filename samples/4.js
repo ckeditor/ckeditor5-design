@@ -3,6 +3,8 @@ require.config( {
 } );
 
 require( [ 'core/mvc' ], function( mvc ) {
+	var firstPattern = /(\s|^)(\w)/g;
+
 	var Input = mvc.View.extend( {
 		template: [
 			'input', {
@@ -15,8 +17,6 @@ require( [ 'core/mvc' ], function( mvc ) {
 			return value.trim();
 		}
 	} );
-
-	var firstPattern = /(\s|^)(\w)/g;
 
 	var Label = mvc.View.extend( {
 		template: [ 'p', mvc.View.bindProp( 'model.text', 'capitalize' ) ],

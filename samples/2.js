@@ -7,22 +7,16 @@ require( [ 'core/mvc' ], function( mvc ) {
 		template: [
 			'button', {
 				onclick: 'click',
-				textContent: mvc.View.bindProp( 'text' )
+				textContent: 'Button'
 			}
 		],
 
 		click: function() {
 			console.log( 'Button clicked!' );
-		},
-
-		initialize: function( options ) {
-			this.text = options.text;
 		}
 	} );
 
-	var button = window.button = new Button( {
-		text: 'Button'
-	} );
+	var button = new Button();
 
 	button.render();
 

@@ -7,13 +7,9 @@ require( [ 'core/mvc' ], function( mvc ) {
 		template: [
 			'button', {
 				onclick: 'click',
-				textContent: mvc.View.bindProp( 'model.text', 'capitalize' )
+				textContent: mvc.View.bindProp( 'model.text' )
 			}
 		],
-
-		capitalize: function( value ) {
-			return value && value.length ? value[ 0 ].toUpperCase() + value.substr( 1 ) : value;
-		},
 
 		click: function() {
 			this.model.counter++;
@@ -22,20 +18,18 @@ require( [ 'core/mvc' ], function( mvc ) {
 
 	var model = window.model = new mvc.Model( {
 		counter: 0,
-		text: 'foo'
+		text: 'Foo'
 	} );
 
 	model.on( 'change:counter', function( model, value ) {
 		console.log( 'Counter changed:', value );
 	} );
 
-	var button = window.button = new Button( {
+	var button = new Button( {
 		model: model
 	} );
 
 	button.render();
 
 	document.body.appendChild( button.el );
-
-	model.text = 'bar';
 } );

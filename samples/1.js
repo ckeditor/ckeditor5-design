@@ -3,20 +3,20 @@ require.config( {
 } );
 
 require( [ 'core/mvc' ], function( mvc ) {
-	var foo = window.foo = new mvc.Model( {
-		bar: 'bar',
+	var model = window.model = new mvc.Model( {
+		text: 'text',
 		baz: true
 	} );
 
-	foo.on( 'change', function( model ) {
-		console.log( 'foo changed', model );
+	model.on( 'change', function( model ) {
+		console.log( 'model changed', model );
 	} );
 
-	foo.on( 'change:bar', function( model, newValue, oldValue ) {
-		console.log( 'foo.bar changed from', oldValue, 'to', newValue );
+	model.on( 'change:text', function( model, newValue, oldValue ) {
+		console.log( 'model.text changed from', oldValue, 'to', newValue );
 	} );
 
-	foo.bar = 'qux';
+	model.text = 'fooooo';
 
-	console.log( 'foo\'s keys:', Object.keys( foo ) );
+	console.log( 'model\'s keys:', Object.keys( model ) );
 } );
