@@ -5,14 +5,12 @@ require.config( {
 require( [
 	'ui',
 	'core/mvc',
-	'tools/dombuilder2',
 	'ui/button',
 	'ui/linkbutton',
 	'ui/checkbutton'
 ], function(
 	ui,
-	MVC,
-	B
+	MVC
 ) {
 	var buttonsEl = document.getElementById( 'buttons' );
 
