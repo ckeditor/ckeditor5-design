@@ -1,14 +1,14 @@
 define( [
+	'tools/bob',
 	'tools/commands',
 	'tools/element',
 	'tools/emitter',
-	'tools/dombuilder2',
 	'tools/utils'
 ], function(
+	Bob,
 	Commands,
 	Element,
 	Emitter,
-	DOMBuilder,
 	utils
 ) {
 	'use strict';
@@ -88,13 +88,21 @@ define( [
 
 	MVC.View = function( options ) {
 		this.options = options;
-		utils.extend( this, options );
+
+		if ( options.model ) {
+			this.model = options.model;
+		}
+
+		if ( options.el ) {
+			this.el = options.el;
+		}
+
 		this.initialize.apply( this, arguments );
 	};
 
-	utils.extend( MVC.View, DOMBuilder.helpers );
+	utils.extend( MVC.View, Bob.helpers );
 
-	utils.extend( MVC.View.prototype, Emitter, DOMBuilder.mixin, {
+	utils.extend( MVC.View.prototype, Emitter, Bob.mixin, {
 		destroy: function() {
 			if ( this.isDestroyed ) {
 				return this;
@@ -132,7 +140,7 @@ define( [
 	 * Space
 	 *************************************************************************/
 
-	MVC.Space = function( options ) {
+	MVC.Space = function( options, properties ) {
 		if ( options instanceof Element || utils.isElement( options ) ) {
 			this.options = {};
 			this.setEl( options );
@@ -140,7 +148,10 @@ define( [
 			this.options = options;
 		}
 
-		utils.extend( this, options );
+		if ( properties ) {
+			utils.extend( this, properties );
+		}
+
 		this.initialize.apply( this, arguments );
 	};
 
@@ -267,9 +278,13 @@ define( [
 		}
 	}, Emitter );
 
-	MVC.SpaceManager = function( options ) {
+	MVC.SpaceManager = function( options, properties ) {
 		this.options = options;
-		utils.extend( this, options );
+
+		if ( properties ) {
+			utils.extend( this, options );
+		}
+
 		this.initialize.apply( this, arguments );
 	};
 
@@ -281,35 +296,27 @@ define( [
 
 
 	/**************************************************************************
-	 * FocusManager
-	 *************************************************************************/
-
-	MVC.FocusManager = function( options ) {
-		this.options = options;
-		utils.extend( this, options );
-		this.initialize.apply( this, arguments );
-	};
-
-	utils.extend( MVC.FocusManager.prototype, Emitter, {
-		initialize: nop
-
-		// TODO
-	} );
-
-	MVC.FocusManager.extend = extend;
-
-
-	/**************************************************************************
 	 * Application
 	 *************************************************************************/
 
-	MVC.Application = function( options ) {
+	MVC.Application = function( options, properties ) {
 		this.options = options;
-		utils.extend( this, options );
+
+		if ( properties ) {
+			utils.extend( this, options );
+		}
+
 		this.initialize.apply( this, arguments );
 	};
 
 	utils.extend( MVC.Application.prototype, Emitter, Commands, MVC.SpaceManagerMixin, {
+		create: function() {
+			this.trigger( 'before:create', this );
+			this.trigger( 'create', this );
+
+			return this;
+		},
+
 		destroy: function() {
 			this.trigger( 'before:destroy' );
 			this._spaceManager.destroy();
@@ -322,14 +329,7 @@ define( [
 				this[ name ];
 		},
 
-		initialize: nop,
-
-		create: function() {
-			this.trigger( 'before:create', this );
-			this.trigger( 'create', this );
-
-			return this;
-		}
+		initialize: nop
 	} );
 
 	MVC.Application.extend = extend;
