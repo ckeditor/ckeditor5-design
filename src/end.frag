@@ -1,3 +1,3 @@
 
-    return require( 'ckeditor' );
+    return require( 'CKEDITOR' );
 } ) );
