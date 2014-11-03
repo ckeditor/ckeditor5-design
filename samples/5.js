@@ -2,7 +2,7 @@ require.config( {
 	baseUrl: '../src/'
 } );
 
-require( [ 'core/mvc' ], function( mvc ) {
+require( [ 'core/mvc', 'tools/utils' ], function( mvc, utils ) {
 	var Button = mvc.View.extend( {
 		template: [
 			'button', {
@@ -29,14 +29,21 @@ require( [ 'core/mvc' ], function( mvc ) {
 				onclick: 'click',
 				href: 'javascript:;',
 				children: [
-					[ 'span', {
-						className: 'icon'
-					} ],
 					[ 'span', Button.bindProp( 'model.text' ) ]
 				]
 			}
 		]
 	} );
+
+	var IconLinkButton =  LinkButton.extend( {
+		template: utils.clone( LinkButton.prototype.template )
+	} );
+
+	IconLinkButton.prototype.template[ 1 ].children.unshift(
+		[ 'span', {
+			className: 'icon'
+		} ]
+	);
 
 	var model = window.model = new mvc.Model( {
 		active: false,
