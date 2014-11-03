@@ -7,7 +7,7 @@ require( [ 'core/mvc' ], function( mvc ) {
 		template: [
 			'button', {
 				onclick: 'click',
-				textContent: mvc.View.bindProp( 'model.text' )
+				text: mvc.View.bindProp( 'model.text' )
 			}
 		],
 

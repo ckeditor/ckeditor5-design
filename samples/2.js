@@ -7,7 +7,7 @@ require( [ 'core/mvc' ], function( mvc ) {
 		template: [
 			'button', {
 				onclick: 'click',
-				textContent: 'Button'
+				text: 'Button'
 			}
 		],
 

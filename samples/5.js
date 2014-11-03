@@ -8,7 +8,7 @@ require( [ 'core/mvc' ], function( mvc ) {
 			'button', {
 				onclick: 'click',
 				className: mvc.View.bindProp( 'model.active', 'isActive' ),
-				textContent: mvc.View.bindProp( 'model.text' )
+				text: mvc.View.bindProp( 'model.text' )
 			}
 		],
 

@@ -5,7 +5,8 @@ define( [
 ) {
 	'use strict';
 
-	var propPattern = /(\w+)(?:\.(\w+))?/;
+	var propPattern = /(\w+)(?:\.(\w+))?/,
+		attAliases = { 'text': 'textContent' };
 
 	var helpers = {
 		bindProp: function( property, mutator ) {
@@ -118,6 +119,8 @@ define( [
 		},
 
 		_setAttribute: function( element, name, value ) {
+			name = attAliases[ name ] || name;
+
 			if ( name in element ) {
 				element[ name ] = value;
 			} else {
