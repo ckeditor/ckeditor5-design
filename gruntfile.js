@@ -36,10 +36,17 @@ module.exports = function( grunt ) {
 					}
 				}
 			}
+		},
+
+		watch: {
+			source: {
+				files: [ 'src/**/*', 'dev/**/*' ],
+				tasks: [ 'build:almond' ]
+			}
 		}
 	} );
 
 	grunt.registerTask( 'build:almond', [ 'clean', 'requirejs:almond' ] );
 	grunt.registerTask( 'build:amdclean', [ 'clean', 'requirejs:amdclean' ] );
-	grunt.registerTask( 'default', [ 'build:almond' ] );
+	grunt.registerTask( 'default', [ 'watch' ] );
 };

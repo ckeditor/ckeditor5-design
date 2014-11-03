@@ -3,13 +3,15 @@ define( [
 	'core/mvc',
 	'tools/element',
 	'tools/dombuilder',
-	'tools/utils'
+	'tools/utils',
+	'ui/ui'
 ], function(
 	Editable,
 	MVC,
 	Element,
 	_,
-	utils
+	utils,
+	ui
 ) {
 	'use strict';
 
@@ -35,6 +37,8 @@ define( [
 	utils.inherit( Editor, MVC.Application );
 
 	utils.extend( Editor.prototype, {
+		ui: ui,
+
 		create: function() {
 			this.trigger( 'before:create', this );
 
