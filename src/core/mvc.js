@@ -349,28 +349,33 @@ define( [
 		this.initialize.apply( this, arguments );
 	};
 
-	utils.extend( MVC.Application.prototype, Emitter, Commands, MVC.SpaceManagerMixin, {
-		create: function() {
-			this.trigger( 'before:create', this );
-			this.trigger( 'create', this );
+	utils.extend(
+		MVC.Application.prototype,
+		Emitter,
+		Commands,
+		MVC.SpaceManagerMixin,
+		MVC.PluginManagerMixin, {
+			create: function() {
+				this.trigger( 'before:create', this );
+				this.trigger( 'create', this );
 
-			return this;
-		},
+				return this;
+			},
 
-		destroy: function() {
-			this.trigger( 'before:destroy' );
-			this._spaceManager.destroy();
-			this.trigger( 'destroy' );
-		},
+			destroy: function() {
+				this.trigger( 'before:destroy' );
+				this._spaceManager.destroy();
+				this.trigger( 'destroy' );
+			},
 
-		getOption: function( name ) {
-			return this.options && this.options[ name ] !== undefined ?
-				this.options[ name ] :
-				this[ name ];
-		},
+			getOption: function( name ) {
+				return this.options && this.options[ name ] !== undefined ?
+					this.options[ name ] :
+					this[ name ];
+			},
 
-		initialize: nop
-	} );
+			initialize: nop
+		} );
 
 	MVC.Application.extend = extend;
 
