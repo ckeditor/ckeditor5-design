@@ -1,24 +1,30 @@
 define( [
 	'editor/editor',
 	'core/mvc',
-	'ui/ui',
-	'tools/utils'
+	'tools/emitter',
+	'tools/utils',
+	'ui/ui'
 ], function(
 	Editor,
 	MVC,
-	ui,
-	utils
+	Emitter,
+	utils,
+	ui
 ) {
 	'use strict';
 
-	var CKEDITOR = {
+	var CKEDITOR = utils.extend( {
 		instances: {},
 		ui: ui
-	};
+	}, Emitter );
 
 	CKEDITOR.create = function( selector, options ) {
 		var id = 'editor_' + utils.uid( 'e' ),
-			editor = CKEDITOR.instances[ id ] = new Editor( selector, options );
+			editor;
+
+		this.trigger( 'before:create', id );
+		editor = CKEDITOR.instances[ id ] = new Editor( selector, options );
+		this.trigger( 'create', editor );
 
 		return editor;
 	};

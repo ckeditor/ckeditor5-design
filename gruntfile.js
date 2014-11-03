@@ -40,7 +40,7 @@ module.exports = function( grunt ) {
 
 		watch: {
 			source: {
-				files: [ 'src/**/*', 'dev/**/*' ],
+				files: [ 'src/**/*' ],
 				tasks: [ 'build:almond' ]
 			}
 		}

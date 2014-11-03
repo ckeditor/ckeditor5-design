@@ -39,20 +39,6 @@ define( [
 	utils.extend( Editor.prototype, {
 		ui: ui,
 
-		create: function() {
-			this.trigger( 'before:create', this );
-
-			if ( this.src ) {
-				this.src
-					.setStyle( 'visibility', 'hidden' )
-					.insertAfter( this.el );
-			}
-
-			this.trigger( 'create', this );
-
-			return this;
-		},
-
 		initialize: function( options ) {
 			this.el = this.template();
 			this.$el = new Element( this.el );
@@ -61,6 +47,14 @@ define( [
 				.addSpace( 'header', this.$el.findOne( '.header' ) )
 				.addSpace( 'content', this.$el.findOne( '.content' ) )
 				.addSpace( 'footer', this.$el.findOne( '.footer' ) );
+
+			if ( options.src ) {
+				options.src
+					.setStyle( 'display', 'none' )
+					.insertAfter( this.el );
+			}
+
+			return this;
 		},
 
 		template: function() {
