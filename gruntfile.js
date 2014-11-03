@@ -7,13 +7,15 @@ module.exports = function( grunt ) {
 		},
 
 		requirejs: {
+			options: {
+				baseUrl: 'src',
+				include: [ 'CKEDITOR' ],
+				out: 'build/ckeditor.js',
+				optimize: 'none'
+			},
 			almond: {
 				options: {
 					almond: true,
-					baseUrl: 'src',
-					include: [ 'CKEDITOR' ],
-					out: 'build/ckeditor.js',
-					// optimize: 'none',
 					wrap: {
 						startFile: 'src/start.frag',
 						endFile: 'src/end.frag'
@@ -22,10 +24,6 @@ module.exports = function( grunt ) {
 			},
 			amdclean: {
 				options: {
-					baseUrl: 'src',
-					include: [ 'CKEDITOR' ],
-					out: 'build/ckeditor.js',
-					// optimize: 'none',
 					onModuleBundleComplete: function( data ) {
 						var fs = require( 'fs' ),
 							amdclean = require( 'amdclean' ),
