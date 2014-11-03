@@ -13,25 +13,25 @@ define( [
 ) {
 	'use strict';
 
-	var CKEDITOR = utils.extend( {
+	var ckeditor = utils.extend( {
 		instances: {},
 		ui: ui
 	}, Emitter );
 
-	CKEDITOR.create = function( selector, options ) {
+	ckeditor.create = function( selector, options ) {
 		var id = 'editor_' + utils.uid( 'e' ),
 			editor;
 
 		this.trigger( 'before:create', id );
-		editor = CKEDITOR.instances[ id ] = new Editor( selector, options );
+		editor = ckeditor.instances[ id ] = new Editor( selector, options );
 		this.trigger( 'create', editor );
 
 		return editor;
 	};
 
-	CKEDITOR.use = function( options ) {
+	ckeditor.use = function( options ) {
 
 	};
 
-	return CKEDITOR;
+	return ckeditor;
 } );
