@@ -48,17 +48,15 @@ require( [ 'core/mvc' ], function( mvc ) {
 		console.log( 'Counter changed:', value );
 	} );
 
-	var button = new Button( {
-		model: model
-	} );
+	var button = new Button( model );
 
-	button.render();
-	document.body.appendChild( button.el );
+	document.body.appendChild( button.render().el );
 
-	var linkButton = new LinkButton( {
-		model: model
-	} );
+	var linkButton = new LinkButton( model );
 
-	linkButton.render();
-	document.body.appendChild( linkButton.el );
+	document.body.appendChild( linkButton.render().el );
+
+	var iconLinkButton = new IconLinkButton( model );
+
+	document.body.appendChild( iconLinkButton.render().el );
 } );

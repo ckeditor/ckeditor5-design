@@ -89,6 +89,10 @@ define( [
 	MVC.View = function( options ) {
 		this.options = options || {};
 
+		if ( options instanceof MVC.Model ) {
+			options.model = options;
+		}
+
 		if ( options && options.model ) {
 			this.model = options.model;
 		}
