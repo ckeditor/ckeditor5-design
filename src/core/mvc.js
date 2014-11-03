@@ -148,9 +148,7 @@ define( [
 			this.options = options;
 		}
 
-		if ( properties ) {
-			utils.extend( this, properties );
-		}
+		utils.extend( this, properties );
 
 		this.initialize.apply( this, arguments );
 	};
@@ -279,11 +277,9 @@ define( [
 	}, Emitter );
 
 	MVC.SpaceManager = function( options, properties ) {
-		this.options = options;
+		this.options = options || {};
 
-		if ( properties ) {
-			utils.extend( this, properties );
-		}
+		utils.extend( this, properties );
 
 		this.initialize.apply( this, arguments );
 	};
@@ -296,15 +292,59 @@ define( [
 
 
 	/**************************************************************************
+	 * Plugin
+	 *************************************************************************/
+
+	MVC.PluginManagerMixin = {
+		getPlugin: function( name ) {
+			return ( this.plugins && this.plugins[ name ] ) || null;
+		},
+
+		startPlugins: function() {
+			Object.keys( this.plugins ).forEach( function( name ) {
+				var plugin = this.plugins[ name ];
+
+				// TODO - use plugin's events or the App's bus?
+				plugin.trigger( name + 'before:start' );
+				plugin.start.call( this, this.options );
+				plugin.trigger( name + ':start' );
+			}, this );
+		},
+
+		use: function( options ) {
+			if ( !this.plugins ) {
+				this.plugins = {};
+			}
+
+			if ( !options.name ) {
+				options.name = 'plugin_' + utils.uid( 'p' );
+			}
+
+			var plugin = this.plugins[ options.name ] = new MVC.Plugin( options );
+			plugin.initialize.call( this, this.options );
+		}
+	};
+
+	MVC.Plugin = function( options ) {
+		utils.extend( this, options );
+	};
+
+	utils.extend( MVC.Plugin.prototype, Emitter, {
+		name: null,
+
+		initialize: nop,
+		start: nop
+	} );
+
+
+	/**************************************************************************
 	 * Application
 	 *************************************************************************/
 
 	MVC.Application = function( options, properties ) {
-		this.options = options;
+		this.options = options || {};
 
-		if ( properties ) {
-			utils.extend( this, properties );
-		}
+		utils.extend( this, properties );
 
 		this.initialize.apply( this, arguments );
 	};

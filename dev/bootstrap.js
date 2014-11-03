@@ -17,12 +17,7 @@ require( [
 	var model = window.model = new MVC.Model( {
 		text: 'Button text',
 		title: 'Button title',
-		active: false,
-		counter: 0
-	} );
-
-	model.on( 'change:active', function( model ) {
-		model.counter++;
+		active: false
 	} );
 
 	var button = window.button = ui.button( {
