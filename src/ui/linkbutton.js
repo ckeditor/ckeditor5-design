@@ -1,8 +1,6 @@
 define( [
-	'ui',
 	'ui/button'
 ], function(
-	ui,
 	Button
 ) {
 	var LinkButton = Button.extend( {
@@ -16,10 +14,6 @@ define( [
 			]
 		} ]
 	} );
-
-	ui.linkButton = function( options ) {
-		return new LinkButton( options );
-	};
 
 	return LinkButton;
 } );

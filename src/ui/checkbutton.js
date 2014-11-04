@@ -1,8 +1,6 @@
 define( [
-	'ui',
 	'ui/button'
 ], function(
-	ui,
 	Button
 ) {
 	var CheckButton = Button.extend( {
@@ -19,10 +17,6 @@ define( [
 			]
 		} ]
 	} );
-
-	ui.checkButton = function( options ) {
-		return new CheckButton( options );
-	};
 
 	return CheckButton;
 } );

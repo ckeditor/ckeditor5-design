@@ -1,8 +1,6 @@
 define( [
-	'ui',
 	'core/mvc'
 ], function(
-	ui,
 	MVC
 ) {
 	'use strict';
@@ -37,10 +35,6 @@ define( [
 			return value ? 'active' : '';
 		}
 	} );
-
-	ui.button = function( options ) {
-		return new Button( options );
-	};
 
 	return Button;
 } );
