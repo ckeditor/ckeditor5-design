@@ -64,8 +64,8 @@ define( [
 
 						if ( oldValue !== value ) {
 							this.attributes[ attr ] = value;
-							this.trigger( 'change', this );
 							this.trigger( 'change:' + attr, this, value, oldValue );
+							this.trigger( 'change', this );
 						}
 					}
 				} );
