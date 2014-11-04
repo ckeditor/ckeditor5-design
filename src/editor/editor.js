@@ -3,15 +3,13 @@ define( [
 	'core/mvc',
 	'tools/element',
 	'tools/dombuilder',
-	'tools/utils',
-	'ui/ui'
+	'tools/utils'
 ], function(
 	Editable,
 	MVC,
 	Element,
 	_,
-	utils,
-	ui
+	utils
 ) {
 	'use strict';
 
@@ -37,8 +35,6 @@ define( [
 	utils.inherit( Editor, MVC.Application );
 
 	utils.extend( Editor.prototype, {
-		ui: ui,
-
 		initialize: function( options ) {
 			this.el = this.template();
 			this.$el = new Element( this.el );
