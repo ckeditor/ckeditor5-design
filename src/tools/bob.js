@@ -12,7 +12,7 @@ define( [
 			var parsed = propPattern.exec( property );
 
 			return function( element, attr ) {
-				var callback = this[ mutator ] || function( value ) {
+				var callback = utils.isFunction( mutator ) ? mutator : this[ mutator ] || function( value ) {
 						return value;
 					},
 					target = parsed[ 2 ] ? this[ parsed[ 1 ] ] : this,
@@ -36,7 +36,7 @@ define( [
 			var parsed = propPattern.exec( property );
 
 			return function( event ) {
-				var callback = this[ mutator ] || function( value ) {
+				var callback = utils.isFunction( mutator ) ? mutator : this[ mutator ] || function( value ) {
 						return value;
 					},
 					target = parsed[ 2 ] ? this[ parsed[ 1 ] ] : this,
