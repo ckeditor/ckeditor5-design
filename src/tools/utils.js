@@ -99,7 +99,7 @@ define( function() {
 			return typeof obj === 'object' && !!obj;
 		},
 
-		isRegExp: makeIs( 'StRegExp' ),
+		isRegExp: makeIs( 'RegExp' ),
 
 		isString: makeIs( 'String' ),
 
