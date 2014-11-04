@@ -1,31 +1,29 @@
 module.exports = function( grunt ) {
+	require( 'load-grunt-tasks' )( grunt );
+
 	grunt.initConfig( {
-		pkg: grunt.file.readJSON( 'package.json' ),
-
-		jshint: {
-			files: [ '*.js' ],
-			options: {
-				jshintrc: 'dev/tasks/jshint-config.json'
-			}
+		clean: {
+			build: [ 'build' ]
 		},
 
-		jscs: {
-			src: '*.js',
-			options: {
-				config: 'dev/tasks/jscs-config.json'
-			}
-		},
-
-		githooks: {
-			all: {
-				'pre-commit': 'default'
+		requirejs: {
+			build: {
+				options: {
+					almond: true,
+					baseUrl: 'node_modules/ckeditor-core/src/',
+					include: [ 'ckeditor', 'plugins/example' ],
+					optimize: 'none',
+					out: 'build/ckeditor.js',
+					packages: [ {
+						name: 'plugins/example',
+						location: '../../ckeditor-plugin-example/src/',
+						main: 'example'
+					} ]
+				}
 			}
 		}
 	} );
 
-	// Load all grunt plugins.
-	require( 'load-grunt-tasks' )( grunt );
-
-	// Default tasks.
-	grunt.registerTask( 'default', [ 'jshint', 'jscs' ] );
+	grunt.registerTask( 'build', [ 'clean', 'requirejs' ] );
+	grunt.registerTask( 'default', [ 'build' ] );
 };

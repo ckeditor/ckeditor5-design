@@ -1,5 +1,5 @@
 {
-	"name": "programmatic-name-of-the-application",
+	"name": "v5-dev-structure",
 	"version": "0.1.0",
 	"description": "A short description",
 	"devDependencies": {
@@ -7,7 +7,13 @@
 		"grunt-jscs": "~0",
 		"grunt-contrib-jshint": "~0",
 		"grunt-githooks": "~0",
-		"load-grunt-tasks": "~1"
+		"load-grunt-tasks": "~1",
+		"grunt-contrib-clean": "^0.6.0",
+		"grunt-contrib-watch": "^0.6.1",
+		"grunt-requirejs": "^0.4.2"
+	},
+	"scripts": {
+		"build": "grunt"
 	},
 	"author": "CKSource (http://cksource.com/)",
 	"license": "See LICENSE.md",
