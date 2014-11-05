@@ -7,8 +7,8 @@
 <body>
 	<script src="../build/ckeditor.js"></script>
 	<script>
-		require( [ 'mvc', 'plugins/example/example' ], function( mvc, ex ) {
-			console.log( mvc, ex );
+		require( [ 'mvc', 'plugins!example', 'plugins!example/foo' ], function( mvc, ex, foo ) {
+			console.log( mvc, ex, foo );
 		} );
 	</script>
 </body>

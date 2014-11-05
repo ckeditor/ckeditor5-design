@@ -434,11 +434,37 @@ define( 'ckeditor',[ 'mvc', 'tools/utils' ], function() {
 	return 'ckeditor';
 } );
 
-define( 'plugins/example/foo',[],function() {
+define( 'plugins',[],function() {
+	
+
+	var plugins = {};
+	var buildModules = {};
+
+	plugins.load = function( name, req, onload, config ) {
+		var path = name.split( '/' );
+
+		path.splice( 1, 0, 'src' );
+
+		if ( path.length === 2 ) {
+			path.push( 'main' );
+		}
+
+		path = '../ckeditor-plugin-' + path.join( '/' );
+
+		req( [ path ], function( value ) {
+			onload( value );
+		} );
+	};
+
+	return plugins;
+} );
+
+define( '../ckeditor-plugin-example/src/foo',[],function() {
 	return 'foo';
 } );
 
-define( 'plugins/example/example',[ './foo' ], function( foo ) {
-	return 'example ' + foo;
+define( '../ckeditor-plugin-example/src/main',[ 'mvc', './foo' ], function( mvc, foo ) {
+	return 'example ' + mvc + ' ' + foo;
 } );
+
 
