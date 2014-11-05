@@ -2,6 +2,10 @@
 	"name": "v5-dev-structure",
 	"version": "0.1.0",
 	"description": "A short description",
+	"dependencies": {
+		"ckeditor-core": "0.1.0",
+		"ckeditor-plugin-example": "0.1.0"
+	},
 	"devDependencies": {
 		"grunt": "~0",
 		"grunt-jscs": "~0",
