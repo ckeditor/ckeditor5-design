@@ -21,7 +21,7 @@ module.exports = function( grunt ) {
 			build: {
 				options: {
 					almond: true,
-					baseUrl: 'node_modules/ckeditor-core/',
+					baseUrl: 'node_modules/ckeditor-core/src/',
 					include: [ 'ckeditor' ].concat( getPlugins() ),
 					optimize: 'none',
 					out: 'build/ckeditor.js'
