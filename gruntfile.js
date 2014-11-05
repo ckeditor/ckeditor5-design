@@ -1,6 +1,17 @@
 module.exports = function( grunt ) {
 	require( 'load-grunt-tasks' )( grunt );
 
+	var pkg = grunt.file.readJSON( 'package.json' );
+
+	function getPlugins() {
+		return Object.keys( pkg.dependencies )
+			.filter( function( name ) {
+				return name.indexOf( 'ckeditor-plugin-' ) === 0;
+			} ).map( function( name ) {
+				return 'plugins!' + name.replace( 'ckeditor-plugin-', '' );
+			} );
+	}
+
 	grunt.initConfig( {
 		clean: {
 			build: [ 'build' ]
@@ -11,16 +22,9 @@ module.exports = function( grunt ) {
 				options: {
 					almond: true,
 					baseUrl: 'node_modules/ckeditor-core/',
-					include: [
-						'ckeditor',
-						'plugins!example'
-					],
+					include: [ 'ckeditor' ].concat( getPlugins() ),
 					optimize: 'none',
 					out: 'build/ckeditor.js'
-					// packages: [ {
-					// 	name: 'plugins/example',
-					// 	location: '../ckeditor-plugin-example/src/'
-					// } ]
 				}
 			}
 		}

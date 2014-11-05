@@ -1,27 +1,20 @@
 requirejs.config( {
 	baseUrl: '../node_modules/ckeditor-core/'
-
-	// packages: [ {
-	// 	name: 'plugins/example',
-	// 	location: '../ckeditor-plugin-example/src/'
-	// } ]
 } );
-
-// var CKEDITOR = CKEDITOR || {};
-
-// CKEDITOR.require = CKEDITOR.require || require;
-// CKEDITOR.define = CKEDITOR.define || define;
 
 require( [
 	'mvc',
+	'ckeditor',
 	'plugins!example',
 	'plugins!example/foo'
 ], function(
-	MVC,
-	example,
+	mvc,
+	ckeditor,
+	ex,
 	foo
 ) {
-	console.log( MVC );
-	console.log( example );
+	console.log( mvc );
+	console.log( ckeditor );
+	console.log( ex );
 	console.log( foo );
 } );
