@@ -1,3 +1,3 @@
 requirejs.config( {
-	baseUrl: '../node_modules/ckeditor-core/'
+	baseUrl: '../node_modules/ckeditor-core/src/'
 } );
