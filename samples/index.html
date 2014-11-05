@@ -7,5 +7,29 @@
 <body>
 	<script src="../lib/require.js"></script>
 	<script src="../ckeditor.js"></script>
+	<!-- load a custom plugin -->
+	<script src="plugin.js"></script>
+
+	<script>
+	require( [
+		'mvc',
+		'ckeditor',
+		'plugins!example',
+		'plugins!example/foo',
+		'plugins!sample'
+	], function(
+		mvc,
+		ckeditor,
+		ex,
+		foo,
+		sample
+	) {
+		console.log( mvc );
+		console.log( ckeditor );
+		console.log( ex );
+		console.log( foo );
+		console.log( sample );
+	} );
+	</script>
 </body>
 </html>

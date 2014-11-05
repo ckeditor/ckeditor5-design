@@ -6,19 +6,25 @@
 </head>
 <body>
 	<script src="../build/ckeditor.js"></script>
+	<!-- load a custom plugin -->
+	<script src="plugin.js"></script>
+
 	<script>
 		require( [
 			'mvc',
 			'plugins!example',
-			'plugins!example/foo'
+			'plugins!example/foo',
+			'plugins!sample',
 		], function(
 			mvc,
 			ex,
-			foo
+			foo,
+			sample
 		) {
 			console.log( mvc );
 			console.log( ex );
 			console.log( foo );
+			console.log( sample );
 		} );
 	</script>
 </body>
