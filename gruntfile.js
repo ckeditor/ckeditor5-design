@@ -24,7 +24,14 @@ module.exports = function( grunt ) {
 					baseUrl: 'node_modules/ckeditor-core/src/',
 					include: [ 'ckeditor' ].concat( getPlugins() ),
 					optimize: 'none',
-					out: 'build/ckeditor.js'
+					out: 'build/ckeditor.js',
+					wrap: {
+						start: '(function (root) {',
+						end: 'root.CKEDITOR = root.CKEDITOR || {};\n' +
+							'CKEDITOR.define = CKEDITOR.define || define;\n' +
+							'CKEDITOR.require = CKEDITOR.require || require;\n' +
+							'})(this);'
+					}
 				}
 			}
 		}
