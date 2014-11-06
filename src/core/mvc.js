@@ -38,10 +38,12 @@ define( [
 	 * Model
 	 *************************************************************************/
 
-	MVC.Model = function( attributes ) {
+	MVC.Model = function( attributes, properties ) {
 		Object.defineProperty( this, 'attributes', {
 			value: {}
 		} );
+
+		utils.extend( this, properties );
 
 		this._initAttributes( attributes || {} );
 		this.initialize.apply( this, arguments );
@@ -80,6 +82,8 @@ define( [
 			}, this );
 		}
 	} );
+
+	MVC.Model.extend = extend;
 
 
 	/**************************************************************************
