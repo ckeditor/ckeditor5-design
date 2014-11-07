@@ -14,14 +14,16 @@ module.exports = function( grunt ) {
 
 	grunt.initConfig( {
 		clean: {
-			build: [ 'build' ]
+			build: [ 'build' ],
+			tmp: [ 'tmp' ]
 		},
 
 		requirejs: {
 			build: {
 				options: {
 					almond: true,
-					baseUrl: 'node_modules/ckeditor-core/src/',
+					baseUrl: 'tmp/ckeditor-core/src/',
+					generateSourceMaps: true,
 					include: [ 'ckeditor' ].concat( getPlugins() ),
 					optimize: 'none',
 					out: 'build/ckeditor.js',
@@ -34,9 +36,19 @@ module.exports = function( grunt ) {
 					}
 				}
 			}
+		},
+
+		sed: {
+			build: {
+				path: 'tmp/',
+				pattern: /^(CKEDITOR\.)(define|require)/,
+				replacement: '$2',
+				recursive: true
+			}
 		}
 	} );
 
-	grunt.registerTask( 'build', [ 'clean', 'requirejs' ] );
+	grunt.loadTasks( 'tasks/' );
+	grunt.registerTask( 'build', [ 'clean', 'copy', 'sed', 'requirejs', 'clean:tmp' ] );
 	grunt.registerTask( 'default', [ 'build' ] );
 };
