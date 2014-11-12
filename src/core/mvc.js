@@ -39,7 +39,7 @@ define( [
 	 *************************************************************************/
 
 	MVC.Model = function( attributes, properties ) {
-		Object.defineProperty( this, 'attributes', {
+		Object.defineProperty( this, '_attributes', {
 			value: {}
 		} );
 
@@ -52,33 +52,33 @@ define( [
 	utils.extend( MVC.Model.prototype, Emitter, {
 		initialize: nop,
 
-		set: function( attr, value ) {
-			if ( !this[ attr ] ) {
-				Object.defineProperty( this, attr, {
-					enumerable: true,
+		define: function( attr, value, options ) {
+			Object.defineProperty( this, attr, utils.extend( {
+				enumerable: true,
 
-					get: function() {
-						return this.attributes[ attr ];
-					},
+				get: function() {
+					return this._attributes[ attr ];
+				},
 
-					set: function( value ) {
-						var oldValue = this.attributes[ attr ];
+				set: function( value ) {
+					var oldValue = this._attributes[ attr ];
 
-						if ( oldValue !== value ) {
-							this.attributes[ attr ] = value;
-							this.trigger( 'change', this );
-							this.trigger( 'change:' + attr, this, value, oldValue );
-						}
+					if ( oldValue !== value ) {
+						this._attributes[ attr ] = value;
+						this.trigger( 'change', this );
+						this.trigger( 'change:' + attr, this, value, oldValue );
 					}
-				} );
-			}
+				}
+			}, options ) );
 
-			this.attributes[ attr ] = value;
+			if ( !utils.isUndefined( value ) ) {
+				this._attributes[ attr ] = value;
+			}
 		},
 
 		_initAttributes: function( attributes ) {
 			Object.keys( attributes ).forEach( function( attr ) {
-				this.set( attr, attributes[ attr ] );
+				this.define( attr, attributes[ attr ] );
 			}, this );
 		}
 	} );
