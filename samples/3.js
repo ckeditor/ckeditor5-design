@@ -6,19 +6,19 @@ require( [ 'core/mvc' ], function( mvc ) {
 	var Button = mvc.View.extend( {
 		template: [
 			'button', {
-				onclick: 'click',
+				onclick: 'model.increment',
 				text: mvc.View.bindProp( 'model.text' )
 			}
-		],
-
-		click: function() {
-			this.model.counter++;
-		}
+		]
 	} );
 
 	var model = window.model = new mvc.Model( {
 		counter: 0,
 		text: 'Foo'
+	}, {
+		increment: function() {
+			this.counter++;
+		}
 	} );
 
 	model.on( 'change:counter', function( model, value ) {
