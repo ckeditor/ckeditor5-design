@@ -49,21 +49,18 @@ define( function() {
 		},
 
 		clone: function( obj ) {
-			var clone, i;
+			var clone;
 
 			if ( this.isArray( obj ) ) {
-				clone = [];
-				for ( i = 0 ; i < obj.length ; i++ ) {
-					clone[ i ] = this.clone( obj[ i ] );
-				}
+				clone = obj.map( function( value ) {
+					return this.clone( value );
+				}, this );
 			} else if ( this.isObject( obj ) ) {
 				clone = {};
 
-				var props = Object.getOwnPropertyNames( obj );
-
-				for ( i = 0 ; i < props.length ; i++ ) {
-					clone[ props[ i ] ] = this.clone( obj[ props[ i ] ] );
-				}
+				Object.getOwnPropertyNames( obj ).forEach( function( name ) {
+					clone[ name ] = this.clone( obj[ name ] );
+				}, this );
 			} else {
 				clone = obj;
 			}
