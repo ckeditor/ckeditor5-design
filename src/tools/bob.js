@@ -6,7 +6,9 @@ define( [
 	'use strict';
 
 	var propPattern = /(\w+)(?:\.(\w+))?/,
-		attAliases = { 'text': 'textContent' };
+		attAliases = {
+			'text': 'textContent'
+		};
 
 	var helpers = {
 		bindProp: function( property, mutator ) {
@@ -63,6 +65,7 @@ define( [
 
 			var tag = elem[ 0 ],
 				attributes = elem[ 1 ],
+				children = elem[ 2 ],
 				element = document.createElement( tag );
 
 			// only children were passed
@@ -81,19 +84,21 @@ define( [
 				Object.keys( attributes ).forEach( function( name ) {
 					var value = attributes[ name ];
 
-					// add children
-					if ( name === 'children' && utils.isArray( value ) ) {
-						value.forEach( function( child ) {
-							if ( ( child = this.build( child ) ) ) {
-								element.appendChild( child );
-							}
-						}, this );
-						// bind an event
-					} else if ( !name.indexOf( 'on' ) ) {
+					// bind an event
+					if ( !name.indexOf( 'on' ) ) {
 						this._bindEvent( element, name, value );
 						// bind an attribute
 					} else {
 						this._bindAttribute( element, name, value );
+					}
+				}, this );
+			}
+
+			// add children
+			if ( utils.isArray( children ) ) {
+				children.forEach( function( child ) {
+					if ( ( child = this.build( child ) ) ) {
+						element.appendChild( child );
 					}
 				}, this );
 			}
@@ -112,10 +117,22 @@ define( [
 		_bindEvent: function( element, event, value ) {
 			event = !event.indexOf( 'on' ) ? event.substr( 2 ) : event;
 
-			element.addEventListener( event, (
-					utils.isFunction( value ) ? value : this[ value ]
-				).bind( this ),
-				false );
+			var handler = utils.isFunction( value ) ? value : this[ value ];
+
+			if ( utils.isFunction( value ) ) {
+				handler = value.bind( this );
+			} else if ( utils.isString( value ) ) {
+				var parsed = propPattern.exec( value ),
+					target = parsed[ 2 ] ? this[ parsed[ 1 ] ] : this,
+					name = parsed[ 2 ] || parsed[ 1 ];
+
+				handler = target[ name ].bind( target );
+			} else {
+				throw new Error( 'Nope' );
+			}
+
+
+			element.addEventListener( event, handler, false );
 		},
 
 		_setAttribute: function( element, name, value ) {
