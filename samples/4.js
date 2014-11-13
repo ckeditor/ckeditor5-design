@@ -3,14 +3,16 @@ require.config( {
 } );
 
 require( [ 'core/mvc' ], function( mvc ) {
-	var firstPattern = /(\s|^)(\w)/g;
+	var firstPattern = /(\s|^)(\w)/g,
+		attr = mvc.View.bindAttr,
+		prop = mvc.View.bindProp;
 
 	var Input = mvc.View.extend( {
 		template: [
 			'div', [
 				[ 'input', {
-					oninput: mvc.View.bindAttr( 'value', 'model.text', 'model.trim' ),
-					value: mvc.View.bindProp( 'model.text' )
+					oninput: attr( 'value', 'model.text', 'model.trim' ),
+					value: prop( 'model.text' )
 				} ],
 				[ 'button', {
 					onclick: 'model.clear',
@@ -21,7 +23,7 @@ require( [ 'core/mvc' ], function( mvc ) {
 	} );
 
 	var Label = mvc.View.extend( {
-		template: [ 'p', mvc.View.bindProp( 'model.text', 'model.capitalize' ) ]
+		template: [ 'p', prop( 'model.text', 'model.capitalize' ) ]
 	} );
 
 	var model = new mvc.Model( {
@@ -44,13 +46,11 @@ require( [ 'core/mvc' ], function( mvc ) {
 		model: model
 	} );
 
-	input.render();
-	document.body.appendChild( input.el );
+	document.body.appendChild( input.render().el );
 
 	var label = new Label( {
 		model: model
 	} );
 
-	label.render();
-	document.body.appendChild( label.el );
+	document.body.appendChild( label.render().el );
 } );

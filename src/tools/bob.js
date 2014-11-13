@@ -11,13 +11,13 @@ define( [
 		};
 
 	var helpers = {
-		_parseProp: function( ctx, prop ) {
+		_parseProp: function( prop ) {
 			if ( !prop || !utils.isString( prop ) ) {
 				return null;
 			}
 
 			var parsed = propPattern.exec( prop ),
-				target = parsed[ 2 ] ? ctx[ parsed[ 1 ] ] : ctx,
+				target = parsed[ 2 ] && parsed[ 1 ],
 				name = parsed[ 2 ] || parsed[ 1 ];
 
 			return {
@@ -27,11 +27,12 @@ define( [
 		},
 
 		bindProp: function( property, mutator ) {
+			var parsed = helpers._parseProp( property ),
+				parsedMut = helpers._parseProp( mutator );
+
 			return function( element, attr ) {
-				var parsed = helpers._parseProp( this, property ),
-					parsedMutator = helpers._parseProp( this, mutator ),
-					callback = parsedMutator ?
-					parsedMutator.target[ parsedMutator.name ] :
+				var callback = parsedMut ?
+					( parsedMut.target ? this[ parsedMut.target ] : this )[ parsedMut.name ] :
 					function( value ) {
 						return value;
 					};
@@ -40,30 +41,30 @@ define( [
 					bob._setAttribute( element, attr, callback( newValue, oldValue ) );
 				}
 
-				if ( parsed.target === this ) {
-					this.on( 'change:' + parsed.name, handler );
+				var target = parsed.target ? this[ parsed.target ] : this;
+
+				if ( parsed.target ) {
+					this.listenTo( this[ parsed.target ], 'change:' + parsed.name, handler, this );
 				} else {
-					this.listenTo( parsed.target, 'change:' + parsed.name, handler, this );
+					this.on( 'change:' + parsed.name, handler );
 				}
 
-				bob._setAttribute( element, attr, callback( parsed.target[ parsed.name ], parsed.target[ parsed.name ] ) );
+				bob._setAttribute( element, attr, callback( target[ parsed.name ], target[ parsed.name ] ) );
 			};
 		},
 
 		bindAttr: function( attr, property, mutator ) {
-			return function() {
-				var parsed = helpers._parseProp( this, property );
-				mutator = utils.isString( mutator ) ? helpers._parseProp( this, mutator ) : null;
+			var parsed = helpers._parseProp( property ),
+				parsedMutator = utils.isString( mutator ) && helpers._parseProp( mutator );
 
-				return function( event ) {
-					var element = event.currentTarget,
-						value = attr in element ? element[ attr ] : element.getAttribute( attr ),
-						callback = mutator ? mutator.target[ mutator.name ] : function( value ) {
-							return value;
-						};
+			return function( event ) {
+				var element = event.currentTarget,
+					value = attr in element ? element[ attr ] : element.getAttribute( attr ),
+					callback = parsedMutator ? ( parsedMutator.target ? this[ parsedMutator.target ] : this )[ parsedMutator.name ] : function( value ) {
+						return value;
+					};
 
-					parsed.target[ parsed.name ] = callback( value );
-				};
+				( parsed.target ? this[ parsed.target ] : this )[ parsed.name ] = callback( value );
 			};
 		}
 	};
@@ -95,7 +96,7 @@ define( [
 				};
 			}
 
-			// add the attributes
+			// add attributes
 			if ( utils.isObject( attributes ) ) {
 				Object.keys( attributes ).forEach( function( name ) {
 					var value = attributes[ name ];
@@ -133,14 +134,14 @@ define( [
 		_bindEvent: function( element, event, value ) {
 			event = !event.indexOf( 'on' ) ? event.substr( 2 ) : event;
 
-			var handler = utils.isFunction( value ) ? value : this[ value ];
+			var handler;
 
 			if ( utils.isFunction( value ) ) {
-				handler = value.call( this );
+				handler = value.bind( this );
 			} else if ( utils.isString( value ) ) {
-				var parsed = helpers._parseProp( this, value );
+				var parsed = helpers._parseProp( value );
 
-				handler = parsed.target[ parsed.name ].bind( parsed.target );
+				handler = ( parsed.target ? this[ parsed.target ] : this )[ parsed.name ].bind( this );
 			} else {
 				throw new Error( 'Nope' );
 			}
