@@ -23,17 +23,17 @@ require( [ 'core/mvc' ], function( mvc ) {
 	} );
 
 	var Label = mvc.View.extend( {
-		template: [ 'p', prop( 'model.text', 'model.capitalize' ) ]
+		template: [ 'p', prop( 'model.text', 'capitalize' ) ],
+		capitalize: function( text ) {
+			return text.replace( firstPattern, function( m, a, b ) {
+				return a + b.toUpperCase();
+			} );
+		}
 	} );
 
 	var model = new mvc.Model( {
 		text: 'foo'
 	}, {
-		capitalize: function( text ) {
-			return text.replace( firstPattern, function( m, a, b ) {
-				return a + b.toUpperCase();
-			} );
-		},
 		clear: function() {
 			this.text = '';
 		},

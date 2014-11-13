@@ -33,6 +33,7 @@ define( [
 			return function( element, attr ) {
 				var callback = parsedMut ?
 					( parsedMut.target ? this[ parsedMut.target ] : this )[ parsedMut.name ] :
+					utils.isFunction( mutator ) ? mutator :
 					function( value ) {
 						return value;
 					};
