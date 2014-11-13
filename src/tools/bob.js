@@ -62,9 +62,10 @@ define( [
 					value = attr in element ? element[ attr ] : element.getAttribute( attr ),
 					callback = parsedMutator ? ( parsedMutator.target ? this[ parsedMutator.target ] : this )[ parsedMutator.name ] : function( value ) {
 						return value;
-					};
+					},
+					target = parsed.target ? this[ parsed.target ] : this;
 
-				( parsed.target ? this[ parsed.target ] : this )[ parsed.name ] = callback( value );
+				target[ parsed.name ] = callback.call( target, value );
 			};
 		}
 	};
@@ -139,9 +140,10 @@ define( [
 			if ( utils.isFunction( value ) ) {
 				handler = value.bind( this );
 			} else if ( utils.isString( value ) ) {
-				var parsed = helpers._parseProp( value );
+				var parsed = helpers._parseProp( value ),
+					target = parsed.target ? this[ parsed.target ] : this;
 
-				handler = ( parsed.target ? this[ parsed.target ] : this )[ parsed.name ].bind( this );
+				handler = target[ parsed.name ].bind( target );
 			} else {
 				throw new Error( 'Nope' );
 			}
