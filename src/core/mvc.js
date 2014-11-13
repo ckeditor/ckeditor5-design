@@ -139,6 +139,8 @@ define( [
 
 			this.trigger( 'render', this );
 
+			this.isDestroyed = false;
+
 			return this;
 		}
 	} );

@@ -8,18 +8,10 @@ require( [ 'core/mvc' ], function( mvc ) {
 		prop = mvc.View.bindProp;
 
 	var Input = mvc.View.extend( {
-		template: [
-			'div', [
-				[ 'input', {
-					oninput: attr( 'value', 'model.text', 'model.trim' ),
-					value: prop( 'model.text' )
-				} ],
-				[ 'button', {
-					onclick: 'model.clear',
-					text: 'Clear'
-				} ]
-			]
-		]
+		template: [ 'input', {
+			oninput: attr( 'value', 'model.text', 'model.trim' ),
+			value: prop( 'model.text' )
+		} ]
 	} );
 
 	var Label = mvc.View.extend( {
@@ -31,7 +23,14 @@ require( [ 'core/mvc' ], function( mvc ) {
 		}
 	} );
 
-	var model = new mvc.Model( {
+	var Button = mvc.View.extend( {
+		template: [ 'button', {
+			onclick: 'model.clear',
+			text: 'Clear'
+		} ]
+	} );
+
+	var model = window.model = new mvc.Model( {
 		text: 'foo'
 	}, {
 		clear: function() {
@@ -42,13 +41,19 @@ require( [ 'core/mvc' ], function( mvc ) {
 		}
 	} );
 
-	var input = new Input( {
+	var input = window.input = new Input( {
 		model: model
 	} );
 
 	document.body.appendChild( input.render().el );
 
-	var label = new Label( {
+	var button = window.button = new Button( {
+		model: model
+	} );
+
+	document.body.appendChild( button.render().el );
+
+	var label = window.label =new Label( {
 		model: model
 	} );
 
