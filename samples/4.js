@@ -9,7 +9,7 @@ require( [ 'core/mvc' ], function( mvc ) {
 		template: [
 			'div', [
 				[ 'input', {
-					oninput: mvc.View.bindAttr( 'value', 'model.text', 'trim' ),
+					oninput: mvc.View.bindAttr( 'value', 'model.text', 'model.trim' ),
 					value: mvc.View.bindProp( 'model.text' )
 				} ],
 				[ 'button', {
@@ -17,28 +17,26 @@ require( [ 'core/mvc' ], function( mvc ) {
 					text: 'Clear'
 				} ]
 			]
-		],
-
-		trim: function( text ) {
-			return text.trim();
-		}
+		]
 	} );
 
 	var Label = mvc.View.extend( {
-		template: [ 'p', mvc.View.bindProp( 'model.text', 'capitalize' ) ],
-
-		capitalize: function( text ) {
-			return text.replace( firstPattern, function( m, a, b ) {
-				return a + b.toUpperCase();
-			} );
-		}
+		template: [ 'p', mvc.View.bindProp( 'model.text', 'model.capitalize' ) ]
 	} );
 
 	var model = new mvc.Model( {
 		text: 'foo'
 	}, {
+		capitalize: function( text ) {
+			return text.replace( firstPattern, function( m, a, b ) {
+				return a + b.toUpperCase();
+			} );
+		},
 		clear: function() {
 			this.text = '';
+		},
+		trim: function( text ) {
+			return text.trim();
 		}
 	} );
 

@@ -111,6 +111,8 @@ define( [
 	utils.extend( MVC.View, Bob.helpers );
 
 	utils.extend( MVC.View.prototype, Emitter, Bob.mixin, {
+		template: null,
+
 		destroy: function() {
 			if ( this.isDestroyed ) {
 				return this;
