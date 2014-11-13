@@ -56,15 +56,23 @@ define( [
 
 		bindAttr: function( attr, property, mutator ) {
 			var parsed = helpers._parseProp( property ),
-				parsedMutator = utils.isString( mutator ) && helpers._parseProp( mutator );
+				parsedMutator = helpers._parseProp( mutator );
 
 			return function( event ) {
 				var element = event.currentTarget,
 					value = attr in element ? element[ attr ] : element.getAttribute( attr ),
-					callback = parsedMutator ? ( parsedMutator.target ? this[ parsedMutator.target ] : this )[ parsedMutator.name ] : function( value ) {
+					target = parsed.target ? this[ parsed.target ] : this,
+					callback;
+
+				if ( parsedMutator ) {
+					callback = ( parsedMutator.target ? this[ parsedMutator.target ] : this )[ parsedMutator.name ];
+				} else if ( utils.isFunction( mutator ) ) {
+					callback = mutator;
+				} else {
+					callback = function( value ) {
 						return value;
-					},
-					target = parsed.target ? this[ parsed.target ] : this;
+					};
+				}
 
 				target[ parsed.name ] = callback.call( target, value );
 			};
