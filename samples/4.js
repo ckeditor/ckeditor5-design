@@ -5,10 +5,22 @@ require.config( {
 require( [ 'core/mvc' ], function( mvc ) {
 	var firstPattern = /(\s|^)(\w)/g,
 		attr = mvc.View.bindAttr,
-		prop = mvc.View.bindProp;
+		prop = mvc.View.bindProp,
+		toggle = mvc.View.bindClassToggle,
+		value = mvc.View.bindClassValue;
 
 	var Input = mvc.View.extend( {
 		template: [ 'input', {
+			classes: [
+				'foo',
+				'label',
+				value( 'model.text', function( text ) {
+					return text.length < 10 ? 'short' : 'long';
+				} ),
+				toggle( 'superlong', 'model.text', function( text ) {
+					return text.length > 20;
+				} )
+			],
 			oninput: attr( 'value', 'model.text', 'model.trim' ),
 			value: prop( 'model.text' )
 		} ]
@@ -53,7 +65,7 @@ require( [ 'core/mvc' ], function( mvc ) {
 
 	document.body.appendChild( button.render().el );
 
-	var label = window.label =new Label( {
+	var label = window.label = new Label( {
 		model: model
 	} );
 

@@ -26,14 +26,129 @@ define( [
 			};
 		},
 
-		bindProp: function( property, mutator ) {
+		bindAttr: function( attr, property, callback ) {
 			var parsed = helpers._parseProp( property ),
-				parsedMut = helpers._parseProp( mutator );
+				parsedCbk = helpers._parseProp( callback );
+
+			return function( event ) {
+				var element = event.currentTarget,
+					value = attr in element ? element[ attr ] : element.getAttribute( attr ),
+					target = parsed.target ? this[ parsed.target ] : this,
+					callback;
+
+				if ( parsedCbk ) {
+					callback = ( parsedCbk.target ? this[ parsedCbk.target ] : this )[ parsedCbk.name ];
+				} else if ( utils.isFunction( callback ) ) {
+					callback = callback;
+				} else {
+					callback = function( value ) {
+						return value;
+					};
+				}
+
+				target[ parsed.name ] = callback.call( target, value );
+			};
+		},
+
+		bindClassToggle: function( name, property, callback ) {
+			var parsed = helpers._parseProp( property ),
+				parsedCbk = helpers._parseProp( callback );
+
+			return function( element ) {
+				var cbk = parsedCbk ?
+					( parsedCbk.target ? this[ parsedCbk.target ] : this )[ parsedCbk.name ] :
+					utils.isFunction( callback ) ? callback :
+					function( value ) {
+						return value;
+					};
+
+				function setClass( enable ) {
+					if ( enable ) {
+						element.classList.add( name );
+					} else {
+						element.classList.remove( name );
+					}
+				}
+
+				function handler( model, newValue, oldValue ) {
+					setClass( cbk( newValue, oldValue ) );
+				}
+
+				var target = parsed.target ? this[ parsed.target ] : this;
+
+				if ( parsed.target ) {
+					this.listenTo( this[ parsed.target ], 'change:' + parsed.name, handler, this );
+				} else {
+					this.on( 'change:' + parsed.name, handler );
+				}
+
+				setClass( cbk( target[ parsed.name ], target[ parsed.name ] ) );
+			};
+		},
+
+		bindClassValue: function( property, callback ) {
+			var parsed = helpers._parseProp( property ),
+				parsedCbk = helpers._parseProp( callback );
+
+			return function( element ) {
+				var cbk = parsedCbk ?
+					( parsedCbk.target ? this[ parsedCbk.target ] : this )[ parsedCbk.name ] :
+					utils.isFunction( callback ) ? callback :
+					function( value ) {
+						return value;
+					};
+
+				if ( !this._classCache ) {
+					Object.defineProperty( this, '_classCache', {
+						value: {}
+					} );
+				}
+
+				var uid = utils.uid( 'c' ),
+					that = this;
+
+				function setClass( value ) {
+					that._classCache[ uid ] = value;
+
+					if ( value ) {
+						element.classList.add( value );
+					}
+				}
+
+				function handler( model, newValue, oldValue ) {
+					var value = cbk( newValue, oldValue );
+
+					if ( that._classCache[ uid ] ) {
+						if ( that._classCache[ uid ] === value ) {
+							return;
+						}
+
+						element.classList.remove( that._classCache[ uid ] );
+					}
+
+					setClass( value );
+				}
+
+				var target = parsed.target ? this[ parsed.target ] : this;
+
+				if ( parsed.target ) {
+					this.listenTo( this[ parsed.target ], 'change:' + parsed.name, handler, this );
+				} else {
+					this.on( 'change:' + parsed.name, handler );
+				}
+
+				setClass( cbk( target[ parsed.name ], target[ parsed.name ] ) );
+			};
+		},
+
+		bindProp: function( property, callback ) {
+			var parsed = helpers._parseProp( property ),
+				parsedCbk = helpers._parseProp( callback );
 
 			return function( element, attr ) {
-				var callback = parsedMut ?
-					( parsedMut.target ? this[ parsedMut.target ] : this )[ parsedMut.name ] :
-					utils.isFunction( mutator ) ? mutator :
+				var callback = parsedCbk ?
+					( parsedCbk.target ? this[ parsedCbk.target ] : this )[ parsedCbk.name ] :
+					utils.isFunction( callback ) ? callback :
 					function( value ) {
 						return value;
 					};
@@ -53,30 +168,6 @@ define( [
 				bob._setAttribute( element, attr, callback( target[ parsed.name ], target[ parsed.name ] ) );
 			};
 		},
-
-		bindAttr: function( attr, property, mutator ) {
-			var parsed = helpers._parseProp( property ),
-				parsedMutator = helpers._parseProp( mutator );
-
-			return function( event ) {
-				var element = event.currentTarget,
-					value = attr in element ? element[ attr ] : element.getAttribute( attr ),
-					target = parsed.target ? this[ parsed.target ] : this,
-					callback;
-
-				if ( parsedMutator ) {
-					callback = ( parsedMutator.target ? this[ parsedMutator.target ] : this )[ parsedMutator.name ];
-				} else if ( utils.isFunction( mutator ) ) {
-					callback = mutator;
-				} else {
-					callback = function( value ) {
-						return value;
-					};
-				}
-
-				target[ parsed.name ] = callback.call( target, value );
-			};
-		}
 	};
 
 	var bob = {
@@ -114,6 +205,13 @@ define( [
 					// bind an event
 					if ( !name.indexOf( 'on' ) ) {
 						this._bindEvent( element, name, value );
+						// bind classes
+					} else if ( name === 'classes' ) {
+						if ( !utils.isArray( value ) ) {
+							return;
+						}
+
+						this._bindClasses( element, value );
 						// bind an attribute
 					} else {
 						this._bindAttribute( element, name, value );
@@ -157,8 +255,17 @@ define( [
 				throw new Error( 'Nope' );
 			}
 
-
 			element.addEventListener( event, handler, false );
+		},
+
+		_bindClasses: function( element, classes ) {
+			classes.forEach( function( value ) {
+				if ( utils.isString( value ) ) {
+					element.classList.add( value );
+				} else if ( utils.isFunction( value ) ) {
+					value.call( this, element );
+				}
+			}, this );
 		},
 
 		_setAttribute: function( element, name, value ) {
