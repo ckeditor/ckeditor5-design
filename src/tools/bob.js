@@ -107,34 +107,29 @@ define( [
 					},
 					handler;
 
+				// set the element's attribute
 				if ( attr ) {
 					handler = function( model, newValue, oldValue ) {
 						bob._setAttribute( element, attr, cbk( newValue, oldValue ) );
 					};
 
 					bob._setAttribute( element, attr, cbk( target[ parsed.name ], target[ parsed.name ] ) );
+					// set the element's class
 				} else {
-					if ( !this._classCache ) {
-						Object.defineProperty( this, '_classCache', {
-							value: {}
-						} );
-					}
-
-					var uid = utils.uid( 'c' ),
-						that = this;
+					var last;
 
 					handler = function( model, newValue, oldValue ) {
 						var value = cbk( newValue, oldValue );
 
-						if ( that._classCache[ uid ] ) {
-							if ( that._classCache[ uid ] === value ) {
+						if ( last ) {
+							if ( last === value ) {
 								return;
 							}
 
-							element.classList.remove( that._classCache[ uid ] );
+							element.classList.remove( last );
 						}
 
-						that._classCache[ uid ] = value;
+						last = value;
 
 						if ( value ) {
 							element.classList.add( value );
@@ -143,7 +138,7 @@ define( [
 
 					var value = cbk( target[ parsed.name ], target[ parsed.name ] );
 
-					that._classCache[ uid ] = value;
+					last = value;
 
 					if ( value ) {
 						element.classList.add( value );
