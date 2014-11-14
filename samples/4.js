@@ -14,12 +14,10 @@ require( [ 'core/mvc' ], function( mvc ) {
 			classes: [
 				'foo',
 				'label',
-				value( 'model.text', function( text ) {
+				prop( 'model.text', function( text ) {
 					return text.length < 10 ? 'short' : 'long';
 				} ),
-				toggle( 'superlong', 'model.text', function( text ) {
-					return text.length > 20;
-				} )
+				toggle( 'empty', '!model.text' )
 			],
 			oninput: attr( 'value', 'model.text', 'model.trim' ),
 			value: prop( 'model.text' )

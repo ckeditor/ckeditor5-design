@@ -51,6 +51,13 @@ define( [
 		},
 
 		bindClassToggle: function( name, property, callback ) {
+			var negate = false;
+
+			if ( property.charAt( 0 ) === '!' ) {
+				negate = true;
+				property = property.substr( 1 );
+			}
+
 			var parsed = helpers._parseProp( property ),
 				parsedCbk = helpers._parseProp( callback );
 
@@ -62,71 +69,16 @@ define( [
 						return value;
 					};
 
-				function setClass( enable ) {
-					if ( enable ) {
-						element.classList.add( name );
-					} else {
-						element.classList.remove( name );
+				function setClass( add ) {
+					if ( negate ) {
+						add = !add;
 					}
+
+					element.classList[ add ? 'add' : 'remove' ]( name );
 				}
 
 				function handler( model, newValue, oldValue ) {
 					setClass( cbk( newValue, oldValue ) );
-				}
-
-				var target = parsed.target ? this[ parsed.target ] : this;
-
-				if ( parsed.target ) {
-					this.listenTo( this[ parsed.target ], 'change:' + parsed.name, handler, this );
-				} else {
-					this.on( 'change:' + parsed.name, handler );
-				}
-
-				setClass( cbk( target[ parsed.name ], target[ parsed.name ] ) );
-			};
-		},
-
-		bindClassValue: function( property, callback ) {
-			var parsed = helpers._parseProp( property ),
-				parsedCbk = helpers._parseProp( callback );
-
-			return function( element ) {
-				var cbk = parsedCbk ?
-					( parsedCbk.target ? this[ parsedCbk.target ] : this )[ parsedCbk.name ] :
-					utils.isFunction( callback ) ? callback :
-					function( value ) {
-						return value;
-					};
-
-				if ( !this._classCache ) {
-					Object.defineProperty( this, '_classCache', {
-						value: {}
-					} );
-				}
-
-				var uid = utils.uid( 'c' ),
-					that = this;
-
-				function setClass( value ) {
-					that._classCache[ uid ] = value;
-
-					if ( value ) {
-						element.classList.add( value );
-					}
-				}
-
-				function handler( model, newValue, oldValue ) {
-					var value = cbk( newValue, oldValue );
-
-					if ( that._classCache[ uid ] ) {
-						if ( that._classCache[ uid ] === value ) {
-							return;
-						}
-
-						element.classList.remove( that._classCache[ uid ] );
-					}
-
-					setClass( value );
 				}
 
 				var target = parsed.target ? this[ parsed.target ] : this;
@@ -146,26 +98,63 @@ define( [
 				parsedCbk = helpers._parseProp( callback );
 
 			return function( element, attr ) {
-				var callback = parsedCbk ?
+				var target = parsed.target ? this[ parsed.target ] : this,
+					cbk = parsedCbk ?
 					( parsedCbk.target ? this[ parsedCbk.target ] : this )[ parsedCbk.name ] :
 					utils.isFunction( callback ) ? callback :
 					function( value ) {
 						return value;
+					},
+					handler;
+
+				if ( attr ) {
+					handler = function( model, newValue, oldValue ) {
+						bob._setAttribute( element, attr, cbk( newValue, oldValue ) );
 					};
 
-				function handler( model, newValue, oldValue ) {
-					bob._setAttribute( element, attr, callback( newValue, oldValue ) );
-				}
+					bob._setAttribute( element, attr, cbk( target[ parsed.name ], target[ parsed.name ] ) );
+				} else {
+					if ( !this._classCache ) {
+						Object.defineProperty( this, '_classCache', {
+							value: {}
+						} );
+					}
 
-				var target = parsed.target ? this[ parsed.target ] : this;
+					var uid = utils.uid( 'c' ),
+						that = this;
+
+					handler = function( model, newValue, oldValue ) {
+						var value = cbk( newValue, oldValue );
+
+						if ( that._classCache[ uid ] ) {
+							if ( that._classCache[ uid ] === value ) {
+								return;
+							}
+
+							element.classList.remove( that._classCache[ uid ] );
+						}
+
+						that._classCache[ uid ] = value;
+
+						if ( value ) {
+							element.classList.add( value );
+						}
+					};
+
+					var value = cbk( target[ parsed.name ], target[ parsed.name ] );
+
+					that._classCache[ uid ] = value;
+
+					if ( value ) {
+						element.classList.add( value );
+					}
+				}
 
 				if ( parsed.target ) {
 					this.listenTo( this[ parsed.target ], 'change:' + parsed.name, handler, this );
 				} else {
 					this.on( 'change:' + parsed.name, handler );
 				}
-
-				bob._setAttribute( element, attr, callback( target[ parsed.name ], target[ parsed.name ] ) );
 			};
 		},
 	};
