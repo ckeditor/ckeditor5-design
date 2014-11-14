@@ -10,6 +10,10 @@ define( [
 			'text': 'textContent'
 		};
 
+	function returnCallback( value ) {
+		return value;
+	}
+
 	var helpers = {
 		_parseProp: function( prop ) {
 			if ( !prop || !utils.isString( prop ) ) {
@@ -34,19 +38,17 @@ define( [
 				var element = event.currentTarget,
 					value = attr in element ? element[ attr ] : element.getAttribute( attr ),
 					target = parsed.target ? this[ parsed.target ] : this,
-					callback;
+					cbk;
 
 				if ( parsedCbk ) {
-					callback = ( parsedCbk.target ? this[ parsedCbk.target ] : this )[ parsedCbk.name ];
+					cbk = ( parsedCbk.target ? this[ parsedCbk.target ] : this )[ parsedCbk.name ];
 				} else if ( utils.isFunction( callback ) ) {
-					callback = callback;
+					cbk = callback;
 				} else {
-					callback = function( value ) {
-						return value;
-					};
+					cbk = returnCallback;
 				}
 
-				target[ parsed.name ] = callback.call( target, value );
+				target[ parsed.name ] = cbk.call( target, value );
 			};
 		},
 
@@ -62,12 +64,15 @@ define( [
 				parsedCbk = helpers._parseProp( callback );
 
 			return function( element ) {
-				var cbk = parsedCbk ?
-					( parsedCbk.target ? this[ parsedCbk.target ] : this )[ parsedCbk.name ] :
-					utils.isFunction( callback ) ? callback :
-					function( value ) {
-						return value;
-					};
+				var cbk;
+
+				if ( parsedCbk ) {
+					cbk = ( parsedCbk.target ? this[ parsedCbk.target ] : this )[ parsedCbk.name ];
+				} else if ( utils.isFunction( callback ) ) {
+					cbk = callback;
+				} else {
+					cbk = returnCallback;
+				}
 
 				function setClass( add ) {
 					if ( negate ) {
@@ -99,13 +104,16 @@ define( [
 
 			return function( element, attr ) {
 				var target = parsed.target ? this[ parsed.target ] : this,
-					cbk = parsedCbk ?
-					( parsedCbk.target ? this[ parsedCbk.target ] : this )[ parsedCbk.name ] :
-					utils.isFunction( callback ) ? callback :
-					function( value ) {
-						return value;
-					},
-					handler;
+					handler,
+					cbk;
+
+				if ( parsedCbk ) {
+					cbk = ( parsedCbk.target ? this[ parsedCbk.target ] : this )[ parsedCbk.name ];
+				} else if ( utils.isFunction( callback ) ) {
+					cbk = callback;
+				} else {
+					cbk = returnCallback;
+				}
 
 				// set the element's attribute
 				if ( attr ) {
