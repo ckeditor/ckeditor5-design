@@ -38,10 +38,12 @@ define( [
 	 * Model
 	 *************************************************************************/
 
-	MVC.Model = function( attributes ) {
-		Object.defineProperty( this, 'attributes', {
+	MVC.Model = function( attributes, properties ) {
+		Object.defineProperty( this, '_attributes', {
 			value: {}
 		} );
+
+		utils.extend( this, properties );
 
 		this._initAttributes( attributes || {} );
 		this.initialize.apply( this, arguments );
@@ -50,36 +52,38 @@ define( [
 	utils.extend( MVC.Model.prototype, Emitter, {
 		initialize: nop,
 
-		set: function( attr, value ) {
-			if ( !this[ attr ] ) {
-				Object.defineProperty( this, attr, {
-					enumerable: true,
+		define: function( attr, value, options ) {
+			Object.defineProperty( this, attr, utils.extend( {
+				enumerable: true,
 
-					get: function() {
-						return this.attributes[ attr ];
-					},
+				get: function() {
+					return this._attributes[ attr ];
+				},
 
-					set: function( value ) {
-						var oldValue = this.attributes[ attr ];
+				set: function( value ) {
+					var oldValue = this._attributes[ attr ];
 
-						if ( oldValue !== value ) {
-							this.attributes[ attr ] = value;
-							this.trigger( 'change:' + attr, this, value, oldValue );
-							this.trigger( 'change', this );
-						}
+					if ( oldValue !== value ) {
+						this._attributes[ attr ] = value;
+						this.trigger( 'change', this );
+						this.trigger( 'change:' + attr, this, value, oldValue );
 					}
-				} );
-			}
+				}
+			}, options ) );
 
-			this.attributes[ attr ] = value;
+			if ( !utils.isUndefined( value ) ) {
+				this._attributes[ attr ] = value;
+			}
 		},
 
 		_initAttributes: function( attributes ) {
 			Object.keys( attributes ).forEach( function( attr ) {
-				this.set( attr, attributes[ attr ] );
+				this.define( attr, attributes[ attr ] );
 			}, this );
 		}
 	} );
+
+	MVC.Model.extend = extend;
 
 
 	/**************************************************************************
@@ -88,6 +92,10 @@ define( [
 
 	MVC.View = function( options ) {
 		this.options = options || {};
+
+		if ( options instanceof MVC.Model ) {
+			options.model = options;
+		}
 
 		if ( options && options.model ) {
 			this.model = options.model;
@@ -103,6 +111,8 @@ define( [
 	utils.extend( MVC.View, Bob.helpers );
 
 	utils.extend( MVC.View.prototype, Emitter, Bob.mixin, {
+		template: null,
+
 		destroy: function() {
 			if ( this.isDestroyed ) {
 				return this;
@@ -129,6 +139,8 @@ define( [
 
 			this.trigger( 'render', this );
 
+			this.isDestroyed = false;
+
 			return this;
 		}
 	} );
@@ -148,7 +160,9 @@ define( [
 			this.options = options;
 		}
 
-		utils.extend( this, properties );
+		if ( properties ) {
+			utils.extend( this, properties );
+		}
 
 		this.initialize.apply( this, arguments );
 	};
@@ -277,9 +291,11 @@ define( [
 	}, Emitter );
 
 	MVC.SpaceManager = function( options, properties ) {
-		this.options = options || {};
+		this.options = options;
 
-		utils.extend( this, properties );
+		if ( properties ) {
+			utils.extend( this, properties );
+		}
 
 		this.initialize.apply( this, arguments );
 	};
@@ -292,90 +308,41 @@ define( [
 
 
 	/**************************************************************************
-	 * Plugin
-	 *************************************************************************/
-
-	MVC.PluginManagerMixin = {
-		getPlugin: function( name ) {
-			return ( this.plugins && this.plugins[ name ] ) || null;
-		},
-
-		startPlugins: function() {
-			Object.keys( this.plugins ).forEach( function( name ) {
-				var plugin = this.plugins[ name ];
-
-				// TODO - use plugin's events or the App's bus?
-				plugin.trigger( name + 'before:start' );
-				plugin.start.call( this, this.options );
-				plugin.trigger( name + ':start' );
-			}, this );
-		},
-
-		use: function( options ) {
-			if ( !this.plugins ) {
-				this.plugins = {};
-			}
-
-			if ( !options.name ) {
-				options.name = 'plugin_' + utils.uid( 'p' );
-			}
-
-			var plugin = this.plugins[ options.name ] = new MVC.Plugin( options );
-			plugin.initialize.call( this, this.options );
-		}
-	};
-
-	MVC.Plugin = function( options ) {
-		utils.extend( this, options );
-	};
-
-	utils.extend( MVC.Plugin.prototype, Emitter, {
-		name: null,
-
-		initialize: nop,
-		start: nop
-	} );
-
-
-	/**************************************************************************
 	 * Application
 	 *************************************************************************/
 
 	MVC.Application = function( options, properties ) {
-		this.options = options || {};
+		this.options = options;
 
-		utils.extend( this, properties );
+		if ( properties ) {
+			utils.extend( this, properties );
+		}
 
 		this.initialize.apply( this, arguments );
 	};
 
-	utils.extend(
-		MVC.Application.prototype,
-		Emitter,
-		Commands,
-		MVC.SpaceManagerMixin,
-		MVC.PluginManagerMixin, {
-			create: function() {
-				this.trigger( 'before:create', this );
-				this.trigger( 'create', this );
+	utils.extend( MVC.Application.prototype, Emitter, Commands, MVC.SpaceManagerMixin, {
+		create: function() {
+			this.trigger( 'before:create', this );
+			this.trigger( 'create', this );
 
-				return this;
-			},
+			return this;
+		},
 
-			destroy: function() {
-				this.trigger( 'before:destroy' );
-				this._spaceManager.destroy();
-				this.trigger( 'destroy' );
-			},
+		destroy: function() {
+			this.trigger( 'before:destroy' );
+			this._spaceManager.destroy();
+			this.trigger( 'destroy' );
+		},
 
-			getOption: function( name ) {
-				return this.options && this.options[ name ] !== undefined ?
-					this.options[ name ] :
-					this[ name ];
-			},
+		getOption: function( name ) {
+			return this.options && this.options[ name ] !== undefined ?
+				this.options[ name ] :
+				this[ name ];
+		},
 
-			initialize: nop
-		} );
+		initialize: nop
+	} );
 
 	MVC.Application.extend = extend;
 

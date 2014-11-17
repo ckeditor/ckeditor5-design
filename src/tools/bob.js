@@ -5,48 +5,161 @@ define( [
 ) {
 	'use strict';
 
-	var propPattern = /(\w+)(?:\.(\w+))?/;
+	var propPattern = /(\w+)(?:\.(\w+))?/,
+		attAliases = {
+			'text': 'textContent'
+		};
+
+	function returnCallback( value ) {
+		return value;
+	}
 
 	var helpers = {
-		bindProp: function( property, mutator ) {
-			var parsed = propPattern.exec( property );
+		_parseProp: function( prop ) {
+			if ( !prop || !utils.isString( prop ) ) {
+				return null;
+			}
 
-			return function( element, attr ) {
-				var callback = utils.isFunction( mutator ) ? mutator : this[ mutator ] || function( value ) {
-						return value;
-					},
-					target = parsed[ 2 ] ? this[ parsed[ 1 ] ] : this,
-					name = parsed[ 2 ] || parsed[ 1 ];
+			var parsed = propPattern.exec( prop ),
+				target = parsed[ 2 ] && parsed[ 1 ],
+				name = parsed[ 2 ] || parsed[ 1 ];
 
-				function handler( model, newValue, oldValue ) {
-					bob._setAttribute( element, attr, callback( newValue, oldValue ) );
-				}
-
-				if ( target === this ) {
-					this.on( 'change:' + name, handler );
-				} else {
-					this.listenTo( target, 'change:' + name, handler, this );
-				}
-
-				bob._setAttribute( element, attr, callback( target[ name ], target[ name ] ) );
+			return {
+				name: name,
+				target: target
 			};
 		},
 
-		bindAttr: function( attr, property, mutator ) {
-			var parsed = propPattern.exec( property );
+		bindAttr: function( attr, property, callback ) {
+			var parsed = helpers._parseProp( property ),
+				parsedCbk = helpers._parseProp( callback );
 
 			return function( event ) {
-				var callback = utils.isFunction( mutator ) ? mutator : this[ mutator ] || function( value ) {
-						return value;
-					},
-					target = parsed[ 2 ] ? this[ parsed[ 1 ] ] : this,
-					name = parsed[ 2 ] || parsed[ 1 ],
-					element = event.currentTarget,
-					value = attr in element ? element[ attr ] : element.getAttribute( attr );
+				var element = event.currentTarget,
+					value = attr in element ? element[ attr ] : element.getAttribute( attr ),
+					target = parsed.target ? this[ parsed.target ] : this,
+					cbk;
 
-				target[ name ] = callback( value );
+				if ( parsedCbk ) {
+					cbk = ( parsedCbk.target ? this[ parsedCbk.target ] : this )[ parsedCbk.name ];
+				} else if ( utils.isFunction( callback ) ) {
+					cbk = callback;
+				} else {
+					cbk = returnCallback;
+				}
+
+				target[ parsed.name ] = cbk.call( target, value );
 			};
-		}
+		},
+
+		bindClassToggle: function( name, property, callback ) {
+			var negate = false;
+
+			if ( property.charAt( 0 ) === '!' ) {
+				negate = true;
+				property = property.substr( 1 );
+			}
+
+			var parsed = helpers._parseProp( property ),
+				parsedCbk = helpers._parseProp( callback );
+
+			return function( element ) {
+				var cbk;
+
+				if ( parsedCbk ) {
+					cbk = ( parsedCbk.target ? this[ parsedCbk.target ] : this )[ parsedCbk.name ];
+				} else if ( utils.isFunction( callback ) ) {
+					cbk = callback;
+				} else {
+					cbk = returnCallback;
+				}
+
+				function setClass( add ) {
+					if ( negate ) {
+						add = !add;
+					}
+
+					element.classList[ add ? 'add' : 'remove' ]( name );
+				}
+
+				function handler( model, newValue, oldValue ) {
+					setClass( cbk( newValue, oldValue ) );
+				}
+
+				var target = parsed.target ? this[ parsed.target ] : this;
+
+				if ( parsed.target ) {
+					this.listenTo( this[ parsed.target ], 'change:' + parsed.name, handler, this );
+				} else {
+					this.on( 'change:' + parsed.name, handler );
+				}
+
+				setClass( cbk( target[ parsed.name ], target[ parsed.name ] ) );
+			};
+		},
+
+		bindProp: function( property, callback ) {
+			var parsed = helpers._parseProp( property ),
+				parsedCbk = helpers._parseProp( callback );
+
+			return function( element, attr ) {
+				var target = parsed.target ? this[ parsed.target ] : this,
+					handler,
+					cbk;
+
+				if ( parsedCbk ) {
+					cbk = ( parsedCbk.target ? this[ parsedCbk.target ] : this )[ parsedCbk.name ];
+				} else if ( utils.isFunction( callback ) ) {
+					cbk = callback;
+				} else {
+					cbk = returnCallback;
+				}
+
+				// set the element's attribute
+				if ( attr ) {
+					handler = function( model, newValue, oldValue ) {
+						bob._setAttribute( element, attr, cbk( newValue, oldValue ) );
+					};
+
+					bob._setAttribute( element, attr, cbk( target[ parsed.name ], target[ parsed.name ] ) );
+					// set the element's class
+				} else {
+					var last;
+
+					handler = function( model, newValue, oldValue ) {
+						var value = cbk( newValue, oldValue );
+
+						if ( last ) {
+							if ( last === value ) {
+								return;
+							}
+
+							element.classList.remove( last );
+						}
+
+						last = value;
+
+						if ( value ) {
+							element.classList.add( value );
+						}
+					};
+
+					var value = cbk( target[ parsed.name ], target[ parsed.name ] );
+
+					last = value;
+
+					if ( value ) {
+						element.classList.add( value );
+					}
+				}
+
+				if ( parsed.target ) {
+					this.listenTo( this[ parsed.target ], 'change:' + parsed.name, handler, this );
+				} else {
+					this.on( 'change:' + parsed.name, handler );
+				}
+			};
+		},
 	};
 
 	var bob = {
@@ -62,6 +175,7 @@ define( [
 
 			var tag = elem[ 0 ],
 				attributes = elem[ 1 ],
+				children = elem[ 2 ],
 				element = document.createElement( tag );
 
 			// only children were passed
@@ -75,24 +189,33 @@ define( [
 				};
 			}
 
-			// add the attributes
+			// add attributes
 			if ( utils.isObject( attributes ) ) {
 				Object.keys( attributes ).forEach( function( name ) {
 					var value = attributes[ name ];
 
-					// add children
-					if ( name === 'children' && utils.isArray( value ) ) {
-						value.forEach( function( child ) {
-							if ( ( child = this.build( child ) ) ) {
-								element.appendChild( child );
-							}
-						}, this );
-						// bind an event
-					} else if ( !name.indexOf( 'on' ) ) {
+					// bind an event
+					if ( !name.indexOf( 'on' ) ) {
 						this._bindEvent( element, name, value );
+						// bind classes
+					} else if ( name === 'classes' ) {
+						if ( !utils.isArray( value ) ) {
+							return;
+						}
+
+						this._bindClasses( element, value );
 						// bind an attribute
 					} else {
 						this._bindAttribute( element, name, value );
+					}
+				}, this );
+			}
+
+			// add children
+			if ( utils.isArray( children ) ) {
+				children.forEach( function( child ) {
+					if ( ( child = this.build( child ) ) ) {
+						element.appendChild( child );
 					}
 				}, this );
 			}
@@ -111,13 +234,35 @@ define( [
 		_bindEvent: function( element, event, value ) {
 			event = !event.indexOf( 'on' ) ? event.substr( 2 ) : event;
 
-			element.addEventListener( event, (
-					utils.isFunction( value ) ? value : this[ value ]
-				).bind( this ),
-				false );
+			var handler;
+
+			if ( utils.isFunction( value ) ) {
+				handler = value.bind( this );
+			} else if ( utils.isString( value ) ) {
+				var parsed = helpers._parseProp( value ),
+					target = parsed.target ? this[ parsed.target ] : this;
+
+				handler = target[ parsed.name ].bind( target );
+			} else {
+				throw new Error( 'Nope' );
+			}
+
+			element.addEventListener( event, handler, false );
+		},
+
+		_bindClasses: function( element, classes ) {
+			classes.forEach( function( value ) {
+				if ( utils.isString( value ) ) {
+					element.classList.add( value );
+				} else if ( utils.isFunction( value ) ) {
+					value.call( this, element );
+				}
+			}, this );
 		},
 
 		_setAttribute: function( element, name, value ) {
+			name = attAliases[ name ] || name;
+
 			if ( name in element ) {
 				element[ name ] = value;
 			} else {

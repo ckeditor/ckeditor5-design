@@ -48,6 +48,26 @@ define( function() {
 			} );
 		},
 
+		clone: function( obj ) {
+			var clone;
+
+			if ( this.isArray( obj ) ) {
+				clone = obj.map( function( value ) {
+					return this.clone( value );
+				}, this );
+			} else if ( this.isObject( obj ) ) {
+				clone = {};
+
+				Object.getOwnPropertyNames( obj ).forEach( function( name ) {
+					clone[ name ] = this.clone( obj[ name ] );
+				}, this );
+			} else {
+				clone = obj;
+			}
+
+			return clone;
+		},
+
 		isArray: function( obj ) {
 			return Array.isArray( obj );
 		},
@@ -76,7 +96,7 @@ define( function() {
 			return typeof obj === 'object' && !!obj;
 		},
 
-		isRegExp: makeIs( 'StRegExp' ),
+		isRegExp: makeIs( 'RegExp' ),
 
 		isString: makeIs( 'String' ),
 

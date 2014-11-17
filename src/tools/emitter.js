@@ -49,7 +49,7 @@ define( [
 				return this;
 			}
 
-			if ( !type && !callback ) {
+			if ( !arguments.length ) {
 				Object.defineProperty( this, '_events', {
 					configurable: true,
 					value: {}
@@ -58,22 +58,26 @@ define( [
 				return this;
 			}
 
-			var events = this._events[ type ];
+			var types = type ? [ type ] : Object.keys( this._events );
 
-			this._events[ type ] = [];
+			types.forEach( function( type ) {
+				var events = this._events[ type ];
 
-			events.forEach( function( event ) {
-				if (
-					( callback && event.callback !== callback && event.callback._original !== callback ) ||
-					( ctx && event.ctx !== ctx )
-				) {
-					this._events[ type ].push( event );
+				this._events[ type ] = [];
+
+				events.forEach( function( event ) {
+					if (
+						( callback && event.callback !== callback && event.callback._original !== callback ) ||
+						( ctx && event.ctx !== ctx )
+					) {
+						this._events[ type ].push( event );
+					}
+				}, this );
+
+				if ( !this._events[ type ].length ) {
+					delete this._events[ type ];
 				}
 			}, this );
-
-			if ( !this._events[ type ].length ) {
-				delete this._events[ type ];
-			}
 
 			return this;
 		},
