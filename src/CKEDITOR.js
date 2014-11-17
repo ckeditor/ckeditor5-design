@@ -1,36 +1,35 @@
 define( [
 	'editor/editor',
-	'core/mvc',
-	'tools/emitter',
-	'tools/utils',
-	'ui/ui'
+	'tools/utils'
 ], function(
 	Editor,
-	MVC,
-	Emitter,
-	utils,
-	ui
+	utils
 ) {
 	'use strict';
 
-	var ckeditor = utils.extend( {
-		instances: {},
-		ui: ui
-	}, Emitter );
-
-	ckeditor.create = function( selector, options ) {
-		var id = 'editor_' + utils.uid( 'e' ),
-			editor;
-
-		this.trigger( 'before:create', id );
-		editor = ckeditor.instances[ id ] = new Editor( selector, options );
-		this.trigger( 'create', editor );
-
-		return editor;
+	var ckeditor = {
+		instances: {}
 	};
 
-	ckeditor.use = function( options ) {
+	ckeditor.create = function( selector, options ) {
+		var editor = null,
+			element;
 
+		if ( utils.isString( selector ) ) {
+			element = document.querySelectorAll( selector );
+
+			if ( element.length > 1 ) {
+				editor = [].map.call( element, function( el ) {
+					var instance = ckeditor.instances[ 'editor_' + utils.uid( 'e' ) ] = new Editor( el, options );
+
+					return instance;
+				} );
+			} else if ( element.length === 1 ) {
+				editor = ckeditor.instances[ 'editor_' + utils.uid( 'e' ) ] = new Editor( element[ 0 ], options );
+			}
+		}
+
+		return editor;
 	};
 
 	return ckeditor;

@@ -322,23 +322,10 @@ define( [
 	};
 
 	utils.extend( MVC.Application.prototype, Emitter, Commands, MVC.SpaceManagerMixin, {
-		create: function() {
-			this.trigger( 'before:create', this );
-			this.trigger( 'create', this );
-
-			return this;
-		},
-
 		destroy: function() {
 			this.trigger( 'before:destroy' );
 			this._spaceManager.destroy();
 			this.trigger( 'destroy' );
-		},
-
-		getOption: function( name ) {
-			return this.options && this.options[ name ] !== undefined ?
-				this.options[ name ] :
-				this[ name ];
 		},
 
 		initialize: nop
