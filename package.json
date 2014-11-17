@@ -3,8 +3,8 @@
 	"version": "0.1.0",
 	"description": "A short description",
 	"dependencies": {
-		"ckeditor-core": "git@github.com:gregpabian/ckeditor-core.git",
-		"ckeditor-plugin-example": "git@github.com:gregpabian/ckeditor-plugin-example.git"
+		"ckeditor-core": "git://github.com/gregpabian/ckeditor-core.git",
+		"ckeditor-plugin-example": "git://github.com/gregpabian/ckeditor-plugin-example.git"
 	},
 	"devDependencies": {
 		"grunt": "^0.4.5",
