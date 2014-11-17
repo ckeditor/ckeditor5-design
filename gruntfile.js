@@ -12,6 +12,17 @@ module.exports = function( grunt ) {
 			} );
 	}
 
+	var pathPattern = /define\(\s?(['|"])(?:[\/\.]+)ckeditor-plugin-(\w+)\/src\/(\w+)\1\,\[([^\]]*)/,
+		depPattern = /(['|"])\.\//g;
+
+	function replacePaths( name, path, content ) {
+		return content.replace( pathPattern, function( m, q, name, submodule, deps ) {
+			return 'define(' + q + 'plugins!' + name +
+				( submodule === name ? '' : '/' + submodule ) + q + ',[' +
+				( deps ? deps.replace( depPattern, '$1plugins!' + name + '/' ) : '' );
+		} );
+	}
+
 	grunt.initConfig( {
 		clean: {
 			build: [ 'build' ],
@@ -24,9 +35,13 @@ module.exports = function( grunt ) {
 					almond: true,
 					baseUrl: 'tmp/ckeditor-core/src/',
 					generateSourceMaps: true,
+					preserveLicenseComments: false,
 					include: [ 'ckeditor' ].concat( getPlugins() ),
+					// optimize: 'uglify2',
 					optimize: 'none',
 					out: 'build/ckeditor.js',
+					onBuildWrite: replacePaths,
+					stubModules: [ 'plugins' ],
 					wrap: {
 						start: '(function (root) {',
 						end: 'root.CKEDITOR = root.CKEDITOR || {};\n' +
