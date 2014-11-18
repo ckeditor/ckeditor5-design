@@ -36,18 +36,18 @@ module.exports = function( grunt ) {
 					baseUrl: 'tmp/ckeditor-core/src/',
 					generateSourceMaps: true,
 					preserveLicenseComments: false,
-					include: [ 'ckeditor' ].concat( getPlugins() ),
+					include: [ 'api' ].concat( getPlugins() ),
 					// optimize: 'uglify2',
 					optimize: 'none',
 					out: 'build/ckeditor.js',
 					onBuildWrite: replacePaths,
 					stubModules: [ 'plugins' ],
 					wrap: {
-						start: '(function (root) {',
-						end: 'root.CKEDITOR = root.CKEDITOR || {};\n' +
+						start: '( function ( root ) {',
+						end: 'root.CKEDITOR = require( \'api\' );\n' +
 							'CKEDITOR.define = CKEDITOR.define || define;\n' +
 							'CKEDITOR.require = CKEDITOR.require || require;\n' +
-							'})(this);'
+							'})( this );'
 					}
 				}
 			}
