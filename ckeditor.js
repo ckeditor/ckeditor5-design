@@ -28,7 +28,15 @@ requirejs.config( {
 		create();
 	}
 
-	require( [ 'api', 'tools/utils' ], function( api, utils ) {
+	require( [
+		'api',
+		'tools/utils',
+		'plugins!samplecreator',
+		'plugins!example'
+	], function(
+		api,
+		utils
+	) {
 		// extend CKEDITOR namespace with the public API
 		// overrides a temporary implementation of the "create" method
 		utils.extend( root.CKEDITOR, api );
