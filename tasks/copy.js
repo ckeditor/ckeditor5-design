@@ -23,7 +23,13 @@ module.exports = function( grunt ) {
 				return done();
 			}
 
-			ncp( path.join( 'node_modules', module ), path.join( 'tmp/', module ), {
+			var dest = path.join( 'tmp/', module );
+
+			if ( !fs.existsSync( dest ) ) {
+				fs.mkdirSync( dest );
+			}
+
+			ncp( path.join( 'node_modules', module, 'src' ), path.join( dest, 'src' ), {
 				dereference: true
 			}, function( err ) {
 				if ( err ) {
