@@ -5,19 +5,21 @@
 	<title>V5 Sample</title>
 </head>
 <body>
-	<script src="../lib/require.js"></script>
-	<script src="../ckeditor.js"></script>
-	<!-- load a custom plugin -->
-	<script src="plugin.js"></script>
-
 	<div id="editor1">
 		<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Distinctio quidem pariatur cum maxime omnis, ducimus officia. Explicabo, facere quo. Neque autem, minus. Eos illo dicta vitae expedita in amet itaque!</p>
 		<p>Qui quis veritatis doloremque architecto at totam nisi fuga velit maiores fugit quaerat, assumenda a distinctio suscipit repellendus labore voluptates. Quisquam tempora laborum incidunt voluptatum fugit rem optio molestiae quos.</p>
 		<p>Impedit molestiae facilis sapiente nemo, eveniet explicabo suscipit vero. Eligendi nobis est necessitatibus pariatur quam, at quaerat ab placeat blanditiis totam natus ad id alias, unde vel voluptates magni numquam.</p>
 	</div>
 
+	<script src="../lib/require.js"></script>
+	<script src="../ckeditor.js"></script>
+	<!-- load a custom plugin -->
+	<script src="plugin.js"></script>
+	<!-- editor initialization -->
 	<script>
-	CKEDITOR.create( '#editor1', {} );
+	CKEDITOR.create( '#editor1', {
+		plugins: 'samplecreator'
+	} );
 	</script>
 </body>
 </html>
