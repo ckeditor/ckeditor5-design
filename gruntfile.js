@@ -34,7 +34,7 @@ module.exports = function( grunt ) {
 				options: {
 					almond: true,
 					baseUrl: 'tmp/ckeditor-core/src/',
-					generateSourceMaps: true,
+					generateSourceMaps: false,
 					preserveLicenseComments: false,
 					include: [ 'api', 'mvc' ].concat( getPlugins() ),
 					// optimize: 'uglify2',
