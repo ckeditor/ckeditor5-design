@@ -4,7 +4,8 @@
 	"description": "A short description",
 	"dependencies": {
 		"ckeditor-core": "git://github.com/gregpabian/ckeditor-core.git",
-		"ckeditor-plugin-example": "git://github.com/gregpabian/ckeditor-plugin-example.git"
+		"ckeditor-plugin-example": "git://github.com/gregpabian/ckeditor-plugin-example.git",
+		"ckeditor-plugin-samplecreator": "git://github.com/gregpabian/ckeditor-plugin-samplecreator.git"
 	},
 	"devDependencies": {
 		"grunt": "^0.4.5",
