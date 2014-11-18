@@ -32,7 +32,8 @@ requirejs.config( {
 		'api',
 		'tools/utils',
 		'plugins!samplecreator',
-		'plugins!example'
+		'plugins!example',
+		'mvc'
 	], function(
 		api,
 		utils
