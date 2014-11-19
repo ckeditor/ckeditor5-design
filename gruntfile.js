@@ -48,9 +48,9 @@ module.exports = function( grunt ) {
 					useStrict: true,
 					wrap: {
 						start: '( function ( root ) {\n',
-						end: 'root.CKEDITOR = require( \'api\' );\n' +
-							'CKEDITOR.define = CKEDITOR.define || define;\n' +
-							'CKEDITOR.require = CKEDITOR.require || require;\n' +
+						end: 'root.CKE = require( \'api\' );\n' +
+							'CKE.define = CKE.define || define;\n' +
+							'CKE.require = CKE.require || require;\n' +
 							'})( this );'
 					}
 				}
@@ -60,7 +60,7 @@ module.exports = function( grunt ) {
 		sed: {
 			build: {
 				path: 'tmp/',
-				pattern: /^(CKEDITOR\.)(define|require)/,
+				pattern: /^(CKE\.)(define|require)/,
 				replacement: '$2',
 				recursive: true
 			}

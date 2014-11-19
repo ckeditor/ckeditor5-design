@@ -27,13 +27,13 @@ requirejs.config( {
 		this.once[ name ] = callback.bind( ctx );
 	};
 
-	// create CKEDITOR namespace
-	var CKEDITOR = root.CKEDITOR || {};
-	CKEDITOR.define = CKEDITOR.define || define;
-	CKEDITOR.require = CKEDITOR.require || require;
+	// create CKE namespace
+	var CKE = root.CKE || {};
+	CKE.define = CKE.define || define;
+	CKE.require = CKE.require || require;
 
 	// CKEditor base path, based on CKE4 code
-	CKEDITOR.basePath = ( function() {
+	CKE.basePath = ( function() {
 		var scripts = document.getElementsByTagName( 'script' ),
 			path;
 
@@ -57,10 +57,10 @@ requirejs.config( {
 		return path;
 	} )();
 
-	CKEDITOR.instances = {};
+	CKE.instances = {};
 
 	// buffer create calls
-	CKEDITOR.create = function( selector, options ) {
+	CKE.create = function( selector, options ) {
 		var editor = new Editor( selector, options );
 
 		createBuffer.push( editor );
@@ -70,10 +70,10 @@ requirejs.config( {
 
 	// return plugins base path for the dev environment
 	function getPluginPath( name ) {
-		return CKEDITOR.basePath + 'node_modules/ckeditor-plugin-' + name + '/src/';
+		return CKE.basePath + 'node_modules/ckeditor-plugin-' + name + '/src/';
 	}
 
-	CKEDITOR.getPluginPath = getPluginPath;
+	CKE.getPluginPath = getPluginPath;
 
 	// create editor instances from the buffer
 	function create() {
@@ -83,14 +83,14 @@ requirejs.config( {
 			return;
 		}
 
-		var instance = CKEDITOR.create.call( CKEDITOR, editor.selector, editor.options );
+		var instance = CKE.create.call( CKE, editor.selector, editor.options );
 
 		// TODO bind fake instance's events
 
 		create();
 	}
 
-	root.CKEDITOR = CKEDITOR;
+	root.CKE = CKE;
 
 	require( [
 		'api',
@@ -99,12 +99,12 @@ requirejs.config( {
 		api,
 		utils
 	) {
-		// extend CKEDITOR namespace with the public API
+		// extend CKE namespace with the public API
 		// overrides a temporary implementation of the "create" method
-		utils.extend( root.CKEDITOR, api );
+		utils.extend( root.CKE, api );
 
 		// override default getPluginPath for the dev environment
-		CKEDITOR.getPluginPath = getPluginPath;
+		CKE.getPluginPath = getPluginPath;
 
 		create();
 	} );
