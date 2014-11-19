@@ -14,11 +14,11 @@
 	<script src="../lib/require.js"></script>
 	<script src="../ckeditor.js"></script>
 	<!-- load a custom plugin -->
-	<script src="plugin.js"></script>
+	<script src="sampleplugin.js"></script>
 	<!-- editor initialization -->
 	<script>
 	CKE.create( '#editor1', {
-		plugins: 'samplecreator'
+		plugins: [ 'sample', 'samplecreator' ]
 	} );
 	</script>
 </body>
