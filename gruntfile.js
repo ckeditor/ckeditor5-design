@@ -36,7 +36,7 @@ module.exports = function( grunt ) {
 					baseUrl: 'tmp/ckeditor-core/src/',
 					generateSourceMaps: false,
 					preserveLicenseComments: false,
-					include: [ 'api', 'mvc' ].concat( getPlugins() ),
+					include: [ 'api' ].concat( getPlugins() ),
 					paths: {
 						plugins: '../../../lib/plugins'
 					},
