@@ -1,13 +1,13 @@
-CKE.define( 'plugins!sample', [], function() {
+CKE.define( 'plugins!sample', [ 'mvc/plugin' ], function( Plugin ) {
 	'use strict';
 
-	return {
-		init: function( editor ) {
-			console.log( 'init sample plugin for', editor );
+	return Plugin.extend( {
+		init: function() {
+			console.log( 'init sample plugin for', this.editor );
 
-			editor.addCommand( 'sample', function( foo ) {
+			this.editor.addCommand( 'sample', function( foo ) {
 				console.log( 'sample:', foo );
 			} );
 		}
-	};
+	} );
 } );
