@@ -7,12 +7,8 @@ requirejs.config( {
 } );
 
 ( function( root ) {
-	// create CKEDITOR namespace
-	root.CKEDITOR = root.CKEDITOR || {};
-	CKEDITOR.define = CKEDITOR.define || define;
-	CKEDITOR.require = CKEDITOR.require || require;
-
-	var createBuffer = [];
+	var basePathSrcPattern = /(^|.*[\\\/])ckeditor\.js(?:\?.*|;.*)?$/i,
+		createBuffer = [];
 
 	// CKEditor instance stub
 	function Editor( selector, options ) {
@@ -31,6 +27,38 @@ requirejs.config( {
 		this.once[ name ] = callback.bind( ctx );
 	};
 
+	// create CKEDITOR namespace
+	var CKEDITOR = root.CKEDITOR || {};
+	CKEDITOR.define = CKEDITOR.define || define;
+	CKEDITOR.require = CKEDITOR.require || require;
+
+	// CKEditor base path, based on CKE4 code
+	CKEDITOR.basePath = ( function() {
+		var scripts = document.getElementsByTagName( 'script' ),
+			path;
+
+		[].some.call( scripts, function( script ) {
+			var match = script.src.match( basePathSrcPattern );
+
+			if ( match ) {
+				path = match[ 1 ];
+				return true;
+			}
+		} );
+
+		if ( path.indexOf( ':/' ) == -1 && path.slice( 0, 2 ) != '//' ) {
+			if ( path.indexOf( '/' ) === 0 ) {
+				path = location.href.match( /^.*?:\/\/[^\/]*/ )[ 0 ] + path;
+			} else {
+				path = location.href.match( /^[^\?]*\/(?:)/ )[ 0 ] + path;
+			}
+		}
+
+		return path;
+	} )();
+
+	CKEDITOR.instances = {};
+
 	// buffer create calls
 	CKEDITOR.create = function( selector, options ) {
 		var editor = new Editor( selector, options );
@@ -39,6 +67,13 @@ requirejs.config( {
 
 		return editor;
 	};
+
+	// return plugins base path for the dev environment
+	function getPluginPath( name ) {
+		return CKEDITOR.basePath + 'node_modules/ckeditor-plugin-' + name + '/src/';
+	}
+
+	CKEDITOR.getPluginPath = getPluginPath;
 
 	// create editor instances from the buffer
 	function create() {
@@ -55,6 +90,8 @@ requirejs.config( {
 		create();
 	}
 
+	root.CKEDITOR = CKEDITOR;
+
 	require( [
 		'api',
 		'tools/utils'
@@ -65,6 +102,10 @@ requirejs.config( {
 		// extend CKEDITOR namespace with the public API
 		// overrides a temporary implementation of the "create" method
 		utils.extend( root.CKEDITOR, api );
+
+		// override default getPluginPath for the dev environment
+		CKEDITOR.getPluginPath = getPluginPath;
+
 		create();
 	} );
 } )( this );
