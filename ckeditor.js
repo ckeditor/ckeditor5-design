@@ -1,5 +1,9 @@
+// basic Require.js configuration
 requirejs.config( {
-	baseUrl: '../node_modules/ckeditor-core/src/'
+	baseUrl: '../node_modules/ckeditor-core/src/',
+	paths: {
+		plugins: '../../../lib/plugins'
+	}
 } );
 
 ( function( root ) {
@@ -10,30 +14,50 @@ requirejs.config( {
 
 	var createBuffer = [];
 
+	// CKEditor instance stub
+	function Editor( selector, options ) {
+		this.selector = selector;
+		this.options = options;
+		this.isCreated = false;
+		this.on = {};
+		this.once = {};
+	}
+
+	Editor.prototype.on = function( name, callback, ctx ) {
+		this.on[ name ] = callback.bind( ctx );
+	};
+
+	Editor.prototype.once = function( name, callback, ctx ) {
+		this.once[ name ] = callback.bind( ctx );
+	};
+
 	// buffer create calls
 	CKEDITOR.create = function( selector, options ) {
-		createBuffer.push( arguments );
+		var editor = new Editor( selector, options );
+
+		createBuffer.push( editor );
+
+		return editor;
 	};
 
 	// create editor instances from the buffer
 	function create() {
-		var options = createBuffer.shift();
+		var editor = createBuffer.shift();
 
-		if ( !options ) {
+		if ( !editor ) {
 			return;
 		}
 
-		CKEDITOR.create.apply( null, options );
+		var instance = CKEDITOR.create.call( CKEDITOR, editor.selector, editor.options );
+
+		// TODO bind fake instance's events
 
 		create();
 	}
 
 	require( [
 		'api',
-		'tools/utils',
-		'plugins!samplecreator',
-		'plugins!example',
-		'mvc'
+		'tools/utils'
 	], function(
 		api,
 		utils
