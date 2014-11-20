@@ -14,7 +14,7 @@ requirejs.config( {
 	function Editor( selector, options ) {
 		this.selector = selector;
 		this.options = options;
-		this.isCreated = false;
+		this.created = false;
 		this.on = {};
 		this.once = {};
 	}
