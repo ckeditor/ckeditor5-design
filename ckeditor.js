@@ -90,18 +90,48 @@ requirejs.config( {
 		create();
 	}
 
+	// internal dependency tree used for plugin initialization in a proper order
+	CKE._dependencyTree = {};
+
 	root.CKE = CKE;
 
+	var pluginPattern = /\.\.\/ckeditor-plugin-([^\/]+)\/src\/(.+)$/;
+
+	// CAUTION!!!
+	// We're using an internal Require.js API here - this may change or disappear in the future
+	requirejs.onResourceLoad = function( context, map, deps ) {
+		var match = pluginPattern.exec( map.id ),
+			name;
+
+		// replace a relative path with plugins!<name>
+		if ( match ) {
+			name = 'plugins!' + match[ 1 ];
+
+			// append submodule path
+			if ( match[ 2 ] !== match[ 1 ] ) {
+				name += '/' + match[ 2 ];
+			}
+		} else {
+			name = map.id;
+		}
+
+		if ( !CKE._dependencyTree[ name ] ) {
+			CKE._dependencyTree[ name ] = deps.map( function( dep ) {
+				return dep.id;
+			} );
+		}
+	};
+
 	require( [
-		'api',
+		'ckeditor',
 		'tools/utils'
 	], function(
-		api,
+		ckeditor,
 		utils
 	) {
 		// extend CKE namespace with the public API
 		// overrides a temporary implementation of the "create" method
-		utils.extend( root.CKE, api );
+		utils.extend( root.CKE, ckeditor );
 
 		// override default getPluginPath for the dev environment
 		CKE.getPluginPath = getPluginPath;

@@ -36,22 +36,20 @@ module.exports = function( grunt ) {
 					baseUrl: 'tmp/ckeditor-core/src/',
 					generateSourceMaps: false,
 					preserveLicenseComments: false,
-					include: [ 'api' ].concat( getPlugins() ),
+					include: ['depTree', 'ckeditor' ].concat( getPlugins() ),
 					paths: {
+						depTree: '../../../lib/depTree',
 						plugins: '../../../lib/plugins'
 					},
 					// optimize: 'uglify2',
 					optimize: 'none',
-					out: 'build/ckeditor.js',
 					onBuildWrite: replacePaths,
+					out: 'build/ckeditor.js',
 					stubModules: [ 'plugins' ],
 					useStrict: true,
 					wrap: {
-						start: '( function ( root ) {\n',
-						end: 'root.CKE = require( \'api\' );\n' +
-							'CKE.define = CKE.define || define;\n' +
-							'CKE.require = CKE.require || require;\n' +
-							'})( this );'
+						startFile: 'lib/start.frag',
+						endFile: 'lib/end.frag'
 					}
 				}
 			}
