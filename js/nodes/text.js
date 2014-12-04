@@ -7,8 +7,20 @@ function TextNode() {
 	Node.apply( this, arguments );
 }
 
-utils.inherit( TextNode, Node );
+utils.extend( TextNode, Node, {
+	type: 'text',
 
-TextNode.type = 'text';
+	toData: function( dom ) {
+		return {
+			insert: dom.textContent
+		};
+	},
+
+	toDom: function( data, doc ) {
+		return doc.createTextNode( data.insert );
+	}
+} );
+
+utils.inherit( TextNode, Node );
 
 module.exports = TextNode;

@@ -7,10 +7,12 @@ function BreakNode() {
 	Node.apply( this, arguments );
 }
 
-utils.inherit( BreakNode, Node );
+utils.extend( BreakNode, Node, {
+	type: 'break',
+	tags: [ 'br' ],
+	isEmpty: true
+} );
 
-BreakNode.type = 'break';
-BreakNode.matchTags = [ 'br' ];
-BreakNode.isEmpty = true;
+utils.inherit( BreakNode, Node );
 
 module.exports = BreakNode;

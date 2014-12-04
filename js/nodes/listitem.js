@@ -7,9 +7,11 @@ function ListItemNode() {
 	Branch.apply( this, arguments );
 }
 
-utils.inherit( ListItemNode, Branch );
+utils.extend( ListItemNode, Branch, {
+	type: 'listItem',
+	tags: [ 'li' ]
+} );
 
-ListItemNode.type = 'listItem';
-ListItemNode.matchTags = [ 'li' ];
+utils.inherit( ListItemNode, Branch );
 
 module.exports = ListItemNode;

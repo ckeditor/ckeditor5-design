@@ -7,9 +7,11 @@ function ParagraphNode() {
 	Branch.apply( this, arguments );
 }
 
-utils.inherit( ParagraphNode, Branch );
+utils.extend( ParagraphNode, Branch, {
+	type: 'paragraph',
+	tags: [ 'p' ]
+} );
 
-ParagraphNode.type = 'paragraph';
-ParagraphNode.matchTags = [ 'p' ];
+utils.inherit( ParagraphNode, Branch );
 
 module.exports = ParagraphNode;

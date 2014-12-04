@@ -7,18 +7,16 @@ function ImageNode() {
 	Node.apply( this, arguments );
 }
 
-utils.inherit( ImageNode, Node );
+utils.extend( ImageNode, Node, {
+	type: 'image',
+	tags: [ 'img' ],
+	isEmpty: true,
 
-ImageNode.type = 'image';
-ImageNode.matchTags = [ 'img' ];
-ImageNode.isEmpty = true;
-
-utils.extend( ImageNode.prototype, {
 	toData: function( dom ) {
 		return {
 			insert: 1,
 			attributes: {
-				type: ImageNode.type,
+				type: this.type,
 				src: dom.src
 			}
 		};
@@ -32,5 +30,7 @@ utils.extend( ImageNode.prototype, {
 		return dom;
 	}
 } );
+
+utils.inherit( ImageNode, Node );
 
 module.exports = ImageNode;

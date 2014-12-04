@@ -7,9 +7,11 @@ function DivNode() {
 	Branch.apply( this, arguments );
 }
 
-utils.inherit( DivNode, Branch );
+utils.extend( DivNode, Branch, {
+	type: 'div',
+	tags: [ 'div' ]
+} );
 
-DivNode.type = 'div';
-DivNode.matchTags = [ 'div' ];
+utils.inherit( DivNode, Branch );
 
 module.exports = DivNode;

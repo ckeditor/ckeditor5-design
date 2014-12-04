@@ -1,7 +1,9 @@
+/* global document */
+
 'use strict';
 
 var Converter = require( './converter' ),
-	NodeManager = require( './node-manager' ),
+	TypeManager = require( './type-manager' ),
 	EventEmitter = require( 'events' ).EventEmitter,
 	utils = require( './utils' );
 
@@ -10,15 +12,17 @@ function Editor( selector ) {
 
 	this.el = document.querySelector( selector );
 
-	this.nodeManager = new NodeManager();
-	this.nodeManager.registerNodeTypes( [
-		'break', 'div', 'heading', 'image', 'list', 'listitem', 'paragraph', 'text', 'unknown'
+	this.typeManager = new TypeManager();
+	this.typeManager.register( [
+		'break', 'div', 'heading', 'image', 'list', 'listitem', 'paragraph', 'span', 'text', 'unknown',
+		'bold', 'italic', 'underline'
 	] );
-	this.converter = new Converter();
 
-	// TODO register nodes with nodeManager
+	this.converter = new Converter( this.typeManager );
 
 	this.document = this.converter.getDocForDom( this.el );
+
+	console.log( this.document );
 }
 
 utils.inherit( Editor, EventEmitter );

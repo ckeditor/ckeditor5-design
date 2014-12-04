@@ -7,8 +7,10 @@ function UnknownNode() {
 	Node.apply( this, arguments );
 }
 
-utils.inherit( UnknownNode, Node );
+utils.extend( UnknownNode, Node, {
+	type: 'unknown'
+} );
 
-UnknownNode.type = 'unknown';
+utils.inherit( UnknownNode, Node );
 
 module.exports = UnknownNode;

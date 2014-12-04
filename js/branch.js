@@ -9,6 +9,10 @@ function Branch( children ) {
 	this.children = Array.isArray( children ) ? children : [];
 }
 
+
+// inherit statics
+utils.extend( Branch, Node );
+// inherit prototype
 utils.inherit( Branch, Node );
 
 utils.extend( Branch.prototype, {

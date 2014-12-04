@@ -1,30 +1,36 @@
 'use strict';
 
-function Node() {}
+function Node() {
+	this.document = null;
+}
 
-// override in a subclass
+// static props
 Node.type = null;
-Node.matchTags = [];
+Node.tags = [];
 
-Node.prototype = {
-	toData: function() {
-		return {
-			insert: 1,
-			attributes: {
-				type: this.constructor.type
-			}
-		};
-	},
-
-	toDom: function( data, doc ) {
-		var tags = this.constructor.matchTags;
-
-		if ( tags.length === 1 ) {
-			return doc.createElement( tags[ 0 ] );
+// static methods
+Node.toData = function( dom ) {
+	return {
+		insert: 1,
+		attributes: {
+			type: this.type
 		}
+	};
+};
 
-		throw new Error( 'Overrid toDom in a subclass' );
+Node.toDom = function( data, doc ) {
+	var tags = this.tags;
+
+	if ( tags.length === 1 ) {
+		return doc.createElement( tags[ 0 ] );
 	}
+
+	throw new Error( 'Overrid toDom in a subclass' );
+};
+
+// prototype
+Node.prototype = {
+	// TODO
 };
 
 module.exports = Node;

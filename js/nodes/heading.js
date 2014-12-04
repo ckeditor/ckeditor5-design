@@ -7,17 +7,15 @@ function HeadingNode() {
 	Node.apply( this, arguments );
 }
 
-utils.inherit( HeadingNode, Node );
+utils.extend( HeadingNode, Node, {
+	type: 'heading',
+	tags: [ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ],
 
-HeadingNode.type = 'heading';
-HeadingNode.matchTags = [ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ];
-
-utils.extend( HeadingNode.prototype, {
 	toData: function( dom ) {
 		return {
 			insert: 1,
 			attributes: {
-				type: HeadingNode.type,
+				type: this.type,
 				level: dom.nodeName.toLowerCase().replace( 'h', '' )
 			}
 		};
@@ -27,5 +25,7 @@ utils.extend( HeadingNode.prototype, {
 		return doc.createElement( 'h' + data.attributes.level );
 	}
 } );
+
+utils.inherit( HeadingNode, Node );
 
 module.exports = HeadingNode;

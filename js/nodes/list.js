@@ -7,17 +7,15 @@ function ListNode() {
 	Branch.apply( this, arguments );
 }
 
-utils.inherit( ListNode, Branch );
+utils.extend( ListNode, Branch, {
+	type: 'list',
+	tags: [ 'ul', 'ol' ],
 
-ListNode.type = 'list';
-ListNode.matchTags = [ 'ul', 'ol' ];
-
-utils.extend( ListNode.prototype, {
 	toData: function( dom ) {
 		return {
 			insert: 1,
 			attributes: {
-				type: ListNode.type,
+				type: this.type,
 				style: dom.nodeName.toLowerCase() == 'ol' ? 'number' : 'bullet'
 			}
 		};
@@ -27,5 +25,7 @@ utils.extend( ListNode.prototype, {
 		return doc.createElement( data.attributes.style === 'number' ? 'ol' : 'ul' );
 	}
 } );
+
+utils.inherit( ListNode, Branch );
 
 module.exports = ListNode;

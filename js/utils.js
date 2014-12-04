@@ -14,13 +14,13 @@ var utils = {
 			return target;
 		}
 
-		var args, keys, i;
+		var args, keys, len, i;
 
 		if ( arguments.length > 2 ) {
 			args = Array.prototype.splice.call( arguments, 1 );
-			i = args.length;
+			len = args.length;
 
-			while ( i-- ) {
+			for ( i = 0; i < len; i++ ) {
 				this.extend( target, args[ i ] );
 			}
 
