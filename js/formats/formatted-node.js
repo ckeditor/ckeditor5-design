@@ -10,14 +10,12 @@ function FormattedNode() {
 // inherit statics
 utils.extend( FormattedNode, Node, {
 	toData: function( dom ) {
-		return {
-			insert: dom.textContent,
-			attributes: {
-				type: this.type,
-				// preserve the original tag
-				tag: dom.nodeName.toLowerCase()
-			}
-		};
+		var attributes = {};
+
+		attributes[ this.type ] = true;
+		attributes[ this.type + 'Tag' ] = dom.nodeName.toLowerCase();
+
+		return attributes;
 	},
 
 	toDom: function( data, doc ) {

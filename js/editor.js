@@ -21,8 +21,6 @@ function Editor( selector ) {
 	this.converter = new Converter( this.typeManager );
 
 	this.document = this.converter.getDocForDom( this.el );
-
-	console.log( this.document );
 }
 
 utils.inherit( Editor, EventEmitter );
