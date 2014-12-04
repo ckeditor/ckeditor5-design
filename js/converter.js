@@ -83,6 +83,7 @@ Converter.prototype = {
 
 		// add parent element's closing tag
 		if ( parent && parent.attributes.type ) {
+			// TODO should we put a closing tag for a void element?
 			data.push( {
 				insert: 1,
 				attributes: {

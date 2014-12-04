@@ -103,6 +103,17 @@ var utils = {
 		return obj === void 0;
 	},
 
+	pick: function( obj, properties ) {
+		return Object.keys( obj )
+			.reduce( function( output, current ) {
+				if ( properties.indexOf( current ) > -1 ) {
+					output[ current ] = obj[ current ];
+				}
+
+				return output;
+			}, {} );
+	},
+
 	uid: function( name ) {
 		if ( !uids[ name ] ) {
 			uids[ name ] = 1;

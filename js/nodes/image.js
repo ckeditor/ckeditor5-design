@@ -10,25 +10,8 @@ function ImageNode() {
 utils.extend( ImageNode, Node, {
 	type: 'image',
 	tags: [ 'img' ],
-	isEmpty: true,
-
-	toData: function( dom ) {
-		return {
-			insert: 1,
-			attributes: {
-				type: this.type,
-				src: dom.src
-			}
-		};
-	},
-
-	toDom: function( data, doc ) {
-		var dom = doc.createElement( 'img' );
-
-		dom.src = data.attributes.src;
-
-		return dom;
-	}
+	attributes: [ 'src', 'alt', 'width', 'height', 'title' ],
+	isEmpty: true
 } );
 
 utils.inherit( ImageNode, Node );
