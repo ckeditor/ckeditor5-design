@@ -1,6 +1,6 @@
 'use strict';
 
-var utils = require( 'utils' );
+var utils = require( './utils' );
 
 function Node() {
 	this.document = null;

@@ -17,11 +17,16 @@ function formatAttributes( attributes ) {
 		.join( '<br>' );
 }
 
+var idx = 0;
+
 html = editor.document.data.map( function( op ) {
-	return '<tr><td>' + op.insert + '</td>' +
+	var str = '<tr><td>' + idx + '</td><td>' + op.insert + '</td>' +
 		'<td class="' + ( op.attributes ? op.attributes.type ? 'tag' : 'style' : 'none' ) + '">' +
-		( op.attributes ? formatAttributes( op.attributes ) : '' ) +
-		'</td></tr>';
+		( op.attributes ? formatAttributes( op.attributes ) : '' ) + '</td></tr>';
+
+	idx += op.insert.toString().length;
+
+	return str;
 } );
 
 document.querySelector( '#data>tbody' ).innerHTML = html.join( '\n' );
