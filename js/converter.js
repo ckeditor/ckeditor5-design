@@ -45,7 +45,7 @@ Converter.prototype = {
 				// formatted text
 				if ( typeConverter.prototype instanceof FormattedNode ) {
 					childStyle = this.getDataForChild( typeConverter, child )[ 0 ];
-					childData = this.getDataFromDom( child, null, utils.extend( childStyle, parentStyle || {} ) );
+					childData = this.getDataFromDom( child, null, utils.extend( {}, parentStyle || {}, childStyle ) );
 
 					// regular element
 				} else {
