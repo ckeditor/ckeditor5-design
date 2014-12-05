@@ -8,7 +8,7 @@ var nodeTypes = {
 	heading: require( './nodes/heading' ),
 	image: require( './nodes/image' ),
 	list: require( './nodes/list' ),
-	listitem: require( './nodes/listitem' ),
+	listItem: require( './nodes/listitem' ),
 	paragraph: require( './nodes/paragraph' ),
 	span: require( './nodes/span' ),
 	text: require( './nodes/text' ),
@@ -57,6 +57,14 @@ TypeManager.prototype.get = function( name ) {
 
 TypeManager.prototype.create = function( type, data ) {
 	return this.types[ type ] ? new this.types[ type ]( data ) : null;
+};
+
+TypeManager.prototype.isEmpty = function( type ) {
+	if ( this.types[ type ] ) {
+		return this.types[ type ].isEmpty;
+	}
+
+	throw new Error( 'Unknown node type: ' + type );
 };
 
 module.exports = TypeManager;

@@ -2,15 +2,15 @@
 
 'use strict';
 
-var Editor = require( './editor' );
+var Editor = require( './editor' ),
+	editor = window.editor = new Editor( '#input' ),
+	output = document.getElementById( 'output' ),
+	html = [];
 
-var editor = window.editor = new Editor( '#editor' );
-
-var html = [];
+editor.getDom( output );
 
 function formatAttributes( attributes ) {
 	return Object.keys( attributes )
-		.sort()
 		.map( function( attr ) {
 			return attr + ': ' + attributes[ attr ];
 		} )

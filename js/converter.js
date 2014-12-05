@@ -13,12 +13,14 @@ function Converter( typeManager ) {
 }
 
 Converter.prototype = {
-	getDocForDom: function( src ) {
-		this.src = src;
+	getDataForChild: function( typeConverter, dom ) {
+		var data = typeConverter.toData( dom );
 
-		var data = this.getDataFromDom( src );
+		if ( !Array.isArray( data ) ) {
+			data = [ data ];
+		}
 
-		return new Document( data, src );
+		return data;
 	},
 
 	getDataFromDom: function( dom, parent, parentStyle ) {
@@ -95,14 +97,98 @@ Converter.prototype = {
 		return data;
 	},
 
-	getDataForChild: function( typeConverter, dom ) {
-		var data = typeConverter.toData( dom );
+	getDocForDom: function( src ) {
+		this.src = src;
 
-		if ( !Array.isArray( data ) ) {
-			data = [ data ];
+		var data = this.getDataFromDom( src );
+
+		return new Document( data, src );
+	},
+
+	getDomForDataset: function( data, targetElement ) {
+		var currentElement = targetElement,
+			doc = targetElement.ownerDocument,
+			formattedNodes = [],
+			formats = [];
+
+		// get a subset of DataView(); representing children of the element at position
+		function getNodeChildrenData( i ) {
+			var end = getNodeClosingPosition( i ),
+				subset = [],
+				j;
+
+			for ( j = i + 1; j < end; j++ ) {
+				subset.push( data[ j ] );
+			}
+
+			return subset;
 		}
 
-		return data;
+		// find closing tag for the element at position
+		function getNodeClosingPosition( i ) {
+			var type = '/' + data[ i ].attributes.type,
+				j;
+
+			for ( j = i + 1; j < data.length; j++ ) {
+				if ( data[ j ] && data[ j ].attributes && data[ j ].attributes.type === type ) {
+					return j;
+				}
+			}
+
+			throw new Error( 'No closing tag found for: ' + type.substr( 1 ) );
+		}
+
+		data.forEach( function( item, idx ) {
+			var childElement,
+				type;
+
+			// tag
+			if ( item.insert === 1 ) {
+				type = item.attributes.type;
+				// closing tag
+				if ( type.charAt( 0 ) === '/' ) {
+					type = type.substr( 1 );
+
+					if ( !this.typeManager.isEmpty( type ) ) {
+						// move context to parent node
+						currentElement = currentElement.parentNode;
+					}
+					// opening tag
+				} else {
+					childElement = this.getDomFromData( item, doc );
+
+					currentElement.appendChild( childElement );
+
+					// child element may contain data
+					if ( !this.typeManager.isEmpty( type ) ) {
+						currentElement = childElement;
+					}
+				}
+
+				// text
+			} else if ( utils.isString( item.insert ) ) {
+				// formatted text
+				if ( item.attributes ) {
+					// TODO
+					formattedNodes.push( item );
+
+					// plain text
+				} else {
+					childElement = this.typeManager.get( 'text' ).toDom( item, doc );
+					currentElement.appendChild( childElement );
+				}
+			}
+		}, this );
+	},
+
+	getDomForDoc: function( doc, targetElement ) {
+		return this.getDomForDataset( doc.data, targetElement );
+	},
+
+	getDomFromData: function( data, doc ) {
+		var typeConverter = this.typeManager.get( data.attributes.type );
+
+		return typeConverter.toDom( data, doc );
 	}
 };
 

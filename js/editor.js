@@ -14,8 +14,8 @@ function Editor( selector ) {
 
 	this.typeManager = new TypeManager();
 	this.typeManager.register( [
-		'break', 'div', 'heading', 'image', 'list', 'listitem', 'paragraph', 'span', 'text', 'unknown',
-		'bold', 'italic', 'underline'
+		'break', 'div', 'heading', 'image', 'list', 'listItem', 'paragraph',
+		'span', 'text', 'unknown', 'bold', 'italic', 'underline'
 	] );
 
 	this.converter = new Converter( this.typeManager );
@@ -26,7 +26,9 @@ function Editor( selector ) {
 utils.inherit( Editor, EventEmitter );
 
 utils.extend( Editor.prototype, {
-
+	getDom: function( target ) {
+		this.converter.getDomForDoc( this.document, target );
+	}
 } );
 
 module.exports = Editor;

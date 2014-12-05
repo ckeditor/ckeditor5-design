@@ -38,10 +38,14 @@ Node.toDom = function( data, doc ) {
 
 	if ( tags.length === 1 ) {
 		var dom = doc.createElement( tags[ 0 ] ),
-			attributes = utils.pick( data, this.attributes );
+			attributes = utils.pick( data.attributes, this.attributes );
 
 		Object.keys( attributes ).forEach( function( name ) {
-			dom.setAttribute( name, attributes[ name ] );
+			var value;
+
+			if ( ( value = attributes[ name ] ) !== null ) {
+				dom.setAttribute( name, value );
+			}
 		} );
 
 		return dom;
