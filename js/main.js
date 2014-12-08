@@ -30,3 +30,21 @@ html = editor.document.data.map( function( op ) {
 } );
 
 document.querySelector( '#data>tbody' ).innerHTML = html.join( '\n' );
+
+var Delta = require( 'rich-text' ).Delta;
+
+var delta = new Delta();
+
+delta.insert( 'Foo', {
+	italic: true
+} ).insert( 'bar' );
+
+var delta2 = new Delta();
+
+delta2.retain( 3, {
+	bold: true
+} );
+
+delta.compose( delta2 );
+
+window.delta = delta;

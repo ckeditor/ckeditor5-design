@@ -13,11 +13,13 @@ var nodeTypes = {
 	span: require( './nodes/span' ),
 	text: require( './nodes/text' ),
 	unknown: require( './nodes/unknown' ),
-	// formats
-	bold: require( './formats/bold' ),
-	italic: require( './formats/italic' ),
-	underline: require( './formats/underline' )
+	// styles
+	bold: require( './styles/bold' ),
+	italic: require( './styles/italic' ),
+	underline: require( './styles/underline' )
 };
+
+var StyledNode = require( './styles/styled-node' );
 
 function TypeManager() {
 	this.types = {};
@@ -35,7 +37,26 @@ TypeManager.prototype.register = function( types ) {
 	}, this );
 };
 
-TypeManager.prototype.match = function( dom ) {
+TypeManager.prototype.matchForData = function( data ) {
+	var result = null;
+
+	Object.keys( data.attributes ).some( function( name ) {
+		if ( data.attributes[ name ] !== true ) {
+			return;
+		}
+
+		var nodeClass = this.types[ name ];
+
+		if ( nodeClass && nodeClass.prototype instanceof StyledNode ) {
+			result = nodeClass;
+			return true;
+		}
+	}, this );
+
+	return result;
+};
+
+TypeManager.prototype.matchForDom = function( dom ) {
 	var result = null,
 		tag = dom.nodeName.toLowerCase();
 

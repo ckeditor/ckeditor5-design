@@ -3,12 +3,12 @@
 var Node = require( '../node' ),
 	utils = require( '../utils' );
 
-function FormattedNode() {
+function StyledNode() {
 	Node.apply( this, arguments );
 }
 
 // inherit statics
-utils.extend( FormattedNode, Node, {
+utils.extend( StyledNode, Node, {
 	toData: function( dom ) {
 		var attributes = {};
 
@@ -35,10 +35,10 @@ utils.extend( FormattedNode, Node, {
 } );
 
 // inherit prototype
-utils.inherit( FormattedNode, Node );
+utils.inherit( StyledNode, Node );
 
-utils.extend( FormattedNode.prototype, {
+utils.extend( StyledNode.prototype, {
 	// TODO
 } );
 
-module.exports = FormattedNode;
+module.exports = StyledNode;

@@ -3,7 +3,7 @@
 'use strict';
 
 var Document = require( './document' ),
-	FormattedNode = require( './formats/formatted-node' ),
+	StyledNode = require( './styles/styled-node' ),
 	Delta = require( 'rich-text' ).Delta,
 	utils = require( './utils' );
 
@@ -40,12 +40,15 @@ Converter.prototype = {
 
 			// element
 			if ( child.nodeType === Node.ELEMENT_NODE ) {
-				typeConverter = this.typeManager.match( child ) || this.typeManager.get( 'unknown' );
+				typeConverter = this.typeManager.matchForDom( child ) || this.typeManager.get( 'unknown' );
 
-				// formatted text
-				if ( typeConverter.prototype instanceof FormattedNode ) {
+				// styled text
+				if ( typeConverter.prototype instanceof StyledNode ) {
 					childStyle = this.getDataForChild( typeConverter, child )[ 0 ];
+
+					// console.log( childStyle );
 					childData = this.getDataFromDom( child, null, utils.extend( {}, parentStyle || {}, childStyle ) );
+					// console.log( childData );
 
 					// regular element
 				} else {
@@ -108,39 +111,42 @@ Converter.prototype = {
 	getDomForDataset: function( data, targetElement ) {
 		var currentElement = targetElement,
 			doc = targetElement.ownerDocument,
-			formattedNodes = [],
-			formats = [];
 
-		// get a subset of DataView(); representing children of the element at position
-		function getNodeChildrenData( i ) {
-			var end = getNodeClosingPosition( i ),
-				subset = [],
-				j;
+			styleStack = [],
+			styles = [],
 
-			for ( j = i + 1; j < end; j++ ) {
-				subset.push( data[ j ] );
-			}
+			styledElementsStack,
+			styledElements,
 
-			return subset;
+			childElement,
+			typeConverter,
+			style,
+			item,
+			type,
+			len,
+			i;
+
+		function openNode( item, typeConverter ) {
+			var node = typeConverter.toDom( item, doc );
+
+
 		}
 
-		// find closing tag for the element at position
-		function getNodeClosingPosition( i ) {
-			var type = '/' + data[ i ].attributes.type,
-				j;
+		function closeNode() {
 
-			for ( j = i + 1; j < data.length; j++ ) {
-				if ( data[ j ] && data[ j ].attributes && data[ j ].attributes.type === type ) {
-					return j;
-				}
-			}
-
-			throw new Error( 'No closing tag found for: ' + type.substr( 1 ) );
 		}
 
-		data.forEach( function( item, idx ) {
-			var childElement,
-				type;
+		function isOnStack( style ) {
+			return styleStack.some( function( item ) {
+				return Object.keys( item ).some( function( name ) {
+					return item[ name ] === style[ name ];
+				} );
+			} );
+		}
+
+		for ( i = 0, len = data.length; i < len; i++ ) {
+			// we'll have to modify this a lot
+			item = utils.clone( data[ i ] );
 
 			// tag
 			if ( item.insert === 1 ) {
@@ -167,18 +173,53 @@ Converter.prototype = {
 
 				// text
 			} else if ( utils.isString( item.insert ) ) {
-				// formatted text
+				// styled text
 				if ( item.attributes ) {
-					// TODO
-					formattedNodes.push( item );
+					styledElementsStack = [];
 
+					// while it's a styled text we want to process a whole chain of such elements
+					while (
+						( item = utils.clone( data[ i ] ) ) &&
+						utils.isString( item.insert ) &&
+						item.attributes
+					) {
+						styles = [];
+
+						// process item styles
+						while ( ( typeConverter = this.typeManager.matchForData( item ) ) ) {
+							type = typeConverter.type;
+
+							// copy a style
+							style = utils.pick( item.attributes, [ type, type + 'Tag' ] );
+
+							styles.push( style );
+
+							// removed the processed style data
+							delete item.attributes[ type ];
+							delete item.attributes[ type + 'Tag' ];
+						}
+
+						// TODO create styled nodes if needed
+
+						// create text node
+						childElement = this.typeManager.get( 'text' ).toDom( item, doc );
+
+						// TODO append text to styled node 
+
+						i++;
+					}
+
+					// TODO append styled elements to the currentElement
+
+					// get back to the previous item which didn't match the while criteria
+					i--;
 					// plain text
 				} else {
 					childElement = this.typeManager.get( 'text' ).toDom( item, doc );
 					currentElement.appendChild( childElement );
 				}
 			}
-		}, this );
+		}
 	},
 
 	getDomForDoc: function( doc, targetElement ) {
