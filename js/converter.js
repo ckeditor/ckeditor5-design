@@ -112,36 +112,59 @@ Converter.prototype = {
 		var currentElement = targetElement,
 			doc = targetElement.ownerDocument,
 
-			styleStack = [],
-			styles = [],
-
-			styledElementsStack,
+			styledElementsStack = [],
+			lastStyledElement,
 			styledElements,
-
-			childElement,
+			styledElement,
 			typeConverter,
+			childElement,
+			styleStack,
+			styles,
 			style,
 			item,
 			type,
 			len,
 			i;
 
-		function openNode( item, typeConverter ) {
-			var node = typeConverter.toDom( item, doc );
-
-
+		function appendNode( child ) {
+			currentElement.appendChild( child );
 		}
 
-		function closeNode() {
+		function compare( a, b ) {
+			return Object.keys( a ).every( function( name ) {
+				return a[ name ] === b[ name ];
+			} );
+		}
 
+		function openAndClose( styles ) {
+			// TODO compare styles with stack - close unused and create new if needed
+			var len, idx, i;
+
+			for ( i = 0, len = styles.length; i < len; i++ ) {
+				if ( findMatchingStyleIndex( styles[ i ] ) > -1 ) {
+					// TODO got this style, proceed
+				} else {
+					// new style - add new elem to the stack
+				}
+			}
 		}
 
 		function isOnStack( style ) {
 			return styleStack.some( function( item ) {
-				return Object.keys( item ).some( function( name ) {
-					return item[ name ] === style[ name ];
-				} );
+				return compare( item, style );
 			} );
+		}
+
+		function findMatchingStyleIndex( style ) {
+			var i = styleStack.length - 1;
+
+			while ( i > -1 ) {
+				if ( compare( style, styleStack[ i ] ) ) {
+					return i;
+				}
+
+				i--;
+			}
 		}
 
 		for ( i = 0, len = data.length; i < len; i++ ) {
@@ -175,8 +198,9 @@ Converter.prototype = {
 			} else if ( utils.isString( item.insert ) ) {
 				// styled text
 				if ( item.attributes ) {
-					styledElementsStack = [];
-
+					styleStack = [];
+					styledElements = [];
+					styledElementsStack = [ styledElements ];
 					// while it's a styled text we want to process a whole chain of such elements
 					while (
 						( item = utils.clone( data[ i ] ) ) &&
@@ -184,38 +208,40 @@ Converter.prototype = {
 						item.attributes
 					) {
 						styles = [];
-
 						// process item styles
 						while ( ( typeConverter = this.typeManager.matchForData( item ) ) ) {
 							type = typeConverter.type;
 
 							// copy a style
 							style = utils.pick( item.attributes, [ type, type + 'Tag' ] );
-
 							styles.push( style );
+
+							openAndClose( styles );
 
 							// removed the processed style data
 							delete item.attributes[ type ];
 							delete item.attributes[ type + 'Tag' ];
 						}
 
-						// TODO create styled nodes if needed
+						typeConverter = this.typeManager.get( 'text' );
 
 						// create text node
-						childElement = this.typeManager.get( 'text' ).toDom( item, doc );
+						childElement = typeConverter.toDom( item, doc );
 
-						// TODO append text to styled node 
+						styledElement.appendChild( childElement );
 
 						i++;
 					}
-
-					// TODO append styled elements to the currentElement
-
 					// get back to the previous item which didn't match the while criteria
 					i--;
+
+					// append styled elements to the currentElement
+					styledElements.forEach( appendNode );
+
 					// plain text
 				} else {
-					childElement = this.typeManager.get( 'text' ).toDom( item, doc );
+					typeConverter = this.typeManager.get( 'text' );
+					childElement = typeConverter.toDom( item, doc );
 					currentElement.appendChild( childElement );
 				}
 			}
