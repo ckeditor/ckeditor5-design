@@ -26,9 +26,9 @@ var utils = {
 
 		} else {
 			keys = Object.keys( source );
-			i = keys.length;
+			len = keys.length;
 
-			while ( i-- ) {
+			for ( i = 0; i < len; i++ ) {
 				target[ keys[ i ] ] = source[ keys[ i ] ];
 			}
 		}
