@@ -111,60 +111,45 @@ Converter.prototype = {
 	getDomForDataset: function( data, targetElement ) {
 		var currentElement = targetElement,
 			doc = targetElement.ownerDocument,
-
-			styledElementsStack = [],
-			lastStyledElement,
-			styledElements,
-			styledElement,
 			typeConverter,
 			childElement,
-			styleStack,
-			styles,
-			style,
 			item,
 			type,
 			len,
 			i;
 
+		// append nodes to the current element
 		function appendNode( child ) {
 			currentElement.appendChild( child );
 		}
 
+		// shallow compare for two objects
 		function compare( a, b ) {
 			return Object.keys( a ).every( function( name ) {
 				return a[ name ] === b[ name ];
 			} );
 		}
 
-		function openAndClose( styles ) {
-			// TODO compare styles with stack - close unused and create new if needed
-			var len, idx, i;
+		// find what's the first index where two style arrays are different
+		function findDifferenceIndex( a, b ) {
+			var diffIdx = -1;
 
-			for ( i = 0, len = styles.length; i < len; i++ ) {
-				if ( findMatchingStyleIndex( styles[ i ] ) > -1 ) {
-					// TODO got this style, proceed
-				} else {
-					// new style - add new elem to the stack
-				}
+			// reverse the order of arrays
+			if ( a.length < b.length ) {
+				var c = a;
+				a = b;
+				b = c;
 			}
-		}
 
-		function isOnStack( style ) {
-			return styleStack.some( function( item ) {
-				return compare( item, style );
+			a.some( function( style, idx ) {
+				if ( !b[ idx ] || !compare( style, b[ idx ] ) ) {
+					diffIdx = idx;
+
+					return true;
+				}
 			} );
-		}
 
-		function findMatchingStyleIndex( style ) {
-			var i = styleStack.length - 1;
-
-			while ( i > -1 ) {
-				if ( compare( style, styleStack[ i ] ) ) {
-					return i;
-				}
-
-				i--;
-			}
+			return diffIdx;
 		}
 
 		for ( i = 0, len = data.length; i < len; i++ ) {
@@ -198,37 +183,68 @@ Converter.prototype = {
 			} else if ( utils.isString( item.insert ) ) {
 				// styled text
 				if ( item.attributes ) {
-					styleStack = [];
-					styledElements = [];
-					styledElementsStack = [ styledElements ];
-					// while it's a styled text we want to process a whole chain of such elements
+					var styleStack = [],
+						styledElements = [];
+
+					// we want to process a whole chain of "styled text" items
 					while (
 						( item = utils.clone( data[ i ] ) ) &&
 						utils.isString( item.insert ) &&
 						item.attributes
 					) {
-						styles = [];
+						var styles = [],
+							itemElems = [],
+							style;
+
 						// process item styles
 						while ( ( typeConverter = this.typeManager.matchForData( item ) ) ) {
 							type = typeConverter.type;
 
-							// copy a style
+							// make a copy of a style
 							style = utils.pick( item.attributes, [ type, type + 'Tag' ] );
 							styles.push( style );
-
-							openAndClose( styles );
+							itemElems.push( typeConverter.toDom( item, doc ) );
 
 							// removed the processed style data
 							delete item.attributes[ type ];
 							delete item.attributes[ type + 'Tag' ];
 						}
 
-						typeConverter = this.typeManager.get( 'text' );
+						var diffIdx = findDifferenceIndex( styles, styleStack );
 
-						// create text node
+						// no common styles
+						if ( diffIdx === 0 && styledElements.length ) {
+							currentElement.appendChild( styledElements[ 0 ] );
+							styledElements = [];
+						}
+
+						// remove styles that are already on the stack
+						styles = styles.slice( diffIdx );
+						// remove elements that are already on the stack
+						itemElems = itemElems.slice( diffIdx );
+
+						// remove styles that are no longer needed
+						styleStack = styleStack.slice( 0, diffIdx );
+						// remove elements that are no longer needed
+						styledElements = styledElements.slice( 0, diffIdx );
+
+						// add new styles to the stack
+						styleStack = styleStack.concat( styles );
+						styledElements = styledElements.concat( itemElems );
+
+						// create a text node
+						typeConverter = this.typeManager.get( 'text' );
 						childElement = typeConverter.toDom( item, doc );
 
-						styledElement.appendChild( childElement );
+						// append the text to the deepest element
+						styledElements[ styledElements.length - 1 ].appendChild( childElement );
+
+						// append elements from bottom to top
+						if ( styledElements.length > 1 ) {
+							for ( var j = 1; j < styledElements.length; j++ ) {
+								styledElements[ j - 1 ].appendChild( styledElements[ j ] );
+							}
+						}
 
 						i++;
 					}
