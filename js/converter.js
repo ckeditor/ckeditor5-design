@@ -45,11 +45,7 @@ Converter.prototype = {
 				// styled text
 				if ( typeConverter.prototype instanceof StyledNode ) {
 					childStyle = this.getDataForChild( typeConverter, child )[ 0 ];
-
-					// console.log( childStyle );
 					childData = this.getDataFromDom( child, null, utils.extend( {}, parentStyle || {}, childStyle ) );
-					// console.log( childData );
-
 					// regular element
 				} else {
 					childData = this.getDataForChild( typeConverter, child );

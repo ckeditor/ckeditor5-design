@@ -4,6 +4,7 @@
 
 var Converter = require( './converter' ),
 	TypeManager = require( './type-manager' ),
+	Normalizer = require( './normalizer' ),
 	EventEmitter = require( 'events' ).EventEmitter,
 	utils = require( './utils' );
 
@@ -19,6 +20,10 @@ function Editor( selector ) {
 	] );
 
 	this.converter = new Converter( this.typeManager );
+
+	this.normalizer = new Normalizer();
+
+	// TODO normalize the DOM before converting
 
 	this.document = this.converter.getDocForDom( this.el );
 }
