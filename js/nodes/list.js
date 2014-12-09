@@ -11,7 +11,7 @@ utils.extend( ListNode, Branch, {
 	type: 'list',
 	tags: [ 'ul', 'ol' ],
 
-	toData: function( dom ) {
+	toOperation: function( dom ) {
 		return {
 			insert: 1,
 			attributes: {
@@ -21,8 +21,8 @@ utils.extend( ListNode, Branch, {
 		};
 	},
 
-	toDom: function( data, doc ) {
-		return doc.createElement( data.attributes.style === 'number' ? 'ol' : 'ul' );
+	toDom: function( operation, doc ) {
+		return doc.createElement( operation.attributes.style === 'number' ? 'ol' : 'ul' );
 	}
 } );
 

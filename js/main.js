@@ -20,7 +20,7 @@ function formatAttributes( attributes ) {
 
 var idx = 0;
 
-html = editor.document.data.map( function( op ) {
+html = editor.document.ops.map( function( op ) {
 	var str = '<tr><td>' + idx + '</td><td>' +
 		( utils.isString( op.insert ) ? '&quot;' + op.insert + '&quot;' : op.insert ) + '</td>' +
 		'<td class="' + ( op.attributes ? op.attributes.type ? 'tag' : 'style' : 'none' ) + '">' +

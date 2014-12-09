@@ -37,11 +37,11 @@ TypeManager.prototype.register = function( types ) {
 	}, this );
 };
 
-TypeManager.prototype.matchForData = function( data ) {
+TypeManager.prototype.matchForOperation = function( operation ) {
 	var result = null;
 
-	Object.keys( data.attributes ).some( function( name ) {
-		if ( data.attributes[ name ] !== true ) {
+	Object.keys( operation.attributes ).some( function( name ) {
+		if ( operation.attributes[ name ] !== true ) {
 			return;
 		}
 
@@ -76,8 +76,8 @@ TypeManager.prototype.get = function( name ) {
 	return this.types[ name ] || null;
 };
 
-TypeManager.prototype.create = function( type, data ) {
-	return this.types[ type ] ? new this.types[ type ]( data ) : null;
+TypeManager.prototype.create = function( type, operation ) {
+	return this.types[ type ] ? new this.types[ type ]( operation ) : null;
 };
 
 TypeManager.prototype.isEmpty = function( type ) {

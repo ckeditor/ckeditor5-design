@@ -9,7 +9,7 @@ function StyledNode() {
 
 // inherit statics
 utils.extend( StyledNode, Node, {
-	toData: function( dom ) {
+	toOperation: function( dom ) {
 		var attributes = {};
 
 		attributes[ this.type ] = true;
@@ -20,9 +20,9 @@ utils.extend( StyledNode, Node, {
 		return attributes;
 	},
 
-	toDom: function( data, doc ) {
+	toDom: function( operation, doc ) {
 		var dom = doc.createElement( this.tags[ 0 ] ),
-			attributes = utils.pick( data, this.attributes );
+			attributes = utils.pick( operation, this.attributes );
 
 		// apply additional attributes
 		Object.keys( attributes ).forEach( function( name ) {

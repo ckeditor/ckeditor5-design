@@ -10,14 +10,14 @@ function TextNode() {
 utils.extend( TextNode, Node, {
 	type: 'text',
 
-	toData: function( dom ) {
+	toOperation: function( dom ) {
 		return {
 			insert: dom.textContent
 		};
 	},
 
-	toDom: function( data, doc ) {
-		return doc.createTextNode( data.insert );
+	toDom: function( operation, doc ) {
+		return doc.createTextNode( operation.insert );
 	}
 } );
 

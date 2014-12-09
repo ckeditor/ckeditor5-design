@@ -24,7 +24,7 @@ Node.pickAttributes = function( dom, attributes ) {
 	return result;
 };
 
-Node.toData = function( dom ) {
+Node.toOperation = function( dom ) {
 	var attributes = utils.extend( {
 		type: this.type
 	}, this.pickAttributes( dom, this.attributes ) );
@@ -35,12 +35,12 @@ Node.toData = function( dom ) {
 	};
 };
 
-Node.toDom = function( data, doc ) {
+Node.toDom = function( operation, doc ) {
 	var tags = this.tags;
 
 	if ( tags.length === 1 ) {
 		var dom = doc.createElement( tags[ 0 ] ),
-			attributes = utils.pick( data.attributes, this.attributes );
+			attributes = utils.pick( operation.attributes, this.attributes );
 
 		Object.keys( attributes ).forEach( function( name ) {
 			var value;
@@ -53,7 +53,7 @@ Node.toDom = function( data, doc ) {
 		return dom;
 	}
 
-	throw new Error( 'Overrid toDom in a subclass' );
+	throw new Error( 'Override toDom in a subclass' );
 };
 
 // prototype

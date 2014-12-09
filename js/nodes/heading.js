@@ -11,7 +11,7 @@ utils.extend( HeadingNode, Node, {
 	type: 'heading',
 	tags: [ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ],
 
-	toData: function( dom ) {
+	toOperation: function( dom ) {
 		return {
 			insert: 1,
 			attributes: {
@@ -21,8 +21,8 @@ utils.extend( HeadingNode, Node, {
 		};
 	},
 
-	toDom: function( data, doc ) {
-		return doc.createElement( 'h' + data.attributes.level );
+	toDom: function( operation, doc ) {
+		return doc.createElement( 'h' + operation.attributes.level );
 	}
 } );
 

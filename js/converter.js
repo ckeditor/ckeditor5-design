@@ -13,29 +13,29 @@ function Converter( typeManager ) {
 }
 
 Converter.prototype = {
-	getDataForChild: function( typeConverter, dom ) {
-		var data = typeConverter.toData( dom );
+	getOperationForChild: function( typeConverter, dom ) {
+		var ops = typeConverter.toOperation( dom );
 
-		if ( !Array.isArray( data ) ) {
-			data = [ data ];
+		if ( !Array.isArray( ops ) ) {
+			ops = [ ops ];
 		}
 
-		return data;
+		return ops;
 	},
 
-	getDataFromDom: function( dom, parent, parentStyle ) {
-		var data = [];
+	getOperationsForDom: function( dom, parent, parentStyle ) {
+		var ops = [];
 
 		// add parent element's opening tag
 		if ( parent && parent.attributes.type ) {
-			data.push( parent );
+			ops.push( parent );
 		}
 
-		// add data for child nodes
+		// add operations for child nodes
 		[].forEach.call( dom.childNodes, function( child ) {
 			var typeConverter,
 				childStyle,
-				childData,
+				childOps,
 				text;
 
 			// element
@@ -44,17 +44,17 @@ Converter.prototype = {
 
 				// styled text
 				if ( typeConverter.prototype instanceof StyledNode ) {
-					childStyle = this.getDataForChild( typeConverter, child )[ 0 ];
-					childData = this.getDataFromDom( child, null, utils.extend( {}, parentStyle || {}, childStyle ) );
+					childStyle = this.getOperationForChild( typeConverter, child )[ 0 ];
+					childOps = this.getOperationsForDom( child, null, utils.extend( {}, parentStyle || {}, childStyle ) );
 					// regular element
 				} else {
-					childData = this.getDataForChild( typeConverter, child );
-					childData = this.getDataFromDom( child, childData[ 0 ] );
+					childOps = this.getOperationForChild( typeConverter, child );
+					childOps = this.getOperationsForDom( child, childOps[ 0 ] );
 
 					// TODO handle void elements
 				}
 
-				data = data.concat( childData );
+				ops = ops.concat( childOps );
 				// text
 			} else if ( child.nodeType === Node.TEXT_NODE ) {
 				text = child.data;
@@ -71,21 +71,21 @@ Converter.prototype = {
 				}
 
 				typeConverter = this.typeManager.get( 'text' );
-				childData = this.getDataForChild( typeConverter, child );
+				childOps = this.getOperationForChild( typeConverter, child );
 
 				// apply parent node styles, if any
 				if ( parentStyle ) {
-					childData[ 0 ].attributes = parentStyle;
+					childOps[ 0 ].attributes = parentStyle;
 				}
 
-				data = data.concat( childData );
+				ops = ops.concat( childOps );
 			}
 		}, this );
 
 		// add parent element's closing tag
 		if ( parent && parent.attributes.type ) {
 			// TODO should we put a closing tag for a void element?
-			data.push( {
+			ops.push( {
 				insert: 1,
 				attributes: {
 					type: '/' + parent.attributes.type
@@ -93,18 +93,18 @@ Converter.prototype = {
 			} );
 		}
 
-		return data;
+		return ops;
 	},
 
 	getDocForDom: function( src ) {
 		this.src = src;
 
-		var data = this.getDataFromDom( src );
+		var ops = this.getOperationsForDom( src );
 
-		return new Document( data, src );
+		return new Document( ops, src );
 	},
 
-	getDomForDataset: function( data, targetElement ) {
+	getDomForOperations: function( ops, targetElement ) {
 		var currentElement = targetElement,
 			doc = targetElement.ownerDocument,
 			typeConverter,
@@ -148,9 +148,9 @@ Converter.prototype = {
 			return diffIdx;
 		}
 
-		for ( i = 0, len = data.length; i < len; i++ ) {
+		for ( i = 0, len = ops.length; i < len; i++ ) {
 			// we'll have to modify this a lot
-			item = utils.clone( data[ i ] );
+			item = utils.clone( ops[ i ] );
 
 			// tag
 			if ( item.insert === 1 ) {
@@ -165,7 +165,7 @@ Converter.prototype = {
 					}
 					// opening tag
 				} else {
-					childElement = this.getDomFromData( item, doc );
+					childElement = this.getDomForOperation( item, doc );
 
 					currentElement.appendChild( childElement );
 
@@ -184,7 +184,7 @@ Converter.prototype = {
 
 					// we want to process a whole chain of "styled text" items
 					while (
-						( item = utils.clone( data[ i ] ) ) &&
+						( item = utils.clone( ops[ i ] ) ) &&
 						utils.isString( item.insert ) &&
 						item.attributes
 					) {
@@ -193,7 +193,7 @@ Converter.prototype = {
 							style;
 
 						// process item styles
-						while ( ( typeConverter = this.typeManager.matchForData( item ) ) ) {
+						while ( ( typeConverter = this.typeManager.matchForOperation( item ) ) ) {
 							type = typeConverter.type;
 
 							// make a copy of a style
@@ -261,13 +261,13 @@ Converter.prototype = {
 	},
 
 	getDomForDoc: function( doc, targetElement ) {
-		return this.getDomForDataset( doc.data, targetElement );
+		return this.getDomForOperations( doc.ops, targetElement );
 	},
 
-	getDomFromData: function( data, doc ) {
-		var typeConverter = this.typeManager.get( data.attributes.type );
+	getDomForOperation: function( operation, doc ) {
+		var typeConverter = this.typeManager.get( operation.attributes.type );
 
-		return typeConverter.toDom( data, doc );
+		return typeConverter.toDom( operation, doc );
 	}
 };
 
