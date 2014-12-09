@@ -17,7 +17,3 @@ grunt
 ```
 
 Open `index.html` file in a web browser.
-
-## License
-
-MIT

@@ -16,6 +16,5 @@
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
-	"author": "CKSource <npm@cksource.com> (http://cksource.com/)",
-	"license": "MIT"
+	"author": "CKSource <npm@cksource.com> (http://cksource.com/)"
 }
