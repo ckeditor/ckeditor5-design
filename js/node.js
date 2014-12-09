@@ -2,8 +2,10 @@
 
 var utils = require( './utils' );
 
-function Node() {
+function Node( element ) {
 	this.document = null;
+	this.parent = null;
+	this.element = element;
 }
 
 // static props

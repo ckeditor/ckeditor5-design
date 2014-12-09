@@ -3,10 +3,14 @@
 var Node = require( './node' ),
 	utils = require( './utils' );
 
-function Branch( children ) {
+function Branch( element, children ) {
 	Node.apply( this, arguments );
 
 	this.children = Array.isArray( children ) ? children : [];
+
+	this.children.forEach( function( child ) {
+		child.parent = this;
+	}, this );
 }
 
 
