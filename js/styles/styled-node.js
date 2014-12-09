@@ -13,7 +13,6 @@ utils.extend( StyledNode, Node, {
 		var attributes = {};
 
 		attributes[ this.type ] = true;
-		attributes[ this.type + 'Tag' ] = dom.nodeName.toLowerCase();
 
 		// save additional attributes
 		utils.extend( attributes, this.pickAttributes( dom, this.attributes ) );
@@ -22,7 +21,7 @@ utils.extend( StyledNode, Node, {
 	},
 
 	toDom: function( data, doc ) {
-		var dom = doc.createElement( data.attributes[ this.type + 'Tag' ] || this.tags[ 0 ] ),
+		var dom = doc.createElement( this.tags[ 0 ] ),
 			attributes = utils.pick( data, this.attributes );
 
 		// apply additional attributes
