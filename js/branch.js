@@ -3,7 +3,7 @@
 var Node = require( './node' ),
 	utils = require( './utils' );
 
-function Branch( element, children ) {
+function Branch( op, children ) {
 	Node.apply( this, arguments );
 
 	this.children = Array.isArray( children ) ? children : [];
@@ -20,12 +20,22 @@ utils.extend( Branch, Node );
 utils.inherit( Branch, Node );
 
 utils.extend( Branch.prototype, {
-	hasChildren: function() {
-		return !!this.children.length;
+	append: function( child ) {
+		this.children.push( child );
+		child.parent = this;
+	},
+
+	prepend: function( child ) {
+		this.children.unshift( child );
+		child.parent = this;
 	},
 
 	getChildren: function() {
 		return this.children;
+	},
+
+	hasChildren: function() {
+		return !!this.children.length;
 	}
 } );
 

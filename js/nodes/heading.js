@@ -1,13 +1,13 @@
 'use strict';
 
-var Node = require( '../node' ),
+var Branch = require( '../branch' ),
 	utils = require( '../utils' );
 
 function HeadingNode() {
-	Node.apply( this, arguments );
+	Branch.apply( this, arguments );
 }
 
-utils.extend( HeadingNode, Node, {
+utils.extend( HeadingNode, Branch, {
 	type: 'heading',
 	tags: [ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ],
 
@@ -26,6 +26,6 @@ utils.extend( HeadingNode, Node, {
 	}
 } );
 
-utils.inherit( HeadingNode, Node );
+utils.inherit( HeadingNode, Branch );
 
 module.exports = HeadingNode;

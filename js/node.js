@@ -2,10 +2,10 @@
 
 var utils = require( './utils' );
 
-function Node( element ) {
+function Node( op ) {
+	this.op = op;
 	this.document = null;
 	this.parent = null;
-	this.element = element;
 }
 
 // static props
@@ -58,7 +58,9 @@ Node.toDom = function( operation, doc ) {
 
 // prototype
 Node.prototype = {
-	// TODO
+	setDocument: function( doc ) {
+		this.document = doc;
+	}
 };
 
 module.exports = Node;

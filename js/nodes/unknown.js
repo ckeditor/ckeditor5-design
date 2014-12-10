@@ -1,16 +1,16 @@
 'use strict';
 
-var Node = require( '../node' ),
+var Branch = require( '../branch' ),
 	utils = require( '../utils' );
 
 function UnknownNode() {
-	Node.apply( this, arguments );
+	Branch.apply( this, arguments );
 }
 
-utils.extend( UnknownNode, Node, {
+utils.extend( UnknownNode, Branch, {
 	type: 'unknown'
 } );
 
-utils.inherit( UnknownNode, Node );
+utils.inherit( UnknownNode, Branch );
 
 module.exports = UnknownNode;

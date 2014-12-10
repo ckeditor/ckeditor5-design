@@ -9,7 +9,6 @@ var Document = require( './document' ),
 
 function Converter( typeManager ) {
 	this.typeManager = typeManager;
-	this.src = null;
 }
 
 Converter.prototype = {
@@ -94,14 +93,6 @@ Converter.prototype = {
 		}
 
 		return ops;
-	},
-
-	getDocForDom: function( src ) {
-		this.src = src;
-
-		var ops = this.getOperationsForDom( src );
-
-		return new Document( ops, src );
 	},
 
 	getDomForOperations: function( ops, targetElement ) {
@@ -258,10 +249,6 @@ Converter.prototype = {
 				}
 			}
 		}
-	},
-
-	getDomForDoc: function( doc, targetElement ) {
-		return this.getDomForOperations( doc.ops, targetElement );
 	},
 
 	getDomForOperation: function( operation, doc ) {

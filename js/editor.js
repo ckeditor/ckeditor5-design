@@ -2,10 +2,8 @@
 
 'use strict';
 
-var Converter = require( './converter' ),
-	TypeManager = require( './type-manager' ),
-	Normalizer = require( './normalizer' ),
-	EventEmitter = require( 'events' ).EventEmitter,
+var EventEmitter = require( 'events' ).EventEmitter,
+	Document = require( './document' ),
 	utils = require( './utils' );
 
 function Editor( selector ) {
@@ -13,26 +11,16 @@ function Editor( selector ) {
 
 	this.el = document.querySelector( selector );
 
-	this.typeManager = new TypeManager();
-	this.typeManager.register( [
-		'break', 'div', 'heading', 'image', 'list', 'listItem', 'paragraph',
-		'span', 'text', 'unknown', 'bold', 'italic', 'underline'
-	] );
+	this.document = new Document( this.el );
 
-	this.converter = new Converter( this.typeManager );
-
-	this.normalizer = new Normalizer();
-
-	// TODO normalize the DOM before converting
-
-	this.document = this.converter.getDocForDom( this.el );
+	this.document.buildFromDom( this.el );
 }
 
 utils.inherit( Editor, EventEmitter );
 
 utils.extend( Editor.prototype, {
 	getDom: function( target ) {
-		this.converter.getDomForDoc( this.document, target );
+		this.document.buildDom( target );
 	}
 } );
 
