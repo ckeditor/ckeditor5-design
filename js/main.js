@@ -4,11 +4,8 @@
 
 var Editor = require( './editor' ),
 	editor = window.editor = new Editor( '#input' ),
-	output = document.getElementById( 'output' ),
 	utils = require( './utils' ),
 	html = [];
-
-editor.getDom( output );
 
 function formatAttributes( attributes ) {
 	return Object.keys( attributes )

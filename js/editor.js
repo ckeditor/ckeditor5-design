@@ -12,8 +12,6 @@ function Editor( selector ) {
 	this.el = document.querySelector( selector );
 
 	this.document = new Document( this.el );
-
-	this.document.buildFromDom( this.el );
 }
 
 utils.inherit( Editor, EventEmitter );

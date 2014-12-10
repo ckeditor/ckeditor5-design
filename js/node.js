@@ -3,9 +3,10 @@
 var utils = require( './utils' );
 
 function Node( op ) {
-	this.op = op;
+	this.op = op || null;
 	this.document = null;
 	this.parent = null;
+	this.root = null;
 }
 
 // static props
@@ -60,6 +61,14 @@ Node.toDom = function( operation, doc ) {
 Node.prototype = {
 	setDocument: function( doc ) {
 		this.document = doc;
+	},
+
+	setParent: function( node ) {
+		this.parent = this;
+	},
+
+	setRoot: function( node ) {
+		this.root = node;
 	}
 };
 

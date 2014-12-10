@@ -22,12 +22,12 @@ utils.inherit( Branch, Node );
 utils.extend( Branch.prototype, {
 	append: function( child ) {
 		this.children.push( child );
-		child.parent = this;
+		child.setParent( this );
 	},
 
 	prepend: function( child ) {
 		this.children.unshift( child );
-		child.parent = this;
+		child.setParent( this );
 	},
 
 	getChildren: function() {

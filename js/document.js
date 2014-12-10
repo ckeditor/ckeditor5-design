@@ -7,13 +7,16 @@ var Converter = require( './converter' ),
 	Delta = require( 'rich-text' ).Delta,
 	utils = require( './utils' );
 
-function Document( el, ops ) {
+function Document( el ) {
 	this.el = el;
+
+	this.normalizer = new Normalizer();
+	this.normalizer.normalize( this.el );
+
 	this.root = new Branch();
 	this.root.setDocument( this );
-	this.ops = Array.isArray( ops ) ? ops : [];
 
-	this.data = null;
+	this.ops = [];
 
 	this.typeManager = new TypeManager();
 	this.typeManager.register( [
@@ -22,7 +25,8 @@ function Document( el, ops ) {
 	] );
 
 	this.converter = new Converter( this.typeManager );
-	this.normalizer = new Normalizer();
+
+	this.buildFromDom( this.el );
 }
 
 Document.prototype = {
@@ -31,8 +35,9 @@ Document.prototype = {
 	},
 
 	buildFromDom: function( dom ) {
-		var ops = this.converter.getOperationsForDom( dom );
-		this.ops = ops;
+		this.ops = this.converter.getOperationsForDom( dom );
+
+		return this.ops;
 	},
 
 	buildTree: function() {
@@ -61,6 +66,7 @@ Document.prototype = {
 					// create a node
 					node = this.typeManager.create( type, op );
 					node.setDocument( this );
+					node.setRoot( this.root );
 					// push to stack
 					nodeStack.push( node );
 					// append to current node
@@ -70,6 +76,7 @@ Document.prototype = {
 			} else {
 				node = this.typeManager.create( 'text', op );
 				node.setDocument( this );
+				node.setRoot( this.root );
 				currentNode.append( node );
 			}
 		}, this );

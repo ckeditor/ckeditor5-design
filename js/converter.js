@@ -23,7 +23,8 @@ Converter.prototype = {
 	},
 
 	getOperationsForDom: function( dom, parent, parentStyle ) {
-		var ops = [];
+		var ops = [],
+			whitespaces = [];
 
 		// add parent element's opening tag
 		if ( parent && parent.attributes.type ) {
@@ -63,10 +64,13 @@ Converter.prototype = {
 					return;
 				}
 
-				// contains just whitespaces
+				// node contains whitespaces only
 				if ( text.match( /^\s+$/ ) ) {
-					// TODO what to do with whitespaces?
-					return;
+					if ( ops[ ops.length - 1 ].insert === 1 ) {
+						return;
+					}
+
+					// TODO is that enough for now?
 				}
 
 				typeConverter = this.typeManager.get( 'text' );
