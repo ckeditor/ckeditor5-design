@@ -1,14 +1,14 @@
 'use strict';
 
-var Node = require( '../node' ),
+var TextNode = require( '../nodes/text' ),
 	utils = require( '../utils' );
 
 function StyledNode() {
-	Node.apply( this, arguments );
+	TextNode.apply( this, arguments );
 }
 
 // inherit statics
-utils.extend( StyledNode, Node, {
+utils.extend( StyledNode, TextNode, {
 	toOperation: function( dom ) {
 		var attributes = {};
 
@@ -34,7 +34,7 @@ utils.extend( StyledNode, Node, {
 } );
 
 // inherit prototype
-utils.inherit( StyledNode, Node );
+utils.inherit( StyledNode, TextNode );
 
 utils.extend( StyledNode.prototype, {
 	// TODO

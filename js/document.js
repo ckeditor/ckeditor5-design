@@ -13,11 +13,6 @@ function Document( el ) {
 	this.normalizer = new Normalizer();
 	this.normalizer.normalize( this.el );
 
-	this.root = new Branch();
-	this.root.setDocument( this );
-
-	this.ops = [];
-
 	this.typeManager = new TypeManager();
 	this.typeManager.register( [
 		'break', 'div', 'heading', 'image', 'list', 'listItem', 'paragraph',
@@ -26,18 +21,14 @@ function Document( el ) {
 
 	this.converter = new Converter( this.typeManager );
 
-	this.buildFromDom( this.el );
+	this.ops = this.converter.getOperationsForDom( this.el );
+
+	this.buildTree();
 }
 
 Document.prototype = {
-	buildDom: function( target ) {
-		return this.converter.getDomForOperations( this.ops, target );
-	},
-
-	buildFromDom: function( dom ) {
-		this.ops = this.converter.getOperationsForDom( dom );
-
-		return this.ops;
+	getCleanDom: function() {
+		// convert the tree to plain DOM elements
 	},
 
 	buildTree: function() {

@@ -13,6 +13,7 @@ function Node( op ) {
 Node.type = null;
 Node.tags = [];
 Node.attributes = [];
+Node.isContent = false;
 
 // static methods
 Node.pickAttributes = function( dom, attributes ) {
@@ -59,6 +60,10 @@ Node.toDom = function( operation, doc ) {
 
 // prototype
 Node.prototype = {
+	isContent: function() {
+		return this.constructor.isContent;
+	},
+
 	setDocument: function( doc ) {
 		this.document = doc;
 	},

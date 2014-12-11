@@ -29,5 +29,3 @@ html = editor.document.ops.map( function( op ) {
 } );
 
 document.querySelector( '#data>tbody' ).innerHTML = html.join( '\n' );
-
-editor.document.buildTree();

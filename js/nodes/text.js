@@ -8,6 +8,8 @@ function TextNode() {
 }
 
 utils.extend( TextNode, Node, {
+	isContent: true,
+
 	type: 'text',
 
 	toOperation: function( dom ) {
