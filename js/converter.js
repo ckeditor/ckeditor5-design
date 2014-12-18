@@ -69,7 +69,6 @@ Converter.prototype = {
 					if ( ops[ ops.length - 1 ].insert === 1 ) {
 						return;
 					}
-
 					// TODO is that enough for now?
 				}
 
@@ -94,6 +93,8 @@ Converter.prototype = {
 					type: '/' + parent.attributes.type
 				}
 			} );
+
+			dom.dataset.length = ops.length;
 		}
 
 		return ops;

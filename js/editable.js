@@ -12,22 +12,21 @@ var config = {
 function Editable( document, el ) {
 	this.document = document;
 	this.el = el;
-	this.observer = new MutationObserver( this.handleMutations.bind( this ) );
-	this.observer.observe( this.el, config );
+
+	this.observer = new MutationSummary( {
+		callback: this.mutationHandler.bind( this ),
+		queries: [ {
+			all: true
+		} ],
+		rootNode: this.el
+	} );
 }
 
 Editable.prototype = {
-	handleMutations: function( mutations ) {
-		mutations.forEach( function( mutation ) {
-			switch ( mutation.type ) {
-				case 'characterData':
-					console.log( 'text - old: "' + mutation.oldValue + '" new: "' + mutation.target.data + '"' );
-					break;
-
-				case 'childList':
-					console.log( 'child list - addedNodes:', mutation.addedNodes, 'removedNodes:', mutation.removedNodes );
-					break;
-			}
+	mutationHandler: function( summaries ) {
+		console.log(summaries.length);
+		summaries.forEach( function( summary ) {
+			console.log( summary );
 		} );
 	}
 };
