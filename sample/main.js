@@ -36,11 +36,18 @@ require( [
 			.join( '<br>' ) : '';
 	}
 
-
 	html = editor.document.ops.map( function( op ) {
+		op = utils.clone( op );
+
 		if ( op.insert === 1 ) {
 			op.insert = op.attributes.type;
 			op.css = 'tag';
+		} else if ( op.insert === 2 ) {
+			op.insert = '/' + op.attributes.type;
+			op.css = 'tag';
+		} else if ( op.insert === ' ' ) {
+			op.insert = '_whitespace_';
+			op.css = 'whitespace';
 		} else {
 			op.css = 'text';
 		}
@@ -57,4 +64,21 @@ require( [
 
 	document.querySelector( '#data>tbody' ).innerHTML = html.join( '\n' );
 
+	function escapeTags( str ) {
+		var replacements = {
+			'&': '&amp;',
+			'<': '&lt;',
+			'>': '&gt;'
+		};
+
+		if ( typeof str !== 'string' ) {
+			return str;
+		}
+
+		return str.replace( /[&<>]/g, function( item ) {
+			return replacements[ item ] || item;
+		} ).replace(/;\s?&/g, ';<br>&');
+	}
+
+	document.getElementById( 'html' ).innerHTML = escapeTags( document.getElementById( 'input' ).innerHTML );
 } );

@@ -75,6 +75,8 @@ define( [
 					}
 
 					typeConverter = this.typeManager.get( 'text' );
+
+					// TODO get op for every single character
 					childOps = this.getOperationForChild( typeConverter, child );
 
 					// apply parent node styles, if any
@@ -90,9 +92,9 @@ define( [
 			if ( parent && parent.attributes.type ) {
 				// TODO should we put a closing tag for a void element?
 				ops.push( {
-					insert: 1,
+					insert: 2,
 					attributes: {
-						type: '/' + parent.attributes.type
+						type: parent.attributes.type
 					}
 				} );
 

@@ -13,16 +13,25 @@
 	}
 
 	#input,
+	#html,
 	#data {
 		box-sizing: border-box;
-		float: left;
 		border: 1px solid #ccc;
 		padding: 10px;
 		width: 50%;
 	}
 
-	#data {
+	#input,
+	#html {
 		float: left;
+	}
+
+	#html {
+		font-size: 0.75em;
+	}
+
+	#data {
+		float: right;
 		font-size: 0.75em;
 		border-collapse: collapse;
 	}
@@ -43,19 +52,26 @@
 		background: #cef;
 	}
 
+	td.whitespace {
+		background: #ccf;
+	}
+
 	td.text {
 		background: #cfc;
+	}
+
+	.float-right {
+		float: right;
 	}
 	</style>
 </head>
 <body>
 	<div id="input" contenteditable>
 		<h1>Lorem ipsum</h1>
+		<img src="img/doge.jpg" alt="Doge" class="float-right" />
 		<p><strong>Foo <em>bar <u>baz</u> qux</em> quux</strong></p>
 		<p><strong>Foo <em>bar</em></strong> <em>baz</em></p>
 		<p><strong>Foo</strong> <em><strong>bar</strong> baz</em></p>
-		<p>Lorem <strong>ipsum <em>dolor sit</em></strong><em> amet</em>, consectetur adipisicing elit.</p>
-		<p>Optio <strong>voluptatem <em>nesciunt</em> incidunt</strong> eos exercitationem saepe cupiditate,<br>maiores tenetur nam officia laudantium minima aspernatur dolores delectus dicta consectetur, unde adipisci a!</p>
 		<h2>Dolor sit amet</h2>
 		<ul>
 			<li>Foo<ul>
@@ -65,7 +81,6 @@
 			<li>Bar</li>
 			<li>Baz</li>
 		</ul>
-		<p><img src="img/doge.jpg" alt="Doge" /></p>
 	</div>
 	<table id="data">
 		<thead>
@@ -81,6 +96,7 @@
 		<tbody>
 		</tbody>
 	</table>
+	<div id="html"></div>
 	<script src="../lib/require.js" data-main="main"></script>
 </body>
 </html>
