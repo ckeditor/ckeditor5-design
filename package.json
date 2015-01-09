@@ -1,16 +1,10 @@
 {
-	"name": "observers",
+	"name": "v5-document-prototype",
 	"version": "0.1.0",
 	"description": "",
 	"main": "gruntfile.js",
-	"dependencies": {
-		"lodash": "^2.4.1",
-		"rich-text": "^1.0.3"
-	},
 	"devDependencies": {
-		"browserify": "^6.3.3",
 		"grunt": "^0.4.5",
-		"grunt-browserify": "^3.2.1",
 		"load-grunt-tasks": "^1.0.0"
 	},
 	"scripts": {
