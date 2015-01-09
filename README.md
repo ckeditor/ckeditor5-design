@@ -1,19 +1,6 @@
-# oteditor prototype
+# CKEditor5 Document Model Prototype
 
-A prototype of a rich-text editor using operational transformations.
-
-## Usage
-
-Install all the dependencies:
-
-```
-npm install
-```
-
-Run Browserify watcher:
-
-```
-grunt
-```
-
-Open `index.html` file in a web browser.
+A prototype of the document representations for the CKEditor 5 using:
+- a linear data
+- a document tree
+- a "dirty" DOM
