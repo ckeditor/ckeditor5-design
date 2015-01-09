@@ -1,19 +1,24 @@
-'use strict';
+define( [
+	'styles/styled-node',
+	'tools/utils'
+], function(
+	StyledNode,
+	utils
+) {
+	'use strict';
 
-var StyledNode = require( './styled-node' ),
-	utils = require( '../utils' );
+	function BoldStyle() {
+		StyledNode.apply( this, arguments );
+	}
 
-function BoldStyle() {
-	StyledNode.apply( this, arguments );
-}
+	// inherit statics
+	utils.extend( BoldStyle, StyledNode, {
+		type: 'bold',
+		tags: [ 'strong', 'b' ]
+	} );
 
-// inherit statics
-utils.extend( BoldStyle, StyledNode, {
-	type: 'bold',
-	tags: [ 'strong', 'b' ]
+	// inherit prototype
+	utils.inherit( BoldStyle, StyledNode );
+
+	return BoldStyle;
 } );
-
-// inherit prototype
-utils.inherit( BoldStyle, StyledNode );
-
-module.exports = BoldStyle;

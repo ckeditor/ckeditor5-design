@@ -1,80 +1,80 @@
-'use strict';
+define( [ 'tools/utils' ], function( utils ) {
+	'use strict';
 
-var utils = require( './utils' );
+	function Node( op ) {
+		this.op = op || null;
+		this.document = null;
+		this.parent = null;
+		this.root = null;
+	}
 
-function Node( op ) {
-	this.op = op || null;
-	this.document = null;
-	this.parent = null;
-	this.root = null;
-}
+	// static props
+	Node.type = null;
+	Node.tags = [];
+	Node.attributes = [];
+	Node.isContent = false;
 
-// static props
-Node.type = null;
-Node.tags = [];
-Node.attributes = [];
-Node.isContent = false;
+	// static methods
+	Node.pickAttributes = function( dom, attributes ) {
+		var result = {};
 
-// static methods
-Node.pickAttributes = function( dom, attributes ) {
-	var result = {};
-
-	attributes.forEach( function( attribute ) {
-		result[ attribute ] = dom.getAttribute( attribute );
-	} );
-
-	return result;
-};
-
-Node.toOperation = function( dom ) {
-	var attributes = utils.extend( {
-		type: this.type
-	}, this.pickAttributes( dom, this.attributes ) );
-
-	return {
-		insert: 1,
-		attributes: attributes
-	};
-};
-
-Node.toDom = function( operation, doc ) {
-	var tags = this.tags;
-
-	if ( tags.length === 1 ) {
-		var dom = doc.createElement( tags[ 0 ] ),
-			attributes = utils.pick( operation.attributes, this.attributes );
-
-		Object.keys( attributes ).forEach( function( name ) {
-			var value;
-
-			if ( ( value = attributes[ name ] ) !== null ) {
-				dom.setAttribute( name, value );
-			}
+		attributes.forEach( function( attribute ) {
+			result[ attribute ] = dom.getAttribute( attribute );
 		} );
 
-		return dom;
-	}
+		return result;
+	};
 
-	throw new Error( 'Override toDom in a subclass' );
-};
+	Node.toOperation = function( dom ) {
+		var attributes = utils.extend( {
+			type: this.type
+		}, this.pickAttributes( dom, this.attributes ) );
 
-// prototype
-Node.prototype = {
-	isContent: function() {
-		return this.constructor.isContent;
-	},
+		return {
+			insert: 1,
+			attributes: attributes
+		};
+	};
 
-	setDocument: function( doc ) {
-		this.document = doc;
-	},
+	Node.toDom = function( operation, doc ) {
+		var tags = this.tags;
 
-	setParent: function( node ) {
-		this.parent = this;
-	},
+		if ( tags.length === 1 ) {
+			var dom = doc.createElement( tags[ 0 ] ),
+				attributes = utils.pick( operation.attributes, this.attributes );
 
-	setRoot: function( node ) {
-		this.root = node;
-	}
-};
+			Object.keys( attributes ).forEach( function( name ) {
+				var value;
 
-module.exports = Node;
+				if ( ( value = attributes[ name ] ) !== null ) {
+					dom.setAttribute( name, value );
+				}
+			} );
+
+			return dom;
+		}
+
+		throw new Error( 'Override toDom in a subclass' );
+	};
+
+	// prototype
+	Node.prototype = {
+		isContent: function() {
+			return this.constructor.isContent;
+		},
+
+		setDocument: function( doc ) {
+			this.document = doc;
+		},
+
+		setParent: function( node ) {
+			this.parent = this;
+		},
+
+		setRoot: function( node ) {
+			this.root = node;
+		}
+	};
+
+	return Node;
+} );

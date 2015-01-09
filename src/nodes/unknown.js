@@ -1,16 +1,21 @@
-'use strict';
+define( [
+	'branch',
+	'tools/utils'
+], function(
+	Branch,
+	utils
+) {
+	'use strict';
 
-var Branch = require( '../branch' ),
-	utils = require( '../utils' );
+	function UnknownNode() {
+		Branch.apply( this, arguments );
+	}
 
-function UnknownNode() {
-	Branch.apply( this, arguments );
-}
+	utils.extend( UnknownNode, Branch, {
+		type: 'unknown'
+	} );
 
-utils.extend( UnknownNode, Branch, {
-	type: 'unknown'
+	utils.inherit( UnknownNode, Branch );
+
+	return UnknownNode;
 } );
-
-utils.inherit( UnknownNode, Branch );
-
-module.exports = UnknownNode;

@@ -1,22 +1,24 @@
-/* global document */
+define( [
+	'tools/emitter',
+	'document',
+	'editable',
+	'tools/utils'
+], function(
+	Emitter,
+	Document,
+	Editable,
+	utils
+) {
+	'use strict';
 
-'use strict';
+	function Editor( selector ) {
+		this.el = document.querySelector( selector );
+		this.document = new Document( this.el );
+		this.editable = new Editable( this.document, this.el );
+	}
 
-var EventEmitter = require( 'events' ).EventEmitter,
-	Document = require( './document' ),
-	Editable = require( './editable' ),
-	utils = require( './utils' );
+	utils.extend( Editor.prototype, Emitter, {} );
 
-function Editor( selector ) {
-	EventEmitter.apply( this, arguments );
+	return Editor;
 
-	this.el = document.querySelector( selector );
-	this.document = new Document( this.el );
-	this.editable = new Editable( this.document, this.el );
-}
-
-utils.inherit( Editor, EventEmitter );
-
-utils.extend( Editor.prototype, {} );
-
-module.exports = Editor;
+} );

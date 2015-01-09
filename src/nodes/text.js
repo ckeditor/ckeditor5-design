@@ -1,28 +1,33 @@
-'use strict';
+define( [
+	'node',
+	'tools/utils'
+], function(
+	Node,
+	utils
+) {
+	'use strict';
 
-var Node = require( '../node' ),
-	utils = require( '../utils' );
-
-function TextNode() {
-	Node.apply( this, arguments );
-}
-
-utils.extend( TextNode, Node, {
-	isContent: true,
-
-	type: 'text',
-
-	toOperation: function( dom ) {
-		return {
-			insert: dom.textContent
-		};
-	},
-
-	toDom: function( operation, doc ) {
-		return doc.createTextNode( operation.insert );
+	function TextNode() {
+		Node.apply( this, arguments );
 	}
+
+	utils.extend( TextNode, Node, {
+		isContent: true,
+
+		type: 'text',
+
+		toOperation: function( dom ) {
+			return {
+				insert: dom.textContent
+			};
+		},
+
+		toDom: function( operation, doc ) {
+			return doc.createTextNode( operation.insert );
+		}
+	} );
+
+	utils.inherit( TextNode, Node );
+
+	return TextNode;
 } );
-
-utils.inherit( TextNode, Node );
-
-module.exports = TextNode;

@@ -1,17 +1,22 @@
-'use strict';
+define( [
+	'styles/styled-node',
+	'tools/utils'
+], function(
+	StyledNode,
+	utils
+) {
+	'use strict';
 
-var StyledNode = require( './styled-node' ),
-	utils = require( '../utils' );
+	function UnderlineStyle() {
+		StyledNode.apply( this, arguments );
+	}
 
-function UnderlineStyle() {
-	StyledNode.apply( this, arguments );
-}
+	utils.extend( UnderlineStyle, StyledNode, {
+		type: 'underline',
+		tags: [ 'u' ]
+	} );
 
-utils.extend( UnderlineStyle, StyledNode, {
-	type: 'underline',
-	tags: [ 'u' ]
+	utils.inherit( UnderlineStyle, StyledNode );
+
+	return UnderlineStyle;
 } );
-
-utils.inherit( UnderlineStyle, StyledNode );
-
-module.exports = UnderlineStyle;

@@ -1,17 +1,22 @@
-'use strict';
+define( [
+	'branch',
+	'tools/utils'
+], function(
+	Branch,
+	utils
+) {
+	'use strict';
 
-var Branch = require( '../branch' ),
-	utils = require( '../utils' );
+	function ParagraphNode() {
+		Branch.apply( this, arguments );
+	}
 
-function ParagraphNode() {
-	Branch.apply( this, arguments );
-}
+	utils.extend( ParagraphNode, Branch, {
+		type: 'paragraph',
+		tags: [ 'p' ]
+	} );
 
-utils.extend( ParagraphNode, Branch, {
-	type: 'paragraph',
-	tags: [ 'p' ]
+	utils.inherit( ParagraphNode, Branch );
+
+	return ParagraphNode;
 } );
-
-utils.inherit( ParagraphNode, Branch );
-
-module.exports = ParagraphNode;

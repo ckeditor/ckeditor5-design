@@ -1,19 +1,24 @@
-'use strict';
+define( [
+	'node',
+	'tools/utils'
+], function(
+	Node,
+	utils
+) {
+	'use strict';
 
-var Node = require( '../node' ),
-	utils = require( '../utils' );
+	function ImageNode() {
+		Node.apply( this, arguments );
+	}
 
-function ImageNode() {
-	Node.apply( this, arguments );
-}
+	utils.extend( ImageNode, Node, {
+		type: 'image',
+		tags: [ 'img' ],
+		attributes: [ 'src', 'alt', 'width', 'height', 'title' ],
+		isEmpty: true
+	} );
 
-utils.extend( ImageNode, Node, {
-	type: 'image',
-	tags: [ 'img' ],
-	attributes: [ 'src', 'alt', 'width', 'height', 'title' ],
-	isEmpty: true
+	utils.inherit( ImageNode, Node );
+
+	return ImageNode;
 } );
-
-utils.inherit( ImageNode, Node );
-
-module.exports = ImageNode;

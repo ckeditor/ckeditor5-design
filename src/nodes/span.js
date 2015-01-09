@@ -1,17 +1,22 @@
-'use strict';
+define( [
+	'branch',
+	'tools/utils'
+], function(
+	Branch,
+	utils
+) {
+	'use strict';
 
-var Branch = require( '../branch' ),
-	utils = require( '../utils' );
+	function SpanNode() {
+		Branch.apply( this, arguments );
+	}
 
-function SpanNode() {
-	Branch.apply( this, arguments );
-}
+	utils.extend( SpanNode, Branch, {
+		type: 'span',
+		tags: [ 'span' ]
+	} );
 
-utils.extend( SpanNode, Branch, {
-	type: 'span',
-	tags: [ 'span' ]
+	utils.inherit( SpanNode, Branch );
+
+	return SpanNode;
 } );
-
-utils.inherit( SpanNode, Branch );
-
-module.exports = SpanNode;

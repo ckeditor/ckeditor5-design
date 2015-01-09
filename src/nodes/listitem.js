@@ -1,17 +1,22 @@
-'use strict';
+define( [
+	'branch',
+	'tools/utils'
+], function(
+	Branch,
+	utils
+) {
+	'use strict';
 
-var Branch = require( '../branch' ),
-	utils = require( '../utils' );
+	function ListItemNode() {
+		Branch.apply( this, arguments );
+	}
 
-function ListItemNode() {
-	Branch.apply( this, arguments );
-}
+	utils.extend( ListItemNode, Branch, {
+		type: 'listItem',
+		tags: [ 'li' ]
+	} );
 
-utils.extend( ListItemNode, Branch, {
-	type: 'listItem',
-	tags: [ 'li' ]
+	utils.inherit( ListItemNode, Branch );
+
+	return ListItemNode;
 } );
-
-utils.inherit( ListItemNode, Branch );
-
-module.exports = ListItemNode;
