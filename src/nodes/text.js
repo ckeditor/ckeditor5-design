@@ -16,10 +16,20 @@ define( [
 
 		type: 'text',
 
-		toOperation: function( dom ) {
-			return {
-				insert: dom.textContent
-			};
+		toOperation: function( dom, parentStyle ) {
+			var text = dom.textContent;
+
+			return text.split( '' ).map( function( char ) {
+				var op = {
+					insert: char
+				};
+
+				if ( parentStyle ) {
+					op.attributes = parentStyle;
+				}
+
+				return op;
+			} );
 		},
 
 		toDom: function( operation, doc ) {

@@ -14,8 +14,8 @@ define( [
 	}
 
 	Converter.prototype = {
-		getOperationForChild: function( typeConverter, dom ) {
-			var ops = typeConverter.toOperation( dom );
+		getOperationForChild: function( typeConverter, dom, parentStyle ) {
+			var ops = typeConverter.toOperation( dom, parentStyle );
 
 			if ( !Array.isArray( ops ) ) {
 				ops = [ ops ];
@@ -52,8 +52,6 @@ define( [
 					} else {
 						childOps = this.getOperationForChild( typeConverter, child );
 						childOps = this.getOperationsForDom( child, childOps[ 0 ] );
-
-						// TODO handle void elements
 					}
 
 					ops = ops.concat( childOps );
@@ -76,8 +74,7 @@ define( [
 
 					typeConverter = this.typeManager.get( 'text' );
 
-					// TODO get op for every single character
-					childOps = this.getOperationForChild( typeConverter, child );
+					childOps = this.getOperationForChild( typeConverter, child, parentStyle );
 
 					// apply parent node styles, if any
 					if ( parentStyle ) {
