@@ -1,8 +1,12 @@
 define( [
+	'document',
 	'mutationSummary',
+	'tools/emitter',
 	'tools/utils'
 ], function(
+	Document,
 	MutationSummary,
+	Emitter,
 	utils
 ) {
 	'use strict';
@@ -16,9 +20,10 @@ define( [
 		attributeOldValue: true
 	};
 
-	function Editable( document, el ) {
-		this.document = document;
+	function Editable( el ) {
 		this.el = el;
+
+		this.document = new Document( el );
 
 		this.observer = new MutationSummary( {
 			callback: this.mutationHandler.bind( this ),
@@ -29,14 +34,14 @@ define( [
 		} );
 	}
 
-	Editable.prototype = {
+	utils.extend( Editable.prototype, Emitter, {
 		mutationHandler: function( summaries ) {
 			console.log( summaries.length );
 			summaries.forEach( function( summary ) {
 				console.log( summary );
 			} );
 		}
-	};
+	} );
 
 	return Editable;
 } );

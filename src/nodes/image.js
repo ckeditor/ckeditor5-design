@@ -1,8 +1,10 @@
 define( [
 	'node',
+	'nodemanager',
 	'tools/utils'
 ], function(
 	Node,
+	nodeManager,
 	utils
 ) {
 	'use strict';
@@ -19,6 +21,8 @@ define( [
 	} );
 
 	utils.inherit( ImageNode, Node );
+
+	nodeManager.register( ImageNode );
 
 	return ImageNode;
 } );

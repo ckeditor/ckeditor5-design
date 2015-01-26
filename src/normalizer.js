@@ -6,8 +6,8 @@ define( function() {
 	function Normalizer() {}
 
 	Normalizer.prototype = {
-		normalize: function( dom ) {
-			var children = dom.childNodes,
+		normalize: function( el ) {
+			var children = el.childNodes,
 				child,
 				i;
 
@@ -16,13 +16,13 @@ define( function() {
 
 				// text node
 				if ( child.nodeType === Node.TEXT_NODE ) {
-					// text node contains only whitespaces
+					// text node contains whitespaces only
 					if ( whitePattern.test( child.data ) ) {
-						// strip whitespaces at the end or the beginning of the dom
+						// strip whitespaces at the end or at the beginning of the el
 						if ( !child.previousSibling || !child.nextSibling ) {
-							dom.removeChild( child );
+							el.removeChild( child );
 
-							// reduce to single white space
+							// reduce to a single white space
 						} else {
 							child.data = ' ';
 						}
@@ -30,7 +30,6 @@ define( function() {
 
 					// TODO move start/end whitespaces to the siblings
 					// http://www.w3.org/TR/html4/struct/text.html#h-9.1
-
 
 					// element
 				} else if ( child.nodeType === Node.ELEMENT_NODE ) {
@@ -40,5 +39,5 @@ define( function() {
 		}
 	};
 
-	return Normalizer;
+	return new Normalizer();
 } );

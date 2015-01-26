@@ -1,8 +1,10 @@
 define( [
 	'branch',
+	'nodemanager',
 	'tools/utils'
 ], function(
 	Branch,
+	nodeManager,
 	utils
 ) {
 	'use strict';
@@ -17,6 +19,8 @@ define( [
 	} );
 
 	utils.inherit( ListItemNode, Branch );
+
+	nodeManager.register( ListItemNode );
 
 	return ListItemNode;
 } );

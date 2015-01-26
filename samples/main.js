@@ -36,28 +36,32 @@ require( [
 			.join( '<br>' ) : '';
 	}
 
-	html = editor.document.ops.map( function( op ) {
+	html = editor.editable.document.data.map( function( op ) {
 		op = utils.clone( op );
 
-		if ( op.insert === 1 ) {
-			op.insert = op.attributes.type;
-			op.css = 'tag';
-		} else if ( op.insert === 2 ) {
-			op.insert = '/' + op.attributes.type;
-			op.css = 'tag';
-		} else if ( op.insert === ' ' ) {
-			op.insert = '_whitespace_';
-			op.css = 'whitespace';
+		if ( !Array.isArray( op ) ) {
+			op = [ op ];
+		}
+
+		if ( op[ 0 ] === 1 ) {
+			op[ 0 ] = op[ 1 ].type;
+			op[ 2 ] = 'tag';
+		} else if ( op[ 0 ] === 2 ) {
+			op[ 0 ] = '/' + op[ 1 ].type;
+			op[ 2 ] = 'tag';
+		} else if ( op[ 0 ] === ' ' ) {
+			op[ 0 ] = '_';
+			op[ 2 ] = 'whitespace';
 		} else {
-			op.css = 'text';
+			op[ 2 ] = 'text';
 		}
 
 		return op;
 	} ).map( function( op, idx ) {
 		return [ '<tr>',
 			'<td>', idx, '</td>',
-			'<td class="', op.css, '">', op.insert, '</td>',
-			'<td>', formatAttributes( op.attributes ), '</td>',
+			'<td class="', op[ 2 ], '">', op[ 0 ], '</td>',
+			'<td>', formatAttributes( op[ 1 ] ), '</td>',
 			'</tr>'
 		].join( '' );
 	} );
@@ -77,7 +81,7 @@ require( [
 
 		return str.replace( /[&<>]/g, function( item ) {
 			return replacements[ item ] || item;
-		} ).replace(/;\s?&/g, ';<br>&');
+		} ).replace( /;\s?&/g, ';<br>&' );
 	}
 
 	document.getElementById( 'html' ).innerHTML = escapeTags( document.getElementById( 'input' ).innerHTML );

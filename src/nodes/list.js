@@ -1,8 +1,10 @@
 define( [
 	'branch',
+	'nodemanager',
 	'tools/utils'
 ], function(
 	Branch,
+	nodeManager,
 	utils
 ) {
 	'use strict';
@@ -16,21 +18,20 @@ define( [
 		tags: [ 'ul', 'ol' ],
 
 		toOperation: function( dom ) {
-			return {
-				insert: 1,
-				attributes: {
-					type: this.type,
-					style: dom.nodeName.toLowerCase() == 'ol' ? 'number' : 'bullet'
-				}
-			};
+			return [ 1, {
+				type: this.type,
+				style: dom.nodeName.toLowerCase() == 'ol' ? 'number' : 'bullet'
+			} ];
 		},
 
 		toDom: function( operation, doc ) {
-			return doc.createElement( operation.attributes.style === 'number' ? 'ol' : 'ul' );
+			return doc.createElement( operation[ 1 ].style === 'number' ? 'ol' : 'ul' );
 		}
 	} );
 
 	utils.inherit( ListNode, Branch );
+
+	nodeManager.register( ListNode );
 
 	return ListNode;
 } );

@@ -1,8 +1,10 @@
 define( [
 	'node',
+	'nodemanager',
 	'tools/utils'
 ], function(
 	Node,
+	nodeManager,
 	utils
 ) {
 	'use strict';
@@ -18,6 +20,8 @@ define( [
 	} );
 
 	utils.inherit( BreakNode, Node );
+
+	nodeManager.register( BreakNode );
 
 	return BreakNode;
 } );

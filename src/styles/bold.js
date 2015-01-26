@@ -1,8 +1,10 @@
 define( [
 	'styles/styled-node',
+	'nodemanager',
 	'tools/utils'
 ], function(
 	StyledNode,
+	nodeManager,
 	utils
 ) {
 	'use strict';
@@ -19,6 +21,8 @@ define( [
 
 	// inherit prototype
 	utils.inherit( BoldStyle, StyledNode );
+
+	nodeManager.register( BoldStyle );
 
 	return BoldStyle;
 } );

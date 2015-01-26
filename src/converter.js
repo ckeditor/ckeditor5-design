@@ -1,35 +1,31 @@
 define( [
 	'document',
+	'nodemanager',
 	'styles/styled-node',
-	'tools/utils'
+	'tools/utils',
+	'nodetypes'
 ], function(
 	Document,
+	nodeManager,
 	StyledNode,
 	utils
 ) {
 	'use strict';
 
-	function Converter( typeManager ) {
-		this.typeManager = typeManager;
-	}
+	function Converter() {}
 
 	Converter.prototype = {
 		getOperationForChild: function( typeConverter, dom, parentStyle ) {
 			var ops = typeConverter.toOperation( dom, parentStyle );
 
-			if ( !Array.isArray( ops ) ) {
-				ops = [ ops ];
-			}
-
-			return ops;
+			return [ ops ]; //?????
 		},
 
 		getOperationsForDom: function( dom, parent, parentStyle ) {
-			var ops = [],
-				whitespaces = [];
+			var ops = [];
 
 			// add parent element's opening tag
-			if ( parent && parent.attributes.type ) {
+			if ( parent && parent[ 1 ] && parent[ 1 ].type ) {
 				ops.push( parent );
 			}
 
@@ -42,7 +38,7 @@ define( [
 
 				// element
 				if ( child.nodeType === Node.ELEMENT_NODE ) {
-					typeConverter = this.typeManager.matchForDom( child ) || this.typeManager.get( 'unknown' );
+					typeConverter = nodeManager.matchForDom( child ) || nodeManager.get( 'unknown' );
 
 					// styled text
 					if ( typeConverter.prototype instanceof StyledNode ) {
@@ -66,39 +62,41 @@ define( [
 
 					// node contains whitespaces only
 					if ( text.match( /^\s+$/ ) ) {
-						if ( ops[ ops.length - 1 ].insert === 1 ) {
+						if ( ops[ ops.length - 1 ] && ops[ ops.length - 1 ][ 0 ] === 1 ) {
 							return;
 						}
 						// TODO is that enough for now?
 					}
 
-					typeConverter = this.typeManager.get( 'text' );
-
-					childOps = this.getOperationForChild( typeConverter, child, parentStyle );
-
-					// apply parent node styles, if any
-					if ( parentStyle ) {
-						childOps[ 0 ].attributes = parentStyle;
-					}
+					childOps = this.getOperationsForText( child.textContent, parentStyle );
 
 					ops = ops.concat( childOps );
 				}
 			}, this );
 
 			// add parent element's closing tag
-			if ( parent && parent.attributes.type ) {
+			if ( parent && parent[ 1 ] && parent[ 1 ].type ) {
 				// TODO should we put a closing tag for a void element?
-				ops.push( {
-					insert: 2,
-					attributes: {
-						type: parent.attributes.type
-					}
-				} );
+				ops.push( [ 2, {
+					type: parent[ 1 ].type
+				} ] );
 
 				dom.dataset.length = ops.length;
 			}
 
 			return ops;
+		},
+
+		getOperationsForText: function( text, parentStyle ) {
+			text = text.split( '' );
+
+			if ( !parentStyle ) {
+				return text;
+			}
+
+			return text.map( function( char ) {
+				return [ char, parentStyle ];
+			} );
 		},
 
 		getDomForOperations: function( ops, targetElement ) {
@@ -118,9 +116,7 @@ define( [
 
 			// shallow compare for two objects
 			function compare( a, b ) {
-				return Object.keys( a ).every( function( name ) {
-					return a[ name ] === b[ name ];
-				} );
+				return JSON.stringify( a ) === JSON.stringify( b );
 			}
 
 			// find what's the first index where two style arrays are different
@@ -150,57 +146,108 @@ define( [
 				item = utils.clone( ops[ i ] );
 
 				// tag
-				if ( item.insert === 1 ) {
-					type = item.attributes.type;
+				if ( item[ 0 ] === 1 ) {
+					type = item[ 1 ].type;
+					childElement = this.getDomForOperation( item, doc );
+
+					currentElement.appendChild( childElement );
+
+					// child element may contain data
+					if ( !nodeManager.isEmpty( type ) ) {
+						currentElement = childElement;
+					}
+				} else if ( item[ 0 ] === 2 ) {
 					// closing tag
-					if ( type.charAt( 0 ) === '/' ) {
-						type = type.substr( 1 );
+					type = item[ 1 ].type;
 
-						if ( !this.typeManager.isEmpty( type ) ) {
-							// move context to parent node
-							currentElement = currentElement.parentNode;
-						}
-						// opening tag
-					} else {
-						childElement = this.getDomForOperation( item, doc );
-
-						currentElement.appendChild( childElement );
-
-						// child element may contain data
-						if ( !this.typeManager.isEmpty( type ) ) {
-							currentElement = childElement;
-						}
+					if ( !nodeManager.isEmpty( type ) ) {
+						// move context to parent node
+						currentElement = currentElement.parentNode;
 					}
 
 					// text
-				} else if ( utils.isString( item.insert ) ) {
+				} else if ( utils.isString( item ) || utils.isString( item[ 0 ] ) ) {
+
 					// styled text
-					if ( item.attributes ) {
+					if ( Array.isArray( item ) && item[ 1 ] ) {
 						var styleStack = [],
-							styledElements = [];
+							styledElements = [],
+							text = [];
 
 						// we want to process a whole chain of "styled text" items
 						while (
 							( item = utils.clone( ops[ i ] ) ) &&
-							utils.isString( item.insert ) &&
-							item.attributes
+							( utils.isString( item ) || utils.isString( item[ 0 ] ) ) &&
+							item[ 1 ]
+						) {
+							var styles = [];
+
+							while ( ( typeConverter = nodeManager.matchForOperation( item ) ) ) {
+								type = typeConverter.type;
+
+								// make a copy of a style
+								var style = utils.pick( item[ 1 ], type );
+
+								styles.push( style );
+
+								// removed the processed style data
+								delete item[ 1 ][ type ];
+							}
+
+							text.push( item[ 0 ] );
+
+							var diffIdx = styleStack.length ? findDifferenceIndex( styles, styleStack[ styleStack.length - 1 ] ) : 0;
+
+							// no common styles
+							if ( diffIdx === 0 ) {
+								var textNode = document.createTextNode( text.join( '' ) );
+
+								styledElements.push( textNode );
+
+								text.length = 0;
+
+								styleStack.push( styles );
+
+								// styles are different
+							} else if ( diffIdx !== -1 ) {
+
+								styleStack.push( styles );
+							}
+
+
+							i++;
+						}
+
+						console.log( styleStack );
+						console.log( text );
+
+						i--;
+
+						// TODO find diff index, produce text node and styled node
+
+
+						/*
+						// we want to process a whole chain of "styled text" items
+						while (
+							( item = utils.clone( ops[ i ] ) ) &&
+							( utils.isString( item ) || utils.isString( item[ 0 ] ) ) &&
+							item[ 1 ]
 						) {
 							var styles = [],
 								itemElems = [],
 								style;
 
 							// process item styles
-							while ( ( typeConverter = this.typeManager.matchForOperation( item ) ) ) {
+							while ( ( typeConverter = nodeManager.matchForOperation( item ) ) ) {
 								type = typeConverter.type;
 
 								// make a copy of a style
-								style = utils.pick( item.attributes, [ type, type + 'Tag' ] );
+								style = utils.pick( item[ 1 ], type );
 								styles.push( style );
 								itemElems.push( typeConverter.toDom( item, doc ) );
 
 								// removed the processed style data
-								delete item.attributes[ type ];
-								delete item.attributes[ type + 'Tag' ];
+								delete item[ 1 ][ type ];
 							}
 
 							var diffIdx = findDifferenceIndex( styles, styleStack );
@@ -226,7 +273,7 @@ define( [
 							styledElements = styledElements.concat( itemElems );
 
 							// create a text node
-							typeConverter = this.typeManager.get( 'text' );
+							typeConverter = nodeManager.get( 'text' );
 							childElement = typeConverter.toDom( item, doc );
 
 							// append the text to the deepest element
@@ -247,10 +294,24 @@ define( [
 						// append styled elements to the currentElement
 						styledElements.forEach( appendNode );
 
+						*/
+
 						// plain text
 					} else {
-						typeConverter = this.typeManager.get( 'text' );
-						childElement = typeConverter.toDom( item, doc );
+						var text = [];
+
+						while (
+							( item = utils.clone( ops[ i ] ) ) &&
+							utils.isString( item )
+						) {
+							text.push( item );
+
+							i++;
+						}
+
+						i--;
+
+						childElement = doc.createTextNode( text.join( '' ) );
 						currentElement.appendChild( childElement );
 					}
 				}
@@ -258,11 +319,17 @@ define( [
 		},
 
 		getDomForOperation: function( operation, doc ) {
-			var typeConverter = this.typeManager.get( operation.attributes.type );
+			var typeConverter = nodeManager.get( operation[ 1 ].type );
 
 			return typeConverter.toDom( operation, doc );
+		},
+
+		getTextForOperation: function( operations, doc ) {
+			return doc.createTextNode( operations.map( function( op ) {
+				return Array.isArray( op ) ? op[ 0 ] : op;
+			} ).join( '' ) );
 		}
 	};
 
-	return Converter;
+	return new Converter();
 } );

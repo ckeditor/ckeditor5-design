@@ -1,8 +1,10 @@
 define( [
 	'styles/styled-node',
+	'nodemanager',
 	'tools/utils'
 ], function(
 	StyledNode,
+	nodeManager,
 	utils
 ) {
 	'use strict';
@@ -17,6 +19,8 @@ define( [
 	} );
 
 	utils.inherit( UnderlineStyle, StyledNode );
+
+	nodeManager.register( UnderlineStyle );
 
 	return UnderlineStyle;
 } );

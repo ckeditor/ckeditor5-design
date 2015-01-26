@@ -30,10 +30,7 @@ define( [ 'tools/utils' ], function( utils ) {
 			type: this.type
 		}, this.pickAttributes( dom, this.attributes ) );
 
-		return {
-			insert: 1,
-			attributes: attributes
-		};
+		return [ 1, attributes ];
 	};
 
 	Node.toDom = function( operation, doc ) {
@@ -41,7 +38,7 @@ define( [ 'tools/utils' ], function( utils ) {
 
 		if ( tags.length === 1 ) {
 			var dom = doc.createElement( tags[ 0 ] ),
-				attributes = utils.pick( operation.attributes, this.attributes );
+				attributes = utils.pick( operation[ 1 ], this.attributes );
 
 			Object.keys( attributes ).forEach( function( name ) {
 				var value;
