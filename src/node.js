@@ -75,6 +75,35 @@ define( [ 'tools/utils' ], function( utils ) {
 	utils.extend( Node.prototype, {
 		adjustLength: function( length ) {
 			this._length += length;
+		},
+
+		getOffset: function() {
+			// it's the topmost element
+			if ( !this.parent ) {
+				return 0;
+			}
+
+			var offset = this.parent.getOffset();
+
+			// add 1 for parent's opening element
+			if ( this.parent !== this.root ) {
+				offset += 1;
+			}
+
+			// add lengths of the siblings to the final offset
+			var found = this.parent.children.some( function( child ) {
+				if ( child === this ) {
+					return true;
+				}
+
+				offset += child.length;
+			}, this );
+
+			if ( !found ) {
+				throw new Error( 'Node not found in its parent\'s children array.' );
+			}
+
+			return offset;
 		}
 	} );
 
