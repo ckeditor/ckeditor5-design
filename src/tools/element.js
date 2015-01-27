@@ -15,6 +15,12 @@ define( [
 		}
 	}
 
+	Element.create = function( tag ) {
+		var el = document.createElement( tag );
+
+		return new Element( el );
+	};
+
 	Element.prototype = {
 		addClass: function( value ) {
 			this._el.classList.add( value.split( sepPattern ) );
@@ -23,7 +29,7 @@ define( [
 		},
 
 		append: function( child ) {
-			this._el.appendChild( child );
+			this._el.appendChild( child instanceof Element ? child._el : child );
 
 			return this;
 		},
@@ -66,13 +72,19 @@ define( [
 		},
 
 		insertAfter: function( sibling ) {
-			this._el.parentNode.insertBefore( sibling, this._el.nextSibling );
+			this._el.parentNode.insertBefore(
+				sibling instanceof Element ? sibling._el : sibling,
+				this._el.nextSibling
+			);
 
 			return this;
 		},
 
 		insertBefore: function( sibling ) {
-			this._el.parentNode.insertBefore( sibling, this._el );
+			this._el.parentNode.insertBefore(
+				sibling instanceof Element ? sibling._el : sibling,
+				his._el
+			);
 
 			return this;
 		},
