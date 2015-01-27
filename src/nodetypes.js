@@ -1,6 +1,7 @@
 define( [
 	'nodes/break',
 	'nodes/div',
+	'nodes/document',
 	'nodes/heading',
 	'nodes/image',
 	'nodes/list',
