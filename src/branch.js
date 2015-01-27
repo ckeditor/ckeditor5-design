@@ -15,7 +15,6 @@ define( [
 		if ( Array.isArray( children ) ) {
 			this.spliceArray( 0, 0, children );
 		}
-
 	}
 
 

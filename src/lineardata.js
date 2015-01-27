@@ -10,12 +10,6 @@ define( [
 	function LinearData( data, store ) {
 		this.data = data || [];
 		this.store = store || new Store();
-
-		Object.defineProperty( this, 'length', {
-			get: function() {
-				return this.data.length;
-			}
-		} );
 	}
 
 	// static methods
@@ -37,7 +31,13 @@ define( [
 		}
 	} );
 
-	// prototype methods
+	// prototype
+	Object.defineProperty( LinearData.prototype, 'length', {
+		get: function() {
+			return this.data.length;
+		}
+	} );
+
 	utils.extend( LinearData.prototype, {
 		isCloseElementAt: function( idx ) {
 			var item = this.data[ idx ];

@@ -3,31 +3,13 @@ define( [ 'tools/utils' ], function( utils ) {
 
 	function Node( op ) {
 		this.op = op || null;
-		this.document = null;
 		this.parent = null;
 		this.root = null;
 
 		this._length = 0;
-
-		Object.defineProperty( this, 'length', {
-			get: function() {
-				// add the opening and closing elements to the length
-				return this._length + ( this.isWrapped ? 2 : 0 );
-			},
-
-			set: function( length ) {
-				this._length = length;
-			}
-		} );
-
-		Object.defineProperty( this, 'isWrapped', {
-			get: function() {
-				return this.constructor.isWrapped;
-			}
-		} );
 	}
 
-	// static props
+	// static properties
 	Node.type = null;
 	Node.tags = [];
 	Node.attributes = [];
@@ -73,6 +55,23 @@ define( [ 'tools/utils' ], function( utils ) {
 	};
 
 	// prototype
+	Object.defineProperty( Node.prototype, 'length', {
+		get: function() {
+			// add the opening and closing elements to the length
+			return this._length + ( this.isWrapped ? 2 : 0 );
+		},
+
+		set: function( length ) {
+			this._length = length;
+		}
+	} );
+
+	Object.defineProperty( Node.prototype, 'isWrapped', {
+		get: function() {
+			return this.constructor.isWrapped;
+		}
+	} );
+
 	utils.extend( Node.prototype, {
 		adjustLength: function( length ) {
 			this._length += length;
