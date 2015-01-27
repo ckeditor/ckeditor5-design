@@ -12,8 +12,8 @@ define( [
 	'use strict';
 
 	function Editor( selector ) {
-		this.el = document.querySelector( selector );
-		this.editable = new Editable( this.el );
+		this.sourceElement = document.querySelector( selector );
+		this.editable = new Editable( this.sourceElement );
 	}
 
 	utils.extend( Editor.prototype, Emitter, {} );

@@ -1,3 +1,4 @@
+// YES, IT'S UGLY, BUT IT'S A TEMPORARY SOLUTION (hopefully)
 define( [
 	'nodes/break',
 	'nodes/div',

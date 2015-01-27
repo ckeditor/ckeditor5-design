@@ -15,17 +15,27 @@ define( [
 	function Converter() {}
 
 	Converter.prototype = {
+		createDocumentFromHTML: function( html ) {
+			if ( DOMParser ) {
+				var parser = new DOMParser();
+
+				return parser.parseFromString( html, 'text/html' );
+			} else {
+				// TODO handle IE < 10
+			}
+		},
+
 		getOperationForChild: function( typeConverter, dom, parentStyle ) {
 			var ops = typeConverter.toOperation( dom, parentStyle );
 
-			return [ ops ]; //?????
+			return [ ops ]; // TODO ?????
 		},
 
 		getOperationsForDom: function( dom, parent, parentStyle ) {
 			var ops = [];
 
 			// add parent element's opening tag
-			if ( parent && parent[ 1 ] && parent[ 1 ].type ) {
+			if ( utils.isObject( parent ) && parent.type ) {
 				ops.push( parent );
 			}
 
@@ -62,7 +72,7 @@ define( [
 
 					// node contains whitespaces only
 					if ( text.match( /^\s+$/ ) ) {
-						if ( ops[ ops.length - 1 ] && ops[ ops.length - 1 ][ 0 ] === 1 ) {
+						if ( ops[ ops.length - 1 ] && ops[ ops.length - 1 ].type ) {
 							return;
 						}
 						// TODO is that enough for now?
@@ -75,11 +85,11 @@ define( [
 			}, this );
 
 			// add parent element's closing tag
-			if ( parent && parent[ 1 ] && parent[ 1 ].type ) {
+			if ( utils.isObject( parent ) && parent.type ) {
 				// TODO should we put a closing tag for a void element?
-				ops.push( [ 2, {
-					type: parent[ 1 ].type
-				} ] );
+				ops.push( {
+					type: '/' + parent.type
+				} );
 
 				dom.dataset.length = ops.length;
 			}
@@ -99,9 +109,12 @@ define( [
 			} );
 		},
 
+		// TODO REWRITE
+		/*
 		getDomForOperations: function( ops, targetElement ) {
 			var currentElement = targetElement,
 				doc = targetElement.ownerDocument,
+				text = [],
 				typeConverter,
 				childElement,
 				item,
@@ -171,8 +184,7 @@ define( [
 					// styled text
 					if ( Array.isArray( item ) && item[ 1 ] ) {
 						var styleStack = [],
-							styledElements = [],
-							text = [];
+							styledElements = [];
 
 						// we want to process a whole chain of "styled text" items
 						while (
@@ -180,15 +192,19 @@ define( [
 							( utils.isString( item ) || utils.isString( item[ 0 ] ) ) &&
 							item[ 1 ]
 						) {
-							var styles = [];
+							var styles = [],
+								styledItems = [];
 
 							while ( ( typeConverter = nodeManager.matchForOperation( item ) ) ) {
 								type = typeConverter.type;
 
 								// make a copy of a style
 								var style = utils.pick( item[ 1 ], type );
-
 								styles.push( style );
+
+								// TODO - NOPE
+								var styledItem = typeConverter.toDom( item, doc );
+								styledItems.push( styledItem );
 
 								// removed the processed style data
 								delete item[ 1 ][ type ];
@@ -200,16 +216,27 @@ define( [
 
 							// no common styles
 							if ( diffIdx === 0 ) {
-								var textNode = document.createTextNode( text.join( '' ) );
+								if ( styledElements.length > 1 ) {
+									for ( var j = 1; j < styledElements.length; j++ ) {
+										styledElements[ j - 1 ].appendChild( styledElements[ j ] );
+									}
 
-								styledElements.push( textNode );
+									currentElement.appendChild( styledElements[ 0 ] );
+								}
 
-								text.length = 0;
+
+								styledElements.length = 0;
+								styledElements = styledElements.concat( styledItems );
 
 								styleStack.push( styles );
 
 								// styles are different
 							} else if ( diffIdx !== -1 ) {
+								var textNode = document.createTextNode( text.join( '' ) );
+
+								text.length = 0;
+
+								styledElements[ styledElements.length - 1 ].appendChild( textNode );
 
 								styleStack.push( styles );
 							}
@@ -218,87 +245,11 @@ define( [
 							i++;
 						}
 
-						console.log( styleStack );
-						console.log( text );
-
 						i--;
-
-						// TODO find diff index, produce text node and styled node
-
-
-						/*
-						// we want to process a whole chain of "styled text" items
-						while (
-							( item = utils.clone( ops[ i ] ) ) &&
-							( utils.isString( item ) || utils.isString( item[ 0 ] ) ) &&
-							item[ 1 ]
-						) {
-							var styles = [],
-								itemElems = [],
-								style;
-
-							// process item styles
-							while ( ( typeConverter = nodeManager.matchForOperation( item ) ) ) {
-								type = typeConverter.type;
-
-								// make a copy of a style
-								style = utils.pick( item[ 1 ], type );
-								styles.push( style );
-								itemElems.push( typeConverter.toDom( item, doc ) );
-
-								// removed the processed style data
-								delete item[ 1 ][ type ];
-							}
-
-							var diffIdx = findDifferenceIndex( styles, styleStack );
-
-							// no common styles
-							if ( diffIdx === 0 && styledElements.length ) {
-								currentElement.appendChild( styledElements[ 0 ] );
-								styledElements = [];
-							}
-
-							// remove styles that are already on the stack
-							styles = styles.slice( diffIdx );
-							// remove elements that are already on the stack
-							itemElems = itemElems.slice( diffIdx );
-
-							// remove styles that are no longer needed
-							styleStack = styleStack.slice( 0, diffIdx );
-							// remove elements that are no longer needed
-							styledElements = styledElements.slice( 0, diffIdx );
-
-							// add new styles to the stack
-							styleStack = styleStack.concat( styles );
-							styledElements = styledElements.concat( itemElems );
-
-							// create a text node
-							typeConverter = nodeManager.get( 'text' );
-							childElement = typeConverter.toDom( item, doc );
-
-							// append the text to the deepest element
-							styledElements[ styledElements.length - 1 ].appendChild( childElement );
-
-							// append elements from bottom to top
-							if ( styledElements.length > 1 ) {
-								for ( var j = 1; j < styledElements.length; j++ ) {
-									styledElements[ j - 1 ].appendChild( styledElements[ j ] );
-								}
-							}
-
-							i++;
-						}
-						// get back to the previous item which didn't match the while criteria
-						i--;
-
-						// append styled elements to the currentElement
-						styledElements.forEach( appendNode );
-
-						*/
 
 						// plain text
 					} else {
-						var text = [];
+						text = [];
 
 						while (
 							( item = utils.clone( ops[ i ] ) ) &&
@@ -317,6 +268,7 @@ define( [
 				}
 			}
 		},
+		*/
 
 		getDomForOperation: function( operation, doc ) {
 			var typeConverter = nodeManager.get( operation[ 1 ].type );

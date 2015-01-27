@@ -6,6 +6,20 @@ define( [ 'tools/utils' ], function( utils ) {
 		this.document = null;
 		this.parent = null;
 		this.root = null;
+
+		this._contentLength = 0;
+
+		Object.defineProperty( this, 'length', {
+			get: function() {
+				// add the opening and closing elements to the length
+				return this._contentLength + ( this.isContent() ? 0 : 2 );
+			},
+
+			set: function( length ) {
+				this._contentLength = length;
+			}
+		} );
+
 	}
 
 	// static props
@@ -26,11 +40,10 @@ define( [ 'tools/utils' ], function( utils ) {
 	};
 
 	Node.toOperation = function( dom ) {
-		var attributes = utils.extend( {
-			type: this.type
-		}, this.pickAttributes( dom, this.attributes ) );
-
-		return [ 1, attributes ];
+		return {
+			type: this.type,
+			attributes: this.pickAttributes( dom, this.attributes )
+		};
 	};
 
 	Node.toDom = function( operation, doc ) {
@@ -38,7 +51,7 @@ define( [ 'tools/utils' ], function( utils ) {
 
 		if ( tags.length === 1 ) {
 			var dom = doc.createElement( tags[ 0 ] ),
-				attributes = utils.pick( operation[ 1 ], this.attributes );
+				attributes = utils.pick( operation.attributes, this.attributes );
 
 			Object.keys( attributes ).forEach( function( name ) {
 				var value;
@@ -55,23 +68,15 @@ define( [ 'tools/utils' ], function( utils ) {
 	};
 
 	// prototype
-	Node.prototype = {
+	utils.extend( Node.prototype, {
 		isContent: function() {
 			return this.constructor.isContent;
 		},
 
-		setDocument: function( doc ) {
-			this.document = doc;
-		},
-
-		setParent: function( node ) {
-			this.parent = this;
-		},
-
-		setRoot: function( node ) {
-			this.root = node;
+		adjustLength: function( length ) {
+			this._contentLength += length;
 		}
-	};
+	} );
 
 	return Node;
 } );

@@ -1,4 +1,3 @@
-// YES, IT'S UGLY, BUT IT'S A TEMPORARY SOLUTION (hopefully)
 define( function() {
 	'use strict';
 

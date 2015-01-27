@@ -1,11 +1,13 @@
 define( [
 	'document',
 	'mutationSummary',
+	'tools/element',
 	'tools/emitter',
 	'tools/utils'
 ], function(
 	Document,
 	MutationSummary,
+	Element,
 	Emitter,
 	utils
 ) {
@@ -20,17 +22,23 @@ define( [
 		attributeOldValue: true
 	};
 
-	function Editable( el ) {
-		this.el = el;
+	function Editable( sourceElement ) {
+		// create a document for this editable area
+		this.document = new Document( sourceElement );
 
-		this.document = new Document( el );
+		// create an element for the editable area
+		this.$el = Element.create( 'div' );
 
+		// TODO append the document tree to this element
+		// this.$el.append( this.document.tree.documentNode.$element );
+
+		// attach the mutation observer
 		this.observer = new MutationSummary( {
 			callback: this.mutationHandler.bind( this ),
 			queries: [ {
 				all: true
 			} ],
-			rootNode: this.el
+			rootNode: this.$el._el
 		} );
 	}
 

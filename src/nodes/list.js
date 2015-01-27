@@ -18,14 +18,16 @@ define( [
 		tags: [ 'ul', 'ol' ],
 
 		toOperation: function( dom ) {
-			return [ 1, {
+			return {
 				type: this.type,
-				style: dom.nodeName.toLowerCase() == 'ol' ? 'number' : 'bullet'
-			} ];
+				attributes: {
+					style: dom.nodeName.toLowerCase() == 'ol' ? 'number' : 'bullet'
+				}
+			};
 		},
 
 		toDom: function( operation, doc ) {
-			return doc.createElement( operation[ 1 ].style === 'number' ? 'ol' : 'ul' );
+			return doc.createElement( operation.attributes.style === 'number' ? 'ol' : 'ul' );
 		}
 	} );
 

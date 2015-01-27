@@ -18,21 +18,53 @@ define( [
 		} );
 	}
 
-	utils.extend( LinearData.prototype, {
+	// static methods
+	utils.extend( LinearData, {
+		getType: function( item ) {
+			return this.isOpenElement( item ) ? item.type : item.type.substr( 1 );
+		},
+
 		isElement: function( item ) {
-			// TODO when the element shape is defined
+			return item && utils.isString( item.type );
 		},
 
 		isOpenElement: function( item ) {
-			// TODO when the element shape is defined
+			return this.isElement( item ) && item.type.charAt( 0 ) !== '/';
 		},
 
 		isCloseElement: function( item ) {
-			// TODO when the element shape is defined
+			return this.isElement( item ) && item.type.charAt( 0 ) === '/';
+		}
+	} );
+
+	// prototype methods
+	utils.extend( LinearData.prototype, {
+		isCloseElementAt: function( idx ) {
+			var item = this.data[ idx ];
+
+			return item && this.constructor.isClosingElement( item );
+		},
+
+		isElementAt: function( idx ) {
+			var item = this.data[ idx ];
+
+			return item && this.constructor.isElement( item );
+		},
+
+		isOpenElementAt: function( idx ) {
+			var item = this.data[ idx ];
+
+			return item && this.constructor.isOpenElement( item );
 		},
 
 		get: function( idx ) {
 			return idx !== undefined ? this.data[ idx ] : this.data;
+		},
+
+		getTypeAt: function( idx ) {
+			var item = this.data[ idx ];
+
+			return item && this.constructor.getType( item );
 		},
 
 		set: function( idx, value ) {
@@ -54,8 +86,6 @@ define( [
 		splice: function() {
 			return [].splice.apply( this.data, arguments );
 		}
-
-
 	} );
 
 	return LinearData;

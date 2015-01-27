@@ -36,24 +36,27 @@ require( [
 			.join( '<br>' ) : '';
 	}
 
-	html = editor.editable.document.data.map( function( op ) {
+	html = editor.editable.document.data.data.map( function( op ) {
 		op = utils.clone( op );
 
-		if ( !Array.isArray( op ) ) {
-			op = [ op ];
-		}
-
-		if ( op[ 0 ] === 1 ) {
-			op[ 0 ] = op[ 1 ].type;
-			op[ 2 ] = 'tag';
-		} else if ( op[ 0 ] === 2 ) {
-			op[ 0 ] = '/' + op[ 1 ].type;
-			op[ 2 ] = 'tag';
-		} else if ( op[ 0 ] === ' ' ) {
-			op[ 0 ] = '_';
-			op[ 2 ] = 'whitespace';
+		if ( Array.isArray( op ) ) {
+			if ( op[ 0 ] === ' ' ) {
+				op[ 0 ] = '_';
+				op[ 2 ] = 'whitespace';
+			} else {
+				op[ 2 ] = 'text';
+			}
+		} else if ( typeof op == 'string' ) {
+			if ( op === ' ' ) {
+				op = [ '_' ];
+				op[ 2 ] = 'whitespace';
+			} else {
+				op = [ op ];
+				op[ 2 ] = 'text';
+			}
 		} else {
-			op[ 2 ] = 'text';
+			op = typeof op == 'object' ? [ op.type, op.attributes ] : [ op ];
+			op[ 2 ] = 'tag';
 		}
 
 		return op;
@@ -81,7 +84,7 @@ require( [
 
 		return str.replace( /[&<>]/g, function( item ) {
 			return replacements[ item ] || item;
-		} ).replace( /;\s?&/g, ';<br>&' );
+		} );
 	}
 
 	document.getElementById( 'html' ).innerHTML = escapeTags( document.getElementById( 'input' ).innerHTML );
