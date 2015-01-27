@@ -16,7 +16,8 @@ define( [
 	}
 
 	utils.extend( DocumentNode, Branch, {
-		type: 'document'
+		type: 'document',
+		isWrapped: false
 	} );
 
 	utils.inherit( DocumentNode, Branch );

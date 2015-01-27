@@ -10,11 +10,12 @@ define( [
 	function Branch( op, children ) {
 		Node.apply( this, arguments );
 
-		this.children = Array.isArray( children ) ? children : [];
+		this.children = [];
 
-		this.children.forEach( function( child ) {
-			child.parent = this;
-		}, this );
+		if ( Array.isArray( children ) ) {
+			this.spliceArray( 0, 0, children );
+		}
+
 	}
 
 
@@ -66,14 +67,14 @@ define( [
 				removedLength = 0,
 				addedLength = 0;
 
-			// calculate the overal length of removed items
+			// calculate the overal length of removed items and clear the item's parent/root
 			removed.forEach( function( item ) {
 				removedLength += item.length;
 				item.parent = null;
 				item.root = null;
 			} );
 
-			// calculate the overal length of added items
+			// calculate the overal length of added items and set the item's parent/root
 			if ( arguments.length > 2 ) {
 				[].slice.call( arguments, 2 ).forEach( function( item ) {
 					addedLength += item.length;
@@ -84,12 +85,18 @@ define( [
 
 			// update the length
 			this.adjustLength( addedLength - removedLength );
+
+			return removed;
+		},
+
+		spliceArray: function( add, remove, items ) {
+			return this.splice.apply( this, [ add, remove ].concat( items ) );
 		},
 
 		unshift: function( child ) {
 			this.splice( 0, 0, child );
 
-			return this.children.length();
+			return this.children.length;
 		}
 	} );
 

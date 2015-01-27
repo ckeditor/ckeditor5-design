@@ -66,9 +66,7 @@ define( [
 								throw new Error( 'This shouldn\'t happen - check the linear data' );
 							}
 
-							// [].splice.apply( currentNode.children, [ 0, 0 ].concat( children ) );
-
-							currentNode.splice.apply( currentNode, [ 0, 0 ].concat( children ) );
+							currentNode.spliceArray( 0, 0, children );
 						}
 
 						currentNode = parentStack[ parentStack.length - 1 ];
@@ -91,9 +89,7 @@ define( [
 				currentNode.length = textLength;
 			}
 
-			// [].splice.apply( this.documentNode.children, [ 0, 0 ].concat( currentStack ) );
-
-			this.documentNode.splice.apply( this.documentNode, [ 0, 0 ].concat( currentStack ) );
+			this.documentNode.spliceArray( 0, 0, currentStack );
 		}
 
 

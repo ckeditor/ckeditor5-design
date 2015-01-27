@@ -14,7 +14,7 @@ define( [
 	}
 
 	utils.extend( TextNode, Node, {
-		isContent: true,
+		isWrapped: false,
 		type: 'text',
 
 		toOperation: function( dom, parentStyle ) {

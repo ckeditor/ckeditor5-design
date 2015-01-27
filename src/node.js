@@ -7,26 +7,31 @@ define( [ 'tools/utils' ], function( utils ) {
 		this.parent = null;
 		this.root = null;
 
-		this._contentLength = 0;
+		this._length = 0;
 
 		Object.defineProperty( this, 'length', {
 			get: function() {
 				// add the opening and closing elements to the length
-				return this._contentLength + ( this.isContent() ? 0 : 2 );
+				return this._length + ( this.isWrapped ? 2 : 0 );
 			},
 
 			set: function( length ) {
-				this._contentLength = length;
+				this._length = length;
 			}
 		} );
 
+		Object.defineProperty( this, 'isWrapped', {
+			get: function() {
+				return this.constructor.isWrapped;
+			}
+		} );
 	}
 
 	// static props
 	Node.type = null;
 	Node.tags = [];
 	Node.attributes = [];
-	Node.isContent = false;
+	Node.isWrapped = true;
 
 	// static methods
 	Node.pickAttributes = function( dom, attributes ) {
@@ -69,12 +74,8 @@ define( [ 'tools/utils' ], function( utils ) {
 
 	// prototype
 	utils.extend( Node.prototype, {
-		isContent: function() {
-			return this.constructor.isContent;
-		},
-
 		adjustLength: function( length ) {
-			this._contentLength += length;
+			this._length += length;
 		}
 	} );
 
