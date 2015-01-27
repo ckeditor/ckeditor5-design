@@ -27,11 +27,13 @@ define( [
 		append: function( child ) {
 			this.children.push( child );
 			child.setParent( this );
+			child.setRoot( this.root );
 		},
 
 		prepend: function( child ) {
 			this.children.unshift( child );
 			child.setParent( this );
+			child.setRoot( this.root );
 		},
 
 		getChildren: function() {
