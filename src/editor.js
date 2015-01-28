@@ -1,11 +1,9 @@
 define( [
 	'editable',
-	'converter',
 	'tools/emitter',
 	'tools/utils'
 ], function(
 	Editable,
-	converter,
 	Emitter,
 	utils
 ) {

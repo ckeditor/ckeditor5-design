@@ -4,7 +4,7 @@ define( [
 	'normalizer',
 	'documenttree',
 	'lineardata',
-	'branch',
+	'store',
 	'tools/utils'
 ], function(
 	Emitter,
@@ -12,7 +12,7 @@ define( [
 	normalizer,
 	DocumentTree,
 	LinearData,
-	Branch,
+	Store,
 	utils
 ) {
 	'use strict';
@@ -22,7 +22,9 @@ define( [
 
 		normalizer.normalize( doc.body );
 
-		this.data = new LinearData( converter.getOperationsForDom( doc.body ) );
+		this.store = new Store();
+
+		this.data = new LinearData( converter.getOperationsForDom( doc.body, this.store ), this.store );
 		this.tree = new DocumentTree( this.data );
 	}
 

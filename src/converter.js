@@ -27,7 +27,7 @@ define( [
 		},
 
 		// the parent argument is used to wrap the result in parent element opening/closing operations
-		getOperationsForDom: function( dom, parent, parentStyle ) {
+		getOperationsForDom: function( dom, store, parent, parentStyle ) {
 			var ops = [];
 
 			// add parent element's opening tag
@@ -41,22 +41,30 @@ define( [
 
 				// element
 				if ( child.nodeType === Node.ELEMENT_NODE ) {
-					var typeConverter = nodeManager.matchForDom( child ) || nodeManager.get( 'unknown' );
+					var nodeConstructor = nodeManager.matchForDom( child ) || nodeManager.get( 'unknown' );
 
 					// styled text
-					if ( typeConverter.prototype instanceof StyledNode ) {
+					if ( nodeConstructor.prototype instanceof StyledNode ) {
 						// styled node's operation contains attributes only
-						var childStyle = typeConverter.toOperation( child );
+						var childStyle = nodeConstructor.toOperation( child );
+
+						// get index of a style in the store
+						var index = store.store( childStyle );
 
 						// merge child's and parent's styles
-						childStyle = utils.extend( {}, parentStyle || {}, childStyle );
+						childStyle = [].concat( parentStyle || [] );
+
+						// add child's style
+						if ( childStyle.indexOf( index ) === -1 ) {
+							childStyle.push( index );
+						}
 
 						// collect operations for all children
-						childOps = this.getOperationsForDom( child, null, childStyle );
+						childOps = this.getOperationsForDom( child, store, null, childStyle );
 						// regular element
 					} else {
-						var parentOp = typeConverter.toOperation( child );
-						childOps = this.getOperationsForDom( child, parentOp );
+						var parentOp = nodeConstructor.toOperation( child );
+						childOps = this.getOperationsForDom( child, store, parentOp );
 					}
 
 					ops = ops.concat( childOps );
@@ -116,9 +124,9 @@ define( [
 		},
 
 		getDomForOperation: function( operation, doc ) {
-			var typeConverter = nodeManager.get( operation[ 1 ].type );
+			var nodeConstructor = nodeManager.get( operation[ 1 ].type );
 
-			return typeConverter.toDom( operation, doc );
+			return nodeConstructor.toDom( operation, doc );
 		}
 	};
 
