@@ -19,19 +19,28 @@ define( [
 
 	utils.extend( DocumentTree.prototype, {
 		build: function() {
-			var currentNode = this.documentNode,
-				currentStack = [],
-				parentStack = [ this.documentNode ],
-				nodeStack = [ parentStack, currentStack ],
-				textLength = 0,
-				inText = false,
-				len,
-				i;
+			var currentStack = [],
+				parentStack = [],
+				nodeStack = [];
 
-			for ( i = 0, len = this.data.length; i < len; i++ ) {
+			// start with the topmost element - the document node
+			var currentNode = this.documentNode;
+
+			parentStack.push( currentNode );
+
+			// add the parent and current stacks to start with
+			nodeStack.push( parentStack, currentStack );
+
+			// length counter for a text node
+			var textLength = 0;
+
+			// flag that says if we're processing a text node
+			var inText = false;
+
+			for ( var i = 0, len = this.data.length; i < len; i++ ) {
 				// an element
 				if ( this.data.isElementAt( i ) ) {
-					// we were in a text before
+					// previous item was a text
 					if ( inText ) {
 						currentNode.length = textLength;
 						inText = false;
@@ -44,10 +53,11 @@ define( [
 						var type = this.data.getTypeAt( i );
 						var item = this.data.get( i );
 
+						// create a node for this element and add it to the stack
 						currentNode = nodeManager.create( type, item );
 						currentStack.push( currentNode );
 
-						// node may have children
+						// node may contain children
 						if ( currentNode.children ) {
 							parentStack = currentStack;
 							currentStack = [];
@@ -55,7 +65,7 @@ define( [
 						}
 						// a closing element
 					} else {
-						// node may have children
+						// node may contain children
 						if ( currentNode.children ) {
 							var children = nodeStack.pop();
 
@@ -76,8 +86,10 @@ define( [
 				} else {
 					// start of a text
 					if ( !inText ) {
+						// create a text node and push it to the stack
 						currentNode = nodeManager.create( 'text' );
 						currentStack.push( currentNode );
+
 						inText = true;
 					}
 
@@ -85,10 +97,12 @@ define( [
 				}
 			}
 
+			// we ended up with text so just update the current node's length
 			if ( inText ) {
 				currentNode.length = textLength;
 			}
 
+			// finally push all the children to the documentNode
 			this.documentNode.spliceArray( 0, 0, currentStack );
 		}
 

@@ -12,7 +12,7 @@ define( [
 
 		this.children = [];
 
-		if ( Array.isArray( children ) ) {
+		if ( utils.isArray( children ) ) {
 			this.spliceArray( 0, 0, children );
 		}
 	}
@@ -24,24 +24,15 @@ define( [
 	utils.inherit( Branch, Node );
 
 	utils.extend( Branch.prototype, {
-		append: function( child ) {
-			this.children.push( child );
-			child.setParent( this );
-			child.setRoot( this.root );
-		},
-
 		hasChildren: function() {
 			return !!this.children.length;
 		},
 
+		// we use splice in following methods so we don't have to recalculate the length each time,
+		// nor update child's parent/root
 		pop: function() {
 			if ( this.children.length ) {
-				var idx = this.children.length - 1;
-				var child = this.children[ idx ];
-
-				this.splice( idx, 1 );
-
-				return child;
+				return this.splice( this.children.length - 1, 1 );
 			}
 		},
 
@@ -53,11 +44,7 @@ define( [
 
 		shift: function() {
 			if ( this.children.length ) {
-				var child = this.children[ 0 ];
-
-				this.splice( 0, 1 );
-
-				return child;
+				return this.splice( 0, 1 );
 			}
 		},
 
@@ -88,6 +75,7 @@ define( [
 			return removed;
 		},
 
+		// an alias to the splice method that accepts an array of new items
 		spliceArray: function( add, remove, items ) {
 			return this.splice.apply( this, [ add, remove ].concat( items ) );
 		},

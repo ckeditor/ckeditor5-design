@@ -17,18 +17,10 @@ define( [
 		isWrapped: false,
 		type: 'text',
 
-		toOperation: function( dom, parentStyle ) {
+		toOperation: function( dom ) {
 			var text = dom.textContent;
 
-			return text.split( '' ).map( function( char ) {
-				var op = [ char ];
-
-				if ( parentStyle ) {
-					op[ 1 ] = parentStyle;
-				}
-
-				return op;
-			} );
+			return text.split( '' );
 		},
 
 		// TODO

@@ -26,6 +26,7 @@ define( [ 'tools/utils' ], function( utils ) {
 		return result;
 	};
 
+	// convert a DOM element into an operation
 	Node.toOperation = function( dom ) {
 		return {
 			type: this.type,
@@ -33,16 +34,21 @@ define( [ 'tools/utils' ], function( utils ) {
 		};
 	};
 
+	// convert an operation into a DOM element
 	Node.toDom = function( operation, doc ) {
 		var tags = this.tags;
 
+		// there's only one tag defined so we just assume that's the one
+		// we want to use for the DOM element
 		if ( tags.length === 1 ) {
 			var dom = doc.createElement( tags[ 0 ] ),
 				attributes = utils.pick( operation.attributes, this.attributes );
 
+			// apply selected attributes on the newly created DOM element
 			Object.keys( attributes ).forEach( function( name ) {
 				var value;
 
+				// there's no point in setting empty attributes... I guess?
 				if ( ( value = attributes[ name ] ) !== null ) {
 					dom.setAttribute( name, value );
 				}
@@ -57,7 +63,7 @@ define( [ 'tools/utils' ], function( utils ) {
 	// prototype
 	Object.defineProperty( Node.prototype, 'length', {
 		get: function() {
-			// add the opening and closing elements to the length
+			// include the opening and closing operations in the final node length
 			return this._length + ( this.isWrapped ? 2 : 0 );
 		},
 
@@ -73,10 +79,13 @@ define( [ 'tools/utils' ], function( utils ) {
 	} );
 
 	utils.extend( Node.prototype, {
-		adjustLength: function( length ) {
-			this._length += length;
+		// increase/decrease length by the given difference
+		adjustLength: function( difference ) {
+			this._length += difference;
 		},
 
+		// returns the offset of a node from the beginning of the document,
+		// this corresponds to the position in the linear data
 		getOffset: function() {
 			// it's the topmost element
 			if ( !this.parent ) {

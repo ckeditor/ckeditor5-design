@@ -6,42 +6,24 @@ define( function() {
 	}
 
 	NodeManager.prototype = {
+		// create a node from the given operation if a proper node type constructor exists
 		create: function( name, operation ) {
 			return this.store[ name ] ? new this.store[ name ]( operation ) : null;
 		},
 
+		// register a constructor for a node type
 		register: function( constructor ) {
 			if ( constructor.type && !this.store[ constructor.type ] ) {
 				this.store[ constructor.type ] = constructor;
 			}
 		},
 
-		matchForOperation: function( operation ) {
-			var result = null;
-
-			if ( !operation[ 1 ] ) {
-				return result;
-			}
-
-			Object.keys( operation[ 1 ] ).some( function( name ) {
-				// use boolean type for styles only?
-				if ( operation[ 1 ][ name ] !== true ) {
-					return;
-				}
-
-				var nodeClass = this.store[ name ];
-
-				// TODO
-				if ( nodeClass ) {
-					// if ( nodeClass && nodeClass.prototype instanceof StyledNode ) {
-					result = nodeClass;
-					return true;
-				}
-			}, this );
-
-			return result;
+		// find a style constructor for the given operation
+		matchStyleForOperation: function( operation ) {
+			// TODO
 		},
 
+		// find a node constructor for the given DOM element
 		matchForDom: function( dom ) {
 			var result = null,
 				tag = dom.nodeName.toLowerCase();
@@ -61,10 +43,12 @@ define( function() {
 			return result;
 		},
 
+		// return a node constructor with the given name
 		get: function( name ) {
 			return this.store[ name ] || null;
 		},
 
+		// check if a node produced by the node construtor with the given name should be empty
 		isEmpty: function( name ) {
 			if ( this.store[ name ] ) {
 				return this.store[ name ].isEmpty;
