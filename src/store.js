@@ -7,7 +7,7 @@ define( [ 'tools/utils' ], function( utils ) {
 	}
 
 	// produce a "hash" of an item
-	function hash( value ) {
+	function makeHash( value ) {
 		// TODO does the order of attributes matter? if not, then should we sort them first?
 		return JSON.stringify( value );
 	}
@@ -15,7 +15,7 @@ define( [ 'tools/utils' ], function( utils ) {
 	utils.extend( Store.prototype, {
 		// store a value in the store and return its index
 		store: function( value ) {
-			var hash = hash( value ),
+			var hash = makeHash( value ),
 				idx = this.hashes[ hash ];
 
 			// this is a new hash
@@ -34,7 +34,7 @@ define( [ 'tools/utils' ], function( utils ) {
 
 		// return an index of a given value (if any)
 		getIndex: function( value ) {
-			var hash = hash( value );
+			var hash = makeHash( value );
 
 			return hash in this.hashes ? this.hashes[ hash ] : null;
 		}
