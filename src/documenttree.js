@@ -55,6 +55,7 @@ define( [
 
 						// create a node for this element and add it to the stack
 						currentNode = nodeManager.create( type, item );
+						currentNode.root = this.documentNode;
 						currentStack.push( currentNode );
 
 						// node may contain children
@@ -88,6 +89,7 @@ define( [
 					if ( !inText ) {
 						// create a text node and push it to the stack
 						currentNode = nodeManager.create( 'text' );
+						currentNode.root = this.documentNode;
 						currentStack.push( currentNode );
 
 						inText = true;
