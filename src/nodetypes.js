@@ -13,5 +13,6 @@ define( [
 	'nodes/unknown',
 	'styles/bold',
 	'styles/italic',
+	'styles/link',
 	'styles/underline'
 ], {} );
