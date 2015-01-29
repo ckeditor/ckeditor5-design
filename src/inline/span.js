@@ -1,24 +1,24 @@
 define( [
-	'branch',
+	'inline/inlinenode',
 	'nodemanager',
 	'tools/utils'
 ], function(
-	Branch,
+	InlineNode,
 	nodeManager,
 	utils
 ) {
 	'use strict';
 
 	function SpanNode() {
-		Branch.apply( this, arguments );
+		InlineNode.apply( this, arguments );
 	}
 
-	utils.extend( SpanNode, Branch, {
+	utils.extend( SpanNode, InlineNode, {
 		type: 'span',
 		tags: [ 'span' ]
 	} );
 
-	utils.inherit( SpanNode, Branch );
+	utils.inherit( SpanNode, InlineNode );
 
 	nodeManager.register( SpanNode );
 

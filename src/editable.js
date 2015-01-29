@@ -24,7 +24,9 @@ define( [
 
 	function Editable( sourceElement ) {
 		// create a document for this editable area
+		console.time('document');
 		this.document = new Document( sourceElement );
+		console.timeEnd('document');
 
 		// create an element for the editable area
 		this.$el = Element.create( 'div' );

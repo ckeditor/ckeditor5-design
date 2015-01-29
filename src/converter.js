@@ -1,13 +1,13 @@
 define( [
 	'document',
 	'nodemanager',
-	'styles/styled-node',
+	'inline/inlinenode',
 	'tools/utils',
 	'nodetypes'
 ], function(
 	Document,
 	nodeManager,
-	StyledNode,
+	InlineNode,
 	utils
 ) {
 	'use strict';
@@ -27,7 +27,7 @@ define( [
 		},
 
 		// the parent argument is used to wrap the result in parent element opening/closing data
-		getDataForDom: function( dom, store, parent, parentStyle ) {
+		getDataForDom: function( dom, store, parent, parentAttributes ) {
 			var data = [];
 
 			// add parent element's opening tag
@@ -43,24 +43,24 @@ define( [
 				if ( child.nodeType === Node.ELEMENT_NODE ) {
 					var nodeConstructor = nodeManager.matchForDom( child ) || nodeManager.get( 'unknown' );
 
-					// styled text
-					if ( nodeConstructor.prototype instanceof StyledNode ) {
-						// styled node's data contains attributes only
-						var childStyle = nodeConstructor.toData( child );
+					// inline text
+					if ( nodeConstructor.prototype instanceof InlineNode ) {
+						// inline node's data contains attributes only
+						var childAttributes = nodeConstructor.toData( child );
 
 						// get index of a style in the store
-						var index = store.store( childStyle );
+						var index = store.store( childAttributes );
 
 						// merge child's and parent's styles
-						childStyle = [].concat( parentStyle || [] );
+						childAttributes = [].concat( parentAttributes || [] );
 
 						// add child's style
-						if ( childStyle.indexOf( index ) === -1 ) {
-							childStyle.push( index );
+						if ( childAttributes.indexOf( index ) === -1 ) {
+							childAttributes.push( index );
 						}
 
 						// collect data for all children
-						childData = this.getDataForDom( child, store, null, childStyle );
+						childData = this.getDataForDom( child, store, null, childAttributes );
 						// regular element
 					} else {
 						var parentData = nodeConstructor.toData( child );
@@ -87,7 +87,7 @@ define( [
 						// TODO is that enough for now?
 					}
 
-					childData = this.getDataForText( child.textContent, parentStyle );
+					childData = this.getDataForText( child.textContent, parentAttributes );
 
 					data = data.concat( childData );
 				}
@@ -107,15 +107,15 @@ define( [
 			return data;
 		},
 
-		getDataForText: function( text, parentStyle ) {
+		getDataForText: function( text, parentAttributes ) {
 			text = text.split( '' );
 
-			if ( !parentStyle ) {
+			if ( !parentAttributes ) {
 				return text;
 			}
 
 			return text.map( function( char ) {
-				return [ char, parentStyle ];
+				return [ char, parentAttributes ];
 			} );
 		},
 

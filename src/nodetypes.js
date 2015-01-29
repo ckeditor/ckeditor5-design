@@ -8,11 +8,11 @@ define( [
 	'nodes/list',
 	'nodes/listitem',
 	'nodes/paragraph',
-	'nodes/span',
 	'nodes/text',
 	'nodes/unknown',
-	'styles/bold',
-	'styles/italic',
-	'styles/link',
-	'styles/underline'
+	'inline/bold',
+	'inline/italic',
+	'inline/link',
+	'inline/span',
+	'inline/underline'
 ], {} );

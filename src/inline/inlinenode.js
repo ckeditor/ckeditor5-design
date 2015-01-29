@@ -7,12 +7,12 @@ define( [
 ) {
 	'use strict';
 
-	function StyledNode() {
+	function InlineNode() {
 		TextNode.apply( this, arguments );
 	}
 
 	// inherit statics
-	utils.extend( StyledNode, TextNode, {
+	utils.extend( InlineNode, TextNode, {
 		toData: function( dom ) {
 			var attributes = {};
 
@@ -38,11 +38,11 @@ define( [
 	} );
 
 	// inherit prototype
-	utils.inherit( StyledNode, TextNode );
+	utils.inherit( InlineNode, TextNode );
 
-	utils.extend( StyledNode.prototype, {
+	utils.extend( InlineNode.prototype, {
 		// TODO
 	} );
 
-	return StyledNode;
+	return InlineNode;
 } );
