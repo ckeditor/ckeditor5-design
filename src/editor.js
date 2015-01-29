@@ -14,7 +14,7 @@ define( [
 	function Editor( selector ) {
 		this.$srcEl = new Element( document.querySelector( selector ) );
 
-		this.editable = new Editable( this.$srcEl.html() );
+		this.editable = new Editable( this.$srcEl );
 
 		// disable content editable and empty the source element
 		this.$srcEl.attr( 'contentEditable', false );

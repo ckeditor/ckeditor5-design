@@ -3,6 +3,8 @@ define( [ 'tools/utils' ], function( utils ) {
 
 	function Node( op ) {
 		this.op = op || null;
+		
+		this.document = null;
 		this.parent = null;
 		this.root = null;
 

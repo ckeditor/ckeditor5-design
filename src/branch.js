@@ -56,6 +56,7 @@ define( [
 			// calculate the overal length of removed items and clear the item's parent/root
 			removed.forEach( function( item ) {
 				removedLength += item.length;
+				item.document = null;
 				item.parent = null;
 				item.root = null;
 			} );
@@ -64,6 +65,7 @@ define( [
 			if ( arguments.length > 2 ) {
 				[].slice.call( arguments, 2 ).forEach( function( item ) {
 					addedLength += item.length;
+					item.document = this.document;
 					item.parent = this;
 					item.root = this.root;
 				}, this );

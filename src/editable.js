@@ -22,9 +22,9 @@ define( [
 		attributeOldValue: true
 	};
 
-	function Editable( html ) {
+	function Editable( $el ) {
 		// create a document for this editable area
-		this.document = new Document( html );
+		this.document = new Document( $el );
 
 		// create an element for the editable area
 		this.$el = Element.create( 'div' );

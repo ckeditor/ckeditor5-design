@@ -17,23 +17,26 @@ define( [
 ) {
 	'use strict';
 
-	function Document( html ) {
+	function Document( $el ) {
 		this.store = new Store();
 
-		// create a detached copy of the source html
-		html = converter.createDocumentFromHTML( html ).body;
+		this.ownerDocument = $el._el.ownerDocument;
 
-		// normalize the html
-		dataProcessor.normalizeWhitespaces( html );
+		// create a detached copy of the source html
+		var dom = converter.createDocumentFromHTML( $el.html() ).body;
+
+		// normalize the dom
+		dataProcessor.normalizeWhitespaces( dom );
 
 		// prepare the data array for the linear data
-		var data = converter.getDataForDom( html, this.store );
+		var data = converter.getDataForDom( dom, this.store );
 
 		// document's linear data
 		this.data = new LinearData( data, this.store );
 
 		// document's node tree
 		this.root = new( nodeManager.get( 'root' ) )();
+		this.root.document = this;
 
 		this.buildTree();
 	}
@@ -77,6 +80,7 @@ define( [
 
 						// create a node for this element and add it to the stack
 						currentNode = nodeManager.create( type, item );
+						currentNode.document = this;
 						currentNode.root = this.root;
 						currentStack.push( currentNode );
 
@@ -111,6 +115,7 @@ define( [
 					if ( !inText ) {
 						// create a text node and push it to the stack
 						currentNode = nodeManager.create( 'text' );
+						currentNode.document = this;
 						currentNode.root = this.root;
 						currentStack.push( currentNode );
 
