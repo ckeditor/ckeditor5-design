@@ -17,7 +17,7 @@ define( [
 		type: 'heading',
 		tags: [ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ],
 
-		toOperation: function( dom ) {
+		toData: function( dom ) {
 			return {
 				type: this.type,
 				attributes: {
@@ -26,8 +26,8 @@ define( [
 			};
 		},
 
-		toDom: function( operation, doc ) {
-			return doc.createElement( 'h' + operation.attributes.level );
+		toDom: function( data, doc ) {
+			return doc.createElement( 'h' + data.attributes.level );
 		}
 	} );
 

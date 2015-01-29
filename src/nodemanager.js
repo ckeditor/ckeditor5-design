@@ -6,9 +6,9 @@ define( function() {
 	}
 
 	NodeManager.prototype = {
-		// create a node from the given operation if a proper node type constructor exists
-		create: function( name, operation ) {
-			return this.store[ name ] ? new this.store[ name ]( operation ) : null;
+		// create a node from the given data if a proper node type constructor exists
+		create: function( name, data ) {
+			return this.store[ name ] ? new this.store[ name ]( data ) : null;
 		},
 
 		// register a constructor for a node type
@@ -18,8 +18,8 @@ define( function() {
 			}
 		},
 
-		// find a style constructor for the given operation
-		matchStyleForOperation: function( operation ) {
+		// find a style constructor for the given data
+		matchStyleForData: function( data ) {
 			// TODO
 		},
 

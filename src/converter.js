@@ -26,18 +26,18 @@ define( [
 			}
 		},
 
-		// the parent argument is used to wrap the result in parent element opening/closing operations
-		getOperationsForDom: function( dom, store, parent, parentStyle ) {
-			var ops = [];
+		// the parent argument is used to wrap the result in parent element opening/closing data
+		getDataForDom: function( dom, store, parent, parentStyle ) {
+			var data = [];
 
 			// add parent element's opening tag
 			if ( utils.isObject( parent ) && parent.type ) {
-				ops.push( parent );
+				data.push( parent );
 			}
 
-			// add operations for child nodes
+			// add data for child nodes
 			[].forEach.call( dom.childNodes, function( child ) {
-				var childOps;
+				var childData;
 
 				// element
 				if ( child.nodeType === Node.ELEMENT_NODE ) {
@@ -45,8 +45,8 @@ define( [
 
 					// styled text
 					if ( nodeConstructor.prototype instanceof StyledNode ) {
-						// styled node's operation contains attributes only
-						var childStyle = nodeConstructor.toOperation( child );
+						// styled node's data contains attributes only
+						var childStyle = nodeConstructor.toData( child );
 
 						// get index of a style in the store
 						var index = store.store( childStyle );
@@ -59,15 +59,15 @@ define( [
 							childStyle.push( index );
 						}
 
-						// collect operations for all children
-						childOps = this.getOperationsForDom( child, store, null, childStyle );
+						// collect data for all children
+						childData = this.getDataForDom( child, store, null, childStyle );
 						// regular element
 					} else {
-						var parentOp = nodeConstructor.toOperation( child );
-						childOps = this.getOperationsForDom( child, store, parentOp );
+						var parentData = nodeConstructor.toData( child );
+						childData = this.getDataForDom( child, store, parentData );
 					}
 
-					ops = ops.concat( childOps );
+					data = data.concat( childData );
 					// text
 				} else if ( child.nodeType === Node.TEXT_NODE ) {
 					var text = child.data;
@@ -79,17 +79,17 @@ define( [
 
 					// node contains whitespaces only
 					if ( text.match( /^\s+$/ ) ) {
-						// there's an element opening operation before the text so ignore it
-						if ( ops[ ops.length - 1 ] && ops[ ops.length - 1 ].type ) {
+						// there's an element opening data before the text so ignore it
+						if ( data[ data.length - 1 ] && data[ data.length - 1 ].type ) {
 							return;
 						}
 
 						// TODO is that enough for now?
 					}
 
-					childOps = this.getOperationsForText( child.textContent, parentStyle );
+					childData = this.getDataForText( child.textContent, parentStyle );
 
-					ops = ops.concat( childOps );
+					data = data.concat( childData );
 				}
 			}, this );
 
@@ -97,17 +97,17 @@ define( [
 			if ( utils.isObject( parent ) && parent.type ) {
 				// TODO should we put a closing tag for a void element?
 
-				// TODO remove empty text before the closing element operation
+				// TODO remove empty text before the closing element data
 
-				ops.push( {
+				data.push( {
 					type: '/' + parent.type
 				} );
 			}
 
-			return ops;
+			return data;
 		},
 
-		getOperationsForText: function( text, parentStyle ) {
+		getDataForText: function( text, parentStyle ) {
 			text = text.split( '' );
 
 			if ( !parentStyle ) {
@@ -119,14 +119,10 @@ define( [
 			} );
 		},
 
-		getDomForOperations: function( ops, targetElement ) {
-			// TODO
-		},
+		getDomForData: function( data, doc ) {
+			var nodeConstructor = nodeManager.get( data[ 1 ].type );
 
-		getDomForOperation: function( operation, doc ) {
-			var nodeConstructor = nodeManager.get( operation[ 1 ].type );
-
-			return nodeConstructor.toDom( operation, doc );
+			return nodeConstructor.toDom( data, doc );
 		}
 	};
 

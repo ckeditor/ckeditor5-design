@@ -13,7 +13,7 @@ define( [
 
 	// inherit statics
 	utils.extend( StyledNode, TextNode, {
-		toOperation: function( dom ) {
+		toData: function( dom ) {
 			var attributes = {};
 
 			attributes[ this.type ] = true;
@@ -24,9 +24,9 @@ define( [
 			return attributes;
 		},
 
-		toDom: function( operation, doc ) {
+		toDom: function( data, doc ) {
 			var dom = doc.createElement( this.tags[ 0 ] ),
-				attributes = utils.pick( operation.attributes, this.attributes );
+				attributes = utils.pick( data.attributes, this.attributes );
 
 			// apply additional attributes
 			Object.keys( attributes ).forEach( function( name ) {

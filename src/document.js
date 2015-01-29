@@ -24,7 +24,9 @@ define( [
 
 		this.store = new Store();
 
-		this.data = new LinearData( converter.getOperationsForDom( doc.body, this.store ), this.store );
+		var Data = converter.getDataForDom( doc.body, this.store );
+
+		this.data = new LinearData( Data, this.store );
 		this.tree = new DocumentTree( this.data );
 	}
 

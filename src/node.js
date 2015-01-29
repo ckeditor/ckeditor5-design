@@ -26,23 +26,23 @@ define( [ 'tools/utils' ], function( utils ) {
 		return result;
 	};
 
-	// convert a DOM element into an operation
-	Node.toOperation = function( dom ) {
+	// convert a DOM element into data
+	Node.toData = function( dom ) {
 		return {
 			type: this.type,
 			attributes: this.pickAttributes( dom, this.attributes )
 		};
 	};
 
-	// convert an operation into a DOM element
-	Node.toDom = function( operation, doc ) {
+	// convert data into a DOM element
+	Node.toDom = function( data, doc ) {
 		var tags = this.tags;
 
 		// there's only one tag defined so we just assume that's the one
 		// we want to use for the DOM element
 		if ( tags.length === 1 ) {
 			var dom = doc.createElement( tags[ 0 ] ),
-				attributes = utils.pick( operation.attributes, this.attributes );
+				attributes = utils.pick( data.attributes, this.attributes );
 
 			// apply selected attributes on the newly created DOM element
 			Object.keys( attributes ).forEach( function( name ) {
@@ -63,7 +63,7 @@ define( [ 'tools/utils' ], function( utils ) {
 	// prototype
 	Object.defineProperty( Node.prototype, 'length', {
 		get: function() {
-			// include the opening and closing operations in the final node length
+			// include the opening and closing element data in the final node length
 			return this._length + ( this.isWrapped ? 2 : 0 );
 		},
 

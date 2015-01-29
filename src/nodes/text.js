@@ -17,15 +17,15 @@ define( [
 		isWrapped: false,
 		type: 'text',
 
-		toOperation: function( dom ) {
+		toData: function( dom ) {
 			var text = dom.textContent;
 
 			return text.split( '' );
 		},
 
 		// TODO
-		toDom: function( operation, doc ) {
-			return doc.createTextNode( operation[ 0 ] );
+		toDom: function( data, doc ) {
+			return doc.createTextNode( data[ 0 ] );
 		}
 	} );
 

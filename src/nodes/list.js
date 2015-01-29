@@ -17,7 +17,7 @@ define( [
 		type: 'list',
 		tags: [ 'ul', 'ol' ],
 
-		toOperation: function( dom ) {
+		toData: function( dom ) {
 			return {
 				type: this.type,
 				attributes: {
@@ -26,8 +26,8 @@ define( [
 			};
 		},
 
-		toDom: function( operation, doc ) {
-			return doc.createElement( operation.attributes.style === 'number' ? 'ol' : 'ul' );
+		toDom: function( data, doc ) {
+			return doc.createElement( data.attributes.style === 'number' ? 'ol' : 'ul' );
 		}
 	} );
 
