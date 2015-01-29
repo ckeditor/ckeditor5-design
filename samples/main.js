@@ -81,21 +81,23 @@ require( [
 
 	document.querySelector( '#data>tbody' ).innerHTML = html.join( '\n' );
 
-	function escapeTags( str ) {
-		var replacements = {
-			'&': '&amp;',
-			'<': '&lt;',
-			'>': '&gt;'
-		};
+	function buildTree( branch, parentElem ) {
+		var elem = document.createElement( 'li' );
 
-		if ( typeof str !== 'string' ) {
-			return str;
+		elem.innerHTML = branch.constructor.type;
+
+		parentElem.appendChild( elem );
+
+		if ( branch.children ) {
+			var childElem = document.createElement( 'ul' );
+
+			branch.children.forEach( function( child ) {
+				buildTree( child, childElem );
+			} );
+
+			elem.appendChild( childElem );
 		}
-
-		return str.replace( /[&<>]/g, function( item ) {
-			return replacements[ item ] || item;
-		} );
 	}
 
-	document.getElementById( 'html' ).innerHTML = escapeTags( document.getElementById( 'input' ).innerHTML );
+	buildTree( editor.editable.document.tree.root, document.querySelector( '#tree > ul' ) );
 } );

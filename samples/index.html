@@ -13,7 +13,7 @@
 	}
 
 	#input,
-	#html,
+	#tree,
 	#data {
 		box-sizing: border-box;
 		border: 1px solid #ccc;
@@ -22,11 +22,11 @@
 	}
 
 	#input,
-	#html {
+	#tree {
 		float: left;
 	}
 
-	#html {
+	#tree {
 		font-size: 0.75em;
 	}
 
@@ -86,7 +86,7 @@
 	<table id="data">
 		<thead>
 			<tr>
-				<th colspan="3">Operations</th>
+				<th colspan="3">Linear Data</th>
 			</tr>
 			<tr>
 				<th>Pos</th>
@@ -97,7 +97,10 @@
 		<tbody>
 		</tbody>
 	</table>
-	<div id="html"></div>
+	<div id="tree">
+		<h1>Document Tree</h1>
+		<ul></ul>
+	</div>
 	<script src="../lib/require.js" data-main="main"></script>
 </body>
 </html>
