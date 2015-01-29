@@ -2,12 +2,12 @@
 define( [
 	'nodes/break',
 	'nodes/div',
-	'nodes/document',
 	'nodes/heading',
 	'nodes/image',
 	'nodes/list',
 	'nodes/listitem',
 	'nodes/paragraph',
+	'nodes/root',
 	'nodes/text',
 	'nodes/unknown',
 	'inline/bold',

@@ -9,20 +9,20 @@ define( [
 ) {
 	'use strict';
 
-	function DocumentNode() {
+	function RootNode() {
 		Branch.apply( this, arguments );
 
 		this.root = this;
 	}
 
-	utils.extend( DocumentNode, Branch, {
-		type: 'document',
+	utils.extend( RootNode, Branch, {
+		type: 'root',
 		isWrapped: false
 	} );
 
-	utils.inherit( DocumentNode, Branch );
+	utils.inherit( RootNode, Branch );
 
-	nodeManager.register( DocumentNode );
+	nodeManager.register( RootNode );
 
-	return DocumentNode;
+	return RootNode;
 } );

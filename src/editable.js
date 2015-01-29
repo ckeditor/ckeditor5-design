@@ -24,15 +24,13 @@ define( [
 
 	function Editable( sourceElement ) {
 		// create a document for this editable area
-		console.time('document');
 		this.document = new Document( sourceElement );
-		console.timeEnd('document');
 
 		// create an element for the editable area
 		this.$el = Element.create( 'div' );
 
 		// TODO append the document tree to this element
-		// this.$el.append( this.document.tree.documentNode.$element );
+		// this.$el.append( this.document.tree.root.$element );
 
 		// attach the mutation observer
 		this.observer = new MutationSummary( {

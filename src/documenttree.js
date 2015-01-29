@@ -8,9 +8,9 @@ define( [
 	'use strict';
 
 	function DocumentTree( data ) {
-		var DocumentNode = nodeManager.get( 'document' );
+		var RootNode = nodeManager.get( 'root' );
 
-		this.documentNode = new DocumentNode();
+		this.root = new RootNode();
 
 		this.data = data;
 
@@ -24,7 +24,7 @@ define( [
 				nodeStack = [];
 
 			// start with the topmost element - the document node
-			var currentNode = this.documentNode;
+			var currentNode = this.root;
 
 			parentStack.push( currentNode );
 
@@ -55,7 +55,7 @@ define( [
 
 						// create a node for this element and add it to the stack
 						currentNode = nodeManager.create( type, item );
-						currentNode.root = this.documentNode;
+						currentNode.root = this.root;
 						currentStack.push( currentNode );
 
 						// node may contain children
@@ -89,7 +89,7 @@ define( [
 					if ( !inText ) {
 						// create a text node and push it to the stack
 						currentNode = nodeManager.create( 'text' );
-						currentNode.root = this.documentNode;
+						currentNode.root = this.root;
 						currentStack.push( currentNode );
 
 						inText = true;
@@ -104,8 +104,8 @@ define( [
 				currentNode.length = textLength;
 			}
 
-			// finally push all the children to the documentNode
-			this.documentNode.spliceArray( 0, 0, currentStack );
+			// finally push all the children to the root node
+			this.root.spliceArray( 0, 0, currentStack );
 		}
 
 
