@@ -20,7 +20,11 @@ define( [ 'tools/utils' ], function( utils ) {
 		var result = {};
 
 		attributes.forEach( function( attribute ) {
-			result[ attribute ] = dom.getAttribute( attribute );
+			var value = dom.getAttribute( attribute );
+
+			if ( value !== null ) {
+				result[ attribute ] = value;
+			}
 		} );
 
 		return result;
