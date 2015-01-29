@@ -8,8 +8,22 @@ define( [ 'tools/utils' ], function( utils ) {
 
 	// produce a "hash" of an item
 	function makeHash( value ) {
-		// TODO does the order of attributes matter? if not, then should we sort them first?
-		return JSON.stringify( value );
+		function sort( key, value ) {
+			if ( !utils.isArray( value ) && utils.isObject( value ) ) {
+				var sorted = {};
+
+				// sort keys and fill up the sorted object
+				Object.keys( value ).sort().forEach( function( key ) {
+					sorted[ key ] = value[ key ];
+				} );
+
+				return sorted;
+			} else {
+				return value;
+			}
+		}
+
+		return JSON.stringify( value, sort );
 	}
 
 	utils.extend( Store.prototype, {
