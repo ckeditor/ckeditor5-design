@@ -82,17 +82,17 @@ require( [
 
 	document.querySelector( '#data>tbody' ).innerHTML = html.join( '\n' );
 
-	function buildTree( branch, parentElem ) {
+	function buildTree( node, parentElem ) {
 		var elem = document.createElement( 'li' );
 
-		elem.innerHTML = branch.constructor.type;
+		elem.innerHTML = node.constructor.type + ' <small>[' + node.length + ']</small>';
 
 		parentElem.appendChild( elem );
 
-		if ( branch.children ) {
+		if ( node.children ) {
 			var childElem = document.createElement( 'ul' );
 
-			branch.children.forEach( function( child ) {
+			node.children.forEach( function( child ) {
 				buildTree( child, childElem );
 			} );
 

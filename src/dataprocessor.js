@@ -3,10 +3,11 @@ define( function() {
 
 	var whitePattern = /^\s+$/;
 
-	function Normalizer() {}
+	function DataProcessor() {}
 
-	Normalizer.prototype = {
-		normalize: function( el ) {
+	DataProcessor.prototype = {
+		// TODO move this to some kind of data processor
+		normalizeWhitespaces: function( el ) {
 			var children = el.childNodes,
 				child,
 				i;
@@ -33,11 +34,11 @@ define( function() {
 
 					// element
 				} else if ( child.nodeType === Node.ELEMENT_NODE ) {
-					this.normalize( child );
+					this.normalizeWhitespaces( child );
 				}
 			}
 		}
 	};
 
-	return new Normalizer();
+	return new DataProcessor();
 } );

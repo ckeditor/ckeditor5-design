@@ -1,7 +1,7 @@
 define( [
 	'tools/emitter',
 	'converter',
-	'normalizer',
+	'dataprocessor',
 	'lineardata',
 	'nodemanager',
 	'store',
@@ -9,7 +9,7 @@ define( [
 ], function(
 	Emitter,
 	converter,
-	normalizer,
+	dataProcessor,
 	LinearData,
 	nodeManager,
 	Store,
@@ -18,22 +18,28 @@ define( [
 	'use strict';
 
 	function Document( html ) {
-		var doc = converter.createDocumentFromHTML( html );
-
-		normalizer.normalize( doc.body );
-
 		this.store = new Store();
 
-		var Data = converter.getDataForDom( doc.body, this.store );
+		// create a detached copy of the source html
+		html = converter.createDocumentFromHTML( html ).body;
 
-		this.data = new LinearData( Data, this.store );
+		// normalize the html
+		dataProcessor.normalizeWhitespaces( html );
 
+		// prepare the data array for the linear data
+		var data = converter.getDataForDom( html, this.store );
+
+		// document's linear data
+		this.data = new LinearData( data, this.store );
+
+		// document's node tree
 		this.root = new( nodeManager.get( 'root' ) )();
 
 		this.buildTree();
 	}
 
 	utils.extend( Document.prototype, Emitter, {
+		// build a node tree starting at this.root
 		buildTree: function() {
 			var currentStack = [],
 				parentStack = [],
@@ -122,6 +128,17 @@ define( [
 
 			// finally push all the children to the root node
 			this.root.spliceArray( 0, 0, currentStack );
+		},
+
+		// retrieve linear data for the given node
+		getNodeData: function( node ) {
+			if ( !node ) {
+				return;
+			}
+
+			var offset = node.getOffset();
+
+			return this.data.slice( offset, offset + node.length );
 		}
 	} );
 
