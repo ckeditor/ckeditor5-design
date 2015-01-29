@@ -63,6 +63,28 @@
 	.float-right {
 		float: right;
 	}
+
+	#tree ul {
+		padding-left: 20px;
+		list-style-type: none;
+	}
+
+	#tree li {
+		margin: 5px 0;
+		position: relative;
+	}
+
+	#tree li:before {
+		position: absolute;
+		top: -4px;
+		left: -10px;
+		content: '\231E';
+		color: #ccc;
+	}
+
+	#tree > ul > li:first-child:before {
+		content: '';
+	}
 	</style>
 </head>
 <body>
@@ -86,12 +108,13 @@
 	<table id="data">
 		<thead>
 			<tr>
-				<th colspan="3">Linear Data</th>
+				<th colspan="4">Linear Data</th>
 			</tr>
 			<tr>
 				<th>Pos</th>
 				<th>Insert</th>
 				<th>Attributes</th>
+				<th>Meta Data</th>
 			</tr>
 		</thead>
 		<tbody>
