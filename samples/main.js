@@ -26,14 +26,24 @@ require( [
 		html = [];
 
 	function formatAttributes( attributes ) {
-		return attributes ? Object.keys( attributes )
-			.filter( function( attr ) {
-				return attr !== 'type';
-			} )
-			.map( function( attr ) {
-				return attr + ': ' + attributes[ attr ];
-			} )
-			.join( '<br>' ) : '';
+		if ( utils.isArray( attributes ) ) {
+			// retrieve attribute values from the store
+			attributes = attributes.map( function( attr ) {
+				return editor.editable.document.store.get( attr );
+			} );
+			attributes.unshift( [] );
+			attributes = utils.extend.apply( utils, attributes );
+		}
+
+		if ( utils.isObject( attributes ) ) {
+			return Object.keys( attributes )
+				.map( function( attr ) {
+					return attr + ': ' + attributes[ attr ];
+				} )
+				.join( '<br>' );
+		} else {
+			return '';
+		}
 	}
 
 	html = editor.editable.document.data.data.map( function( op ) {
