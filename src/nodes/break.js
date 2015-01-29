@@ -14,9 +14,9 @@ define( [
 	}
 
 	utils.extend( BreakNode, Node, {
-		type: 'break',
+		isEmpty: true,
 		tags: [ 'br' ],
-		isEmpty: true
+		type: 'break'
 	} );
 
 	utils.inherit( BreakNode, Node );

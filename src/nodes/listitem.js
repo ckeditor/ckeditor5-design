@@ -14,8 +14,8 @@ define( [
 	}
 
 	utils.extend( ListItemNode, Branch, {
-		type: 'listItem',
-		tags: [ 'li' ]
+		tags: [ 'li' ],
+		type: 'listItem'
 	} );
 
 	utils.inherit( ListItemNode, Branch );

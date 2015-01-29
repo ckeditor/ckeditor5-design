@@ -15,9 +15,9 @@ define( [
 
 	// inherit statics
 	utils.extend( LinkNode, InlineNode, {
-		type: 'link',
+		attributes: [ 'href', 'target' ],
 		tags: [ 'a' ],
-		attributes: [ 'href', 'target' ]
+		type: 'link'
 	} );
 
 	// inherit prototype

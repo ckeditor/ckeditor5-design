@@ -14,8 +14,8 @@ define( [
 	}
 
 	utils.extend( ItalicNode, InlineNode, {
-		type: 'italic',
-		tags: [ 'em', 'i' ]
+		tags: [ 'em', 'i' ],
+		type: 'italic'
 	} );
 
 	utils.inherit( ItalicNode, InlineNode );

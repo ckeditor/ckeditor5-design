@@ -14,8 +14,8 @@ define( [
 	}
 
 	utils.extend( ListNode, Branch, {
-		type: 'list',
 		tags: [ 'ul', 'ol' ],
+		type: 'list',
 
 		toData: function( dom ) {
 			return {

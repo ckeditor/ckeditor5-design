@@ -16,8 +16,8 @@ define( [
 	}
 
 	utils.extend( RootNode, Branch, {
-		type: 'root',
-		isWrapped: false
+		isWrapped: false,
+		type: 'root'
 	} );
 
 	utils.inherit( RootNode, Branch );

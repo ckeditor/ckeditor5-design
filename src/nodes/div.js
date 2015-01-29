@@ -14,8 +14,8 @@ define( [
 	}
 
 	utils.extend( DivNode, Branch, {
-		type: 'div',
-		tags: [ 'div' ]
+		tags: [ 'div' ],
+		type: 'div'
 	} );
 
 	utils.inherit( DivNode, Branch );

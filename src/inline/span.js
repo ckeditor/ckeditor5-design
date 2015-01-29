@@ -14,8 +14,8 @@ define( [
 	}
 
 	utils.extend( SpanNode, InlineNode, {
-		type: 'span',
-		tags: [ 'span' ]
+		tags: [ 'span' ],
+		type: 'span'
 	} );
 
 	utils.inherit( SpanNode, InlineNode );

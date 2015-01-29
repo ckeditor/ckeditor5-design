@@ -14,8 +14,8 @@ define( [
 	}
 
 	utils.extend( ParagraphNode, Branch, {
-		type: 'paragraph',
-		tags: [ 'p' ]
+		tags: [ 'p' ],
+		type: 'paragraph'
 	} );
 
 	utils.inherit( ParagraphNode, Branch );

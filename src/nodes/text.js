@@ -14,6 +14,7 @@ define( [
 	}
 
 	utils.extend( TextNode, Node, {
+		isEmpty: true,
 		isWrapped: false,
 		type: 'text',
 

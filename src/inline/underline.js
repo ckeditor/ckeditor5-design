@@ -14,8 +14,8 @@ define( [
 	}
 
 	utils.extend( UnderlineNode, InlineNode, {
-		type: 'underline',
-		tags: [ 'u' ]
+		tags: [ 'u' ],
+		type: 'underline'
 	} );
 
 	utils.inherit( UnderlineNode, InlineNode );

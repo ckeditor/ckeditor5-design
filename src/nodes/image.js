@@ -14,10 +14,10 @@ define( [
 	}
 
 	utils.extend( ImageNode, Node, {
-		type: 'image',
-		tags: [ 'img' ],
 		attributes: [ 'src', 'alt', 'width', 'height', 'title' ],
-		isEmpty: true
+		isEmpty: true,
+		tags: [ 'img' ],
+		type: 'image'
 	} );
 
 	utils.inherit( ImageNode, Node );

@@ -15,8 +15,8 @@ define( [
 
 	// inherit statics
 	utils.extend( BoldNode, InlineNode, {
-		type: 'bold',
-		tags: [ 'strong', 'b' ]
+		tags: [ 'strong', 'b' ],
+		type: 'bold'
 	} );
 
 	// inherit prototype
