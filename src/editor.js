@@ -12,12 +12,15 @@ define( [
 	'use strict';
 
 	function Editor( selector ) {
-		this.sourceElement = document.querySelector( selector );
-		this.$sourceElement = new Element( this.sourceElement );
+		this.$srcEl = new Element( document.querySelector( selector ) );
 
-		this.editable = new Editable( this.sourceElement );
+		this.editable = new Editable( this.$srcEl.html() );
 
-		this.$sourceElement.html('');
+		// disable content editable and empty the source element
+		this.$srcEl.attr( 'contentEditable', false );
+		this.$srcEl.html( '' );
+
+		this.$srcEl.append( this.editable.$el );
 	}
 
 	utils.extend( Editor.prototype, Emitter, {} );

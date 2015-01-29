@@ -22,15 +22,17 @@ define( [
 		attributeOldValue: true
 	};
 
-	function Editable( sourceElement ) {
+	function Editable( html ) {
 		// create a document for this editable area
-		this.document = new Document( sourceElement );
+		this.document = new Document( html );
 
 		// create an element for the editable area
 		this.$el = Element.create( 'div' );
 
+		this.$el.attr( 'contentEditable', true );
+
 		// TODO append the document tree to this element
-		// this.$el.append( this.document.tree.root.$element );
+		// this.$el.append( this.document.root.$el );
 
 		// attach the mutation observer
 		this.observer = new MutationSummary( {

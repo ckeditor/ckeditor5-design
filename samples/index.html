@@ -28,6 +28,7 @@
 
 	#tree {
 		font-size: 0.75em;
+		margin: 0;
 	}
 
 	#data {
@@ -64,7 +65,12 @@
 		float: right;
 	}
 
-	#tree ul {
+	#tree:before {
+		content: 'Document Tree';
+		font-weight: bold;
+	}
+
+	#tree, #tree ul {
 		padding-left: 20px;
 		list-style-type: none;
 	}
@@ -82,7 +88,7 @@
 		color: #ccc;
 	}
 
-	#tree > ul > li:first-child:before {
+	#tree > li:first-child:before {
 		content: '';
 	}
 	</style>
@@ -108,9 +114,6 @@
 	<table id="data">
 		<thead>
 			<tr>
-				<th colspan="4">Linear Data</th>
-			</tr>
-			<tr>
 				<th>Pos</th>
 				<th>Insert</th>
 				<th>Attributes</th>
@@ -120,10 +123,7 @@
 		<tbody>
 		</tbody>
 	</table>
-	<div id="tree">
-		<h1>Document Tree</h1>
-		<ul></ul>
-	</div>
+	<ul id="tree"></ul>
 	<script src="../lib/require.js" data-main="main"></script>
 </body>
 </html>

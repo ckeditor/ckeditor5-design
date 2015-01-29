@@ -75,6 +75,7 @@ require( [
 			'<td>', idx, '</td>',
 			'<td class="', op[ 2 ], '">', op[ 0 ], '</td>',
 			'<td>', formatAttributes( op[ 1 ] ), '</td>',
+			'<td></td>',
 			'</tr>'
 		].join( '' );
 	} );
@@ -99,5 +100,5 @@ require( [
 		}
 	}
 
-	buildTree( editor.editable.document.tree.root, document.querySelector( '#tree > ul' ) );
+	buildTree( editor.editable.document.root, document.getElementById( 'tree' ) );
 } );
