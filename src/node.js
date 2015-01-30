@@ -1,9 +1,9 @@
 define( [ 'tools/utils' ], function( utils ) {
 	'use strict';
 
-	function Node( op ) {
-		this.op = op || null;
-		
+	function Node( data ) {
+		this.data = data || null;
+
 		this.document = null;
 		this.parent = null;
 		this.root = null;
@@ -48,7 +48,7 @@ define( [ 'tools/utils' ], function( utils ) {
 		// we want to use for the DOM element
 		if ( tags.length === 1 ) {
 			var dom = doc.createElement( tags[ 0 ] ),
-				attributes = utils.pick( data.attributes, this.attributes );
+				attributes = data.attributes ? utils.pick( data.attributes, this.attributes ) : [];
 
 			// apply selected attributes on the newly created DOM element
 			Object.keys( attributes ).forEach( function( name ) {

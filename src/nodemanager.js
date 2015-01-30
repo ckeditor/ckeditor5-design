@@ -20,7 +20,18 @@ define( function() {
 
 		// find a style constructor for the given data
 		matchStyleForData: function( data ) {
-			// TODO
+			var result = null;
+
+			Object.keys( data ).some( function( name ) {
+				// we use booleans for style flags only (for now at least)
+				if ( data[ name ] === true && this.store[ name ] ) {
+					result = this.store[ name ];
+
+					return true;
+				}
+			}, this );
+
+			return result;
 		},
 
 		// find a node constructor for the given DOM element

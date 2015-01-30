@@ -1,19 +1,19 @@
 define( [
-	'branch',
+	'contentbranch',
 	'nodemanager',
 	'tools/utils'
 ], function(
-	Branch,
+	ContentBranch,
 	nodeManager,
 	utils
 ) {
 	'use strict';
 
 	function HeadingNode() {
-		Branch.apply( this, arguments );
+		ContentBranch.apply( this, arguments );
 	}
 
-	utils.extend( HeadingNode, Branch, {
+	utils.extend( HeadingNode, ContentBranch, {
 		tags: [ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ],
 		type: 'heading',
 
@@ -31,7 +31,7 @@ define( [
 		}
 	} );
 
-	utils.inherit( HeadingNode, Branch );
+	utils.inherit( HeadingNode, ContentBranch );
 
 	nodeManager.register( HeadingNode );
 

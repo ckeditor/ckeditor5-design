@@ -1,24 +1,24 @@
 define( [
-	'branch',
+	'contentbranch',
 	'nodemanager',
 	'tools/utils'
 ], function(
-	Branch,
+	ContentBranch,
 	nodeManager,
 	utils
 ) {
 	'use strict';
 
 	function ParagraphNode() {
-		Branch.apply( this, arguments );
+		ContentBranch.apply( this, arguments );
 	}
 
-	utils.extend( ParagraphNode, Branch, {
+	utils.extend( ParagraphNode, ContentBranch, {
 		tags: [ 'p' ],
 		type: 'paragraph'
 	} );
 
-	utils.inherit( ParagraphNode, Branch );
+	utils.inherit( ParagraphNode, ContentBranch );
 
 	nodeManager.register( ParagraphNode );
 
