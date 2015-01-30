@@ -26,7 +26,7 @@ define( [
 
 		toDom: function( data, doc ) {
 			var dom = doc.createElement( this.tags[ 0 ] ),
-				attributes = data[ 1 ] ? utils.pick( data[ 1 ], this.attributes ) : [];
+				attributes = utils.pick( data, this.attributes );
 
 			// apply additional attributes
 			Object.keys( attributes ).forEach( function( name ) {
