@@ -7,6 +7,7 @@ define( [ 'tools/utils' ], function( utils ) {
 		this.document = null;
 		this.parent = null;
 		this.root = null;
+		this.view = null;
 
 		this._length = 0;
 	}
@@ -88,6 +89,20 @@ define( [ 'tools/utils' ], function( utils ) {
 		// increase/decrease length by the given difference
 		adjustLength: function( difference ) {
 			this._length += difference;
+		},
+
+		// attach node to the parent element
+		attachTo: function( target ) {
+			this.parent = target;
+			this.root = target.root;
+			this.document = target.document;
+		},
+
+		// detach the node
+		detach: function() {
+			this.parent = null;
+			this.root = null;
+			this.document = null;
 		},
 
 		// returns the offset of a node from the beginning of the document,
