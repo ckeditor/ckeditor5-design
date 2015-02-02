@@ -13,6 +13,7 @@
 	}
 
 	#input,
+	#output,
 	#tree,
 	#data {
 		box-sizing: border-box;
@@ -22,6 +23,7 @@
 	}
 
 	#input,
+	#output,
 	#tree {
 		float: left;
 	}
@@ -65,6 +67,16 @@
 		float: right;
 	}
 
+	#input:before {
+		content: 'Input';
+		font-weight: bold;
+	}
+
+	#output:before {
+		content: 'Output';
+		font-weight: bold;
+	}
+
 	#tree:before {
 		content: 'Document Tree';
 		font-weight: bold;
@@ -100,7 +112,7 @@
 <body>
 	<div id="input" contenteditable>
 		<h1>Lorem ipsum</h1>
-		<img src="img/doge.jpg" alt="Doge" class="float-right" />
+		<img src="img/doge.jpg" alt="Doge" />
 		<p>ab<strong> cd<em> ef<u> gh</u></em> ij</strong><em> kl</em> mn<u> op</u> qr <em><strong>st</strong></em> uv</p>
 		<!--<p><strong>Foo <em>bar</em></strong> <em>baz</em></p>
 		<p><strong>Foo</strong> <em><strong>bar</strong> baz</em></p>-->
@@ -116,6 +128,7 @@
 	<p>Lorem ipsum dolor sit amet,<br> consectetur adipisicing elit.</p>
     <p>by <a href="http://cksource.com">CKSource</a></p>
 	</div>
+	<div id="output"></div>
 	<table id="data">
 		<thead>
 			<tr>

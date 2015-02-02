@@ -15,9 +15,11 @@ require.config( {
 
 require( [
 	'editor',
+	'converter',
 	'tools/utils'
 ], function(
 	Editor,
+	converter,
 	utils
 ) {
 	'use strict';
@@ -101,4 +103,12 @@ require( [
 	}
 
 	buildTree( editor.editable.document.root, document.getElementById( 'tree' ) );
+
+	var elements = converter.getDomElementsForData( editor.editable.document.data.data, editor.editable.document.store, document );
+
+	var output = document.getElementById( 'output' );
+
+	elements.forEach( function( elem ) {
+		output.appendChild( elem );
+	} );
 } );
