@@ -23,7 +23,7 @@ define( [
 		this.ownerDocument = $el._el.ownerDocument;
 
 		// create a detached copy of the source html
-		var dom = converter.createDocumentFromHTML( $el.html() ).body;
+		var dom = utils.createDocumentFromHTML( $el.html() ).body;
 
 		// normalize the dom
 		dataProcessor.normalizeWhitespaces( dom );

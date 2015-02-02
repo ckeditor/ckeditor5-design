@@ -1,11 +1,11 @@
 define( [
-	'document',
+	'lineardata',
 	'nodemanager',
 	'inline/inlinenode',
 	'tools/utils',
 	'nodetypes'
 ], function(
-	Document,
+	LinearData,
 	nodeManager,
 	InlineNode,
 	utils
@@ -15,17 +15,7 @@ define( [
 	function Converter() {}
 
 	Converter.prototype = {
-		// create a new detached document from an HTML string
-		createDocumentFromHTML: function( html ) {
-			if ( DOMParser ) {
-				var parser = new DOMParser();
-
-				return parser.parseFromString( html, 'text/html' );
-			} else {
-				// TODO handle IE < 10
-			}
-		},
-
+		// prepare linear data for the given DOM
 		// the parent argument is used to wrap the result in parent element opening/closing data
 		getDataForDom: function( dom, store, parent, parentAttributes ) {
 			var data = [];
@@ -107,6 +97,7 @@ define( [
 			return data;
 		},
 
+		// prepare linear data for the given text
 		getDataForText: function( text, parentAttributes ) {
 			text = text.split( '' );
 
@@ -119,10 +110,69 @@ define( [
 			} );
 		},
 
-		getDomForData: function( data, doc ) {
-			var nodeConstructor = nodeManager.get( data[ 1 ].type );
+		// prepare DOM elements for the given data
+		getDomElementsForData: function( data, store, doc ) {
+			var elementStack = [],
+				textStack = [],
+				currentElement,
+				parentElement;
 
-			return nodeConstructor.toDom( data, doc );
+			function appendToCurrent( child ) {
+				currentElement.appendChild( child );
+			}
+
+			for ( var i = 0, len = data.length; i < len; i++ ) {
+				var item = data[ i ],
+					nodeConstructor;
+
+				// text or styled-text
+				if ( utils.isString( item ) || utils.isArray( item ) ) {
+					// push the text item to the stack
+					textStack.push( item );
+					// element
+				} else if ( utils.isObject( item ) ) {
+					// flush the text stack
+					if ( textStack.length ) {
+						nodeConstructor = nodeManager.get( 'text' );
+
+						var childElements = nodeConstructor.toDom( textStack, doc, store );
+
+						childElements.forEach( appendToCurrent );
+
+						// clear the stack
+						textStack.length = 0;
+					}
+
+					var nodeType = LinearData.getType( item );
+
+					nodeConstructor = nodeManager.get( nodeType ) || nodeManager.get( 'unknown' );
+
+					// opening element
+					if ( LinearData.isOpenElement( item ) ) {
+						// we're inside of an element so let's make it a parent
+						if ( currentElement ) {
+							parentElement = currentElement;
+						}
+
+						// build the current element
+						currentElement = nodeConstructor.toDom( item, doc );
+
+						// append it to the parent or push it to the stack
+						if ( parentElement ) {
+							parentElement.appendChild( currentElement );
+						} else {
+							elementStack.push( currentElement );
+						}
+
+						// closing element
+					} else if ( LinearData.isCloseElement( item ) ) {
+						currentElement = currentElement.parentNode;
+						parentElement = currentElement ? currentElement.parentNode : null;
+					}
+				}
+			}
+
+			return elementStack;
 		}
 	};
 

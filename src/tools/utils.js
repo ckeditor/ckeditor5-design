@@ -10,6 +10,17 @@ define( function() {
 	var uids = {};
 
 	var utils = {
+		// create a new detached document from an HTML string
+		createDocumentFromHTML: function( html ) {
+			if ( DOMParser ) {
+				var parser = new DOMParser();
+
+				return parser.parseFromString( html, 'text/html' );
+			} else {
+				// TODO handle IE < 10
+			}
+		},
+
 		extend: function( target, source ) {
 			if ( !this.isObject( source ) && !this.isFunction( source ) ) {
 				return target;
