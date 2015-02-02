@@ -1,23 +1,25 @@
 define( [
-	'tools/emitter',
 	'converter',
 	'dataprocessor',
 	'lineardata',
 	'nodemanager',
 	'store',
+	'view',
+	'tools/emitter',
 	'tools/utils'
 ], function(
-	Emitter,
 	converter,
 	dataProcessor,
 	LinearData,
 	nodeManager,
 	Store,
+	View,
+	Emitter,
 	utils
 ) {
 	'use strict';
 
-	function Document( $el ) {
+	function Document( $el, editable ) {
 		this.store = new Store();
 
 		this.ownerDocument = $el._el.ownerDocument;
@@ -25,6 +27,7 @@ define( [
 		// create a detached copy of the source html
 		var dom = utils.createDocumentFromHTML( $el.html() ).body;
 
+		// TODO combine the data processing with data conversion loop
 		// normalize the dom
 		dataProcessor.normalizeWhitespaces( dom );
 
@@ -35,14 +38,20 @@ define( [
 		this.data = new LinearData( data, this.store );
 
 		// document's node tree
-		this.root = new( nodeManager.get( 'root' ) )();
+		var RootNode = nodeManager.get( 'root' );
+
+		this.root = new RootNode();
 		this.root.document = this;
+		// set the editable element as a root view
+		this.root.view = editable.$el;
 
 		this.buildTree();
+		this.renderTree( this.root, this.root.view );
 	}
 
 	utils.extend( Document.prototype, Emitter, {
-		// build a node tree starting at this.root
+		// build a node tree, collect the children first and then push them to their parents
+		// we use this oreder to calculate the lengths properly
 		buildTree: function() {
 			var currentStack = [],
 				parentStack = [],
@@ -67,6 +76,7 @@ define( [
 				if ( this.data.isElementAt( i ) ) {
 					// previous item was a text
 					if ( inText ) {
+						// set the final length of a text node
 						currentNode.length = textLength;
 						inText = false;
 						textLength = 0;
@@ -144,7 +154,36 @@ define( [
 			var offset = node.getOffset();
 
 			return this.data.slice( offset, offset + node.length );
-		}
+		},
+
+		renderTree: function( node, parent ) {
+			var doc = this.ownerDocument;
+
+			function appendToParent( el ) {
+				parent.append( el );
+			}
+
+			node.children.forEach( function( child ) {
+				// use child's data or get it from the linear data
+				var data = child.data || this.getNodeData( child );
+				// create DOM element(s) for a child nnode
+				var elem = child.constructor.toDom( data, doc, this.store );
+
+				// node returns an array of element so there's no point in processing its children again
+				// this happens e.g. for text nodes
+				if ( utils.isArray( elem ) ) {
+					elem.forEach( appendToParent );
+				} else {
+					child.view = new View( this, elem );
+					child.view.appendTo( parent );
+
+					if ( child.children ) {
+						this.renderTree( child, child.view );
+					}
+				}
+
+			}, this );
+		},
 	} );
 
 	return Document;

@@ -9,9 +9,9 @@ define( [
 ) {
 	'use strict';
 
-	function RootNode() {
-		Branch.apply( this, arguments );
-
+	function RootNode( document ) {
+		Branch.call( this );
+		this.document = document;
 		this.root = this;
 	}
 

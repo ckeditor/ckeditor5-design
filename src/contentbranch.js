@@ -17,11 +17,9 @@ define( [
 	utils.inherit( ContentBranch, Branch );
 
 	utils.extend( ContentBranch.prototype, {
-		renderContent: function() {
+		renderContent: function( doc ) {
 			var store = this.document.store,
-				doc = this.document.ownerDocument,
-				container = this.constructor.toDom( this.data, doc ),
-				styleStack = [];
+				container = this.constructor.toDom( this.data, doc );
 
 			this.children.forEach( function( child ) {
 				// retrieve child node's data from the linear data
