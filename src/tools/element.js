@@ -34,6 +34,16 @@ define( [
 			return this;
 		},
 
+		appendTo: function( target ) {
+			if ( target instanceof Element ) {
+				target.append( this );
+			} else {
+				target.appendChild( this._el );
+			}
+
+			return this;
+		},
+
 		attr: function( name, value ) {
 			this._el.setAttribute( name, value );
 
