@@ -50,6 +50,10 @@ define( [
 			return this;
 		},
 
+		data: function( name, vale ) {
+			this._el.dataset[ name ] = value;
+		},
+
 		find: function( selector ) {
 			var elems = this._el.querySelectorAll( selector );
 
@@ -121,6 +125,10 @@ define( [
 			this._el.classList.remove( value.split( sepPattern ) );
 
 			return this;
+		},
+
+		removeData: function( name ) {
+			delete this._el.dataset[ name ];
 		},
 
 		setStyle: function( prop, value ) {
