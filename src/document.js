@@ -22,7 +22,8 @@ define( [
 	function Document( $el, editable ) {
 		this.store = new Store();
 
-		this.ownerDocument = $el._el.ownerDocument;
+		// reference to the parent editable object
+		this.editable = editable;
 
 		// create a detached copy of the source html
 		var dom = utils.createDocumentFromHTML( $el.html() ).body;
@@ -37,13 +38,8 @@ define( [
 		// document's linear data
 		this.data = new LinearData( data, this.store );
 
-		// document's node tree
-		var RootNode = nodeManager.get( 'root' );
-
-		this.root = new RootNode();
-		this.root.document = this;
-		// set the editable element as a root view
-		this.root.view = editable.$el;
+		// create document tree root element
+		this.root = this.makeRoot();
 
 		this.buildTree();
 		this.renderTree( this.root, this.root.view );
@@ -156,8 +152,25 @@ define( [
 			return this.data.slice( offset, offset + node.length );
 		},
 
+		makeRoot: function() {
+			// document's node tree
+			var RootNode = nodeManager.get( 'root' );
+			// create root node
+			var node = new RootNode();
+			// create root node's DOM element
+			var rootEl = document.createElement( 'div' );
+
+			node.view = new View( node, rootEl );
+			node.document = this;
+
+			this.editable.addView( node.view );
+
+			return node;
+		},
+
+		// render given node tree and append it to the parent
 		renderTree: function( node, parent ) {
-			var doc = this.ownerDocument;
+			var doc = parent.getElement().ownerDocument;
 
 			function appendToParent( el ) {
 				parent.append( el );
@@ -174,7 +187,9 @@ define( [
 				if ( utils.isArray( elem ) ) {
 					elem.forEach( appendToParent );
 				} else {
-					child.view = new View( this, elem );
+					child.view = new View( child, elem );
+					// TODO this doesn't seem to be the best place to store it
+					this.editable.addView( child.view );
 					child.view.appendTo( parent );
 
 					if ( child.children ) {
