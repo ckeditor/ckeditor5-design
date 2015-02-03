@@ -31,6 +31,7 @@ define( [
 
 				// element
 				if ( child.nodeType === Node.ELEMENT_NODE ) {
+					// TODO allow using multiple constructors no a single node
 					var nodeConstructor = nodeManager.matchForDom( child ) || nodeManager.get( 'unknown' );
 
 					// inline text
@@ -137,7 +138,13 @@ define( [
 
 						var childElements = nodeConstructor.toDom( textStack, doc, store );
 
-						childElements.forEach( appendToCurrent );
+						// append children to the current element
+						if ( currentElement ) {
+							childElements.forEach( appendToCurrent );
+							// push them to the element stack
+						} else {
+							elementStack = elementStack.concat( childElements );
+						}
 
 						// clear the stack
 						textStack.length = 0;
