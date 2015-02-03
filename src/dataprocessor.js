@@ -1,7 +1,8 @@
 define( function() {
 	'use strict';
 
-	var whitePattern = /^\s+$/;
+	var allWhitePattern = /^\s+$/,
+		startEndWhitePattern = /^\s+|\s+$/;
 
 	function DataProcessor() {}
 
@@ -18,7 +19,7 @@ define( function() {
 				// text node
 				if ( child.nodeType === Node.TEXT_NODE ) {
 					// text node contains whitespaces only
-					if ( whitePattern.test( child.data ) ) {
+					if ( allWhitePattern.test( child.data ) ) {
 						// strip whitespaces at the end or at the beginning of the el
 						if ( !child.previousSibling || !child.nextSibling ) {
 							el.removeChild( child );
@@ -27,9 +28,12 @@ define( function() {
 						} else {
 							child.data = ' ';
 						}
+						// replace multiple whitespaces at the start/end with a single one
+					} else {
+						child.data = child.data.replace( startEndWhitePattern, ' ' );
 					}
 
-					// TODO move start/end whitespaces to the siblings
+					// TODO move start/end whitespaces
 					// http://www.w3.org/TR/html4/struct/text.html#h-9.1
 
 					// element
