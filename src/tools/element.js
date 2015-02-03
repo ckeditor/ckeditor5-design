@@ -28,6 +28,12 @@ define( [
 			return this;
 		},
 
+		addListener: function( type, handler ) {
+			this._el.addEventListener( type, handler );
+
+			return this;
+		},
+
 		append: function( child ) {
 			this._el.appendChild( child instanceof Element ? child._el : child );
 
@@ -50,7 +56,7 @@ define( [
 			return this;
 		},
 
-		data: function( name, vale ) {
+		data: function( name, value ) {
 			this._el.dataset[ name ] = value;
 		},
 
@@ -103,18 +109,6 @@ define( [
 			return this;
 		},
 
-		off: function( type, handler ) {
-			this._el.removeEventListener( type, handler );
-
-			return this;
-		},
-
-		on: function( type, handler ) {
-			this._el.addEventListener( type, handler );
-
-			return this;
-		},
-
 		remove: function() {
 			this._el.parentNode.removeChild( this._el );
 
@@ -129,6 +123,12 @@ define( [
 
 		removeData: function( name ) {
 			delete this._el.dataset[ name ];
+		},
+
+		removeListener: function( type, handler ) {
+			this._el.removeEventListener( type, handler );
+
+			return this;
 		},
 
 		setStyle: function( prop, value ) {
