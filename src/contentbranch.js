@@ -1,10 +1,8 @@
 define( [
 	'branch',
-	'store',
 	'tools/utils'
 ], function(
 	Branch,
-	store,
 	utils
 ) {
 	'use strict';
@@ -14,15 +12,14 @@ define( [
 	}
 
 	// inherit statics
-	utils.extend( ContentBranch, Branch, {
-		hasContent: true
-	} );
+	utils.extend( ContentBranch, Branch );
 	// inherit prototype
 	utils.inherit( ContentBranch, Branch );
 
 	utils.extend( ContentBranch.prototype, {
 		renderContent: function( doc ) {
-			var container = this.constructor.toDom( this.data, doc );
+			var store = this.document.store,
+				container = this.constructor.toDom( this.data, doc );
 
 			this.children.forEach( function( child ) {
 				// retrieve child node's data from the linear data

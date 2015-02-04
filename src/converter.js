@@ -1,14 +1,12 @@
 define( [
 	'lineardata',
 	'nodemanager',
-	'store',
 	'inline/inlinenode',
 	'tools/utils',
 	'nodetypes'
 ], function(
 	LinearData,
 	nodeManager,
-	store,
 	InlineNode,
 	utils
 ) {
@@ -18,50 +16,13 @@ define( [
 
 	Converter.prototype = {
 		// prepare linear data for the given DOM
-		getDataForDom: function( dom, wrapper, parentAttributes ) {
+		// the parent argument is used to wrap the result in parent element opening/closing data
+		getDataForDom: function( dom, store, parent, parentAttributes ) {
 			var data = [];
 
-			var isWrapper = false,
-				hasWrapper = false,
-				wrapperConstructor;
-
-			function wrap() {
-				if ( !isWrapper && !hasWrapper ) {
-					data.push( {
-						type: 'paragraph',
-						internal: {
-							temporary: true
-						}
-					} );
-
-					hasWrapper = true;
-				}
-			}
-
-			function unwrap() {
-				if ( hasWrapper ) {
-					data.push( {
-						type: '/paragraph'
-					} );
-
-					hasWrapper = false;
-				}
-			}
-
-			// check if the wrapper exists and expects content
-			if ( wrapper === true ||
-				(
-					wrapper &&
-					( wrapperConstructor = nodeManager.get( wrapper.type ) ) &&
-					wrapperConstructor.hasContent
-				)
-			) {
-				isWrapper = true;
-			}
-
-			// add wrapper's opening element
-			if ( utils.isObject( wrapper ) && wrapper.type ) {
-				data.push( wrapper );
+			// add parent element's opening tag
+			if ( utils.isObject( parent ) && parent.type ) {
+				data.push( parent );
 			}
 
 			// add data for child nodes
@@ -89,20 +50,12 @@ define( [
 							childAttributes.push( index );
 						}
 
-						// wrap the content in a temporary paragraph
-						wrap();
-
 						// collect data for all children
-						childData = this.getDataForDom( child, isWrapper || hasWrapper, childAttributes );
-
+						childData = this.getDataForDom( child, store, null, childAttributes );
 						// regular element
 					} else {
 						var parentData = nodeConstructor.toData( child );
-
-						childData = this.getDataForDom( child, parentData );
-
-						// close the remaining wrapper
-						unwrap();
+						childData = this.getDataForDom( child, store, parentData );
 					}
 
 					data = data.concat( childData );
@@ -127,21 +80,18 @@ define( [
 
 					childData = this.getDataForText( child.textContent, parentAttributes );
 
-					// wrap the content in a temporary paragraph
-					wrap();
-
-
 					data = data.concat( childData );
 				}
 			}, this );
 
-			// close the remaining wrapper
-			unwrap();
+			// add parent element's closing tag
+			if ( utils.isObject( parent ) && parent.type ) {
+				// TODO should we put a closing tag for a void element?
 
-			// add wrapper element's closing tag
-			if ( utils.isObject( wrapper ) && wrapper.type ) {
+				// TODO remove empty text before the closing element data
+
 				data.push( {
-					type: '/' + wrapper.type
+					type: '/' + parent.type
 				} );
 			}
 
@@ -162,7 +112,7 @@ define( [
 		},
 
 		// prepare DOM elements for the given data
-		getDomElementsForData: function( data, doc ) {
+		getDomElementsForData: function( data, store, doc ) {
 			var elementStack = [],
 				textStack = [],
 				currentElement,
@@ -206,8 +156,6 @@ define( [
 
 					// opening element
 					if ( LinearData.isOpenElement( item ) ) {
-						// TODO remove temporary wrappers
-
 						// we're inside of an element so let's make it a parent
 						if ( currentElement ) {
 							parentElement = currentElement;

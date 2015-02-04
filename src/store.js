@@ -55,5 +55,5 @@ define( [ 'tools/utils' ], function( utils ) {
 
 	} );
 
-	return new Store();
+	return Store;
 } );
