@@ -17,15 +17,30 @@ define( [
 		}
 	}
 
-
 	// inherit statics
 	utils.extend( Branch, Node );
 	// inherit prototype
 	utils.inherit( Branch, Node );
 
-	utils.extend( Branch.prototype, {
-		hasChildren: function() {
+	Object.defineProperty( Branch.prototype, 'childLength', {
+		get: function() {
+			return this.children.length;
+		}
+	} );
+
+	Object.defineProperty( Branch.prototype, 'hasChildren', {
+		get: function() {
 			return !!this.children.length;
+		}
+	} );
+
+	utils.extend( Branch.prototype, {
+		childAt: function( index ) {
+			return this.children[ index ] || null;
+		},
+
+		indexOf: function( node ) {
+			return this.children.indexOf( node );
 		},
 
 		// we use splice in following methods so we don't have to recalculate the length each time,
