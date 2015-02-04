@@ -1,7 +1,6 @@
 define( [
 	'document',
 	'definitions',
-	'mutationSummary',
 	'tools/element',
 	'tools/emitter',
 	'tools/utils'
@@ -14,6 +13,13 @@ define( [
 	utils
 ) {
 	'use strict';
+
+	var config = {
+		childList: true,
+		attributes: true,
+		characterData: true,
+		subtree: true
+	};
 
 	function Editable( $el ) {
 		// create an element for the editable area
@@ -29,16 +35,10 @@ define( [
 		this.$documentView.appendTo( this.$el );
 		this.$documentView.attr( 'contenteditable', true );
 
-		// attach the mutation observer
-		this.observer = new MutationSummary( {
-			callback: this.handleMutation.bind( this ),
-			queries: [ {
-				characterData: true
-			} ],
-			rootNode: this.$documentView.getElement()
-		} );
+		this.observer = new MutationObserver( this.handleMutation.bind( this ) );
+		this.observer.observe( this.$documentView.getElement(), config );
 
-		this.$documentView.addListener( 'keydown', this.handleKeyDown.bind( this ) );
+		// this.$documentView.addListener( 'keydown', this.handleKeyDown.bind( this ) );
 	}
 
 	utils.extend( Editable.prototype, Emitter, {
@@ -54,83 +54,51 @@ define( [
 			// we want to handle ENTER key ourselves
 			switch ( e.keyCode ) {
 				case def.KEY.ENTER:
-					e.preventDefault();
-
 					// TODO handle enter key
 					break;
 			}
 		},
 
-		handleMutation: function( summaries ) {
-			var summary = summaries[ 0 ],
+		handleMutation: function( mutations ) {
+			var target,
+				minOffset = Infinity,
+				currentView,
 				that = this;
 
-			Object.keys( summary ).forEach( function( type ) {
-				var nodes = summary[ type ];
+			function findParentView( element ) {
+				var topEl = that.$el.getElement();
 
-				// ignore empty summaries
-				if ( !nodes || !nodes.length ) {
-					return;
-				}
-
-				nodes.forEach( function( node ) {
-					if ( type === 'added' ) {
-						handleAdd( node );
-					}
-
-					if ( type === 'removed' ) {
-						handleRemove( node );
-					}
-
-					if ( type === 'valueChanged' ) {
-						handleChange( node );
-					}
-				} );
-			} );
-
-			function handleAdd( node ) {
-				console.log( 'add', node );
-			}
-
-			function handleRemove( node ) {
-				console.log( 'remove', node );
-				var parent = summary.getOldParentNode( node ),
-					oldText;
-
-				try {
-					oldText = summary.getOldCharacterData( node );
-				} catch ( e ) {
-					console.log( e );
-				}
-
-				console.log( 'remove', parent, oldText );
-			}
-
-			function handleChange( node ) {
-				console.log( 'change', node );
-				var oldText = summary.getOldCharacterData( node );
-
-				var parentView = findParentView( node );
-
-				console.log( parentView );
-			}
-
-			function findParentView( node ) {
-				var topEl = that.$el.getElement(),
-					parent;
-
-				while ( ( parent = node.parentElement ) ) {
+				while ( element ) {
 					// we've found a parent view
-					if ( parent.dataset.vid ) {
-						return that.getView( parent.dataset.vid );
+					if ( element.dataset && element.dataset.vid ) {
+						return that.getView( element.dataset.vid );
 						// we reached the editable element
-					} else if ( parent === topEl ) {
+					} else if ( element === topEl ) {
 						return null;
 					}
 
-					node = parent;
+					element = element.parentElement;
 				}
 			}
+
+			// get the top-most affected node
+			mutations.forEach( function( mutation ) {
+				var type = mutation.type;
+
+				var view = findParentView( mutation.target );
+
+				if ( view ) {
+					var offset = view.node.getOffset();
+
+					// the model with the lowest offset would represent the top-most node in the modified node tree
+					if ( offset < minOffset ) {
+						currentView = view;
+						minOffset = offset;
+					}
+				}
+			} );
+
+			console.log( currentView.node );
 		},
 
 		removeView: function( vid ) {

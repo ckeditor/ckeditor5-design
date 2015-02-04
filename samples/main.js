@@ -3,13 +3,6 @@ require.config( {
 
 	paths: {
 		lodash: '../lib/lodash',
-		mutationSummary: '../lib/mutation-summary'
-	},
-
-	shim: {
-		mutationSummary: {
-			exports: 'MutationSummary'
-		}
 	}
 } );
 
