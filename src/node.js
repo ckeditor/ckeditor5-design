@@ -85,6 +85,32 @@ define( [ 'tools/utils' ], function( utils ) {
 		}
 	} );
 
+	Object.defineProperty( Node.prototype, 'nextSibling', {
+		get: function() {
+			var idx;
+
+			// no parent or child doesn't exist in parent's children
+			if ( !this.parent || ( idx = this.parent.indexOf( this ) ) == -1 ) {
+				return null;
+			}
+
+			return this.parent.childAt( idx + 1 );
+		}
+	} );
+
+	Object.defineProperty( Node.prototype, 'previousSibling', {
+		get: function() {
+			var idx;
+
+			// no parent or child doesn't exist in parent's children
+			if ( !this.parent || ( idx = this.parent.indexOf( this ) ) == -1 ) {
+				return null;
+			}
+
+			return this.parent.childAt( idx - 1 );
+		}
+	} );
+
 	utils.extend( Node.prototype, {
 		// increase/decrease length by the given difference
 		adjustLength: function( difference ) {
