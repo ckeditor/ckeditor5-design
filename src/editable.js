@@ -107,12 +107,14 @@ define( [
 			}
 
 			function handleChange( node ) {
-				console.log( 'change', node );
 				var oldText = summary.getOldCharacterData( node );
+
+				console.log( 'change', oldText );
+				console.dir( node );
 
 				var parentView = findParentView( node );
 
-				console.log( parentView );
+				console.log( 'parent', parentView );
 			}
 
 			function findParentView( node ) {

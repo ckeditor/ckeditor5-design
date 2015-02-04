@@ -12,7 +12,7 @@ define( [
 	dataProcessor,
 	LinearData,
 	nodeManager,
-	Store,
+	store,
 	View,
 	Emitter,
 	utils
@@ -20,8 +20,6 @@ define( [
 	'use strict';
 
 	function Document( $el, editable ) {
-		this.store = new Store();
-
 		// reference to the parent editable object
 		this.editable = editable;
 
@@ -33,10 +31,10 @@ define( [
 		dataProcessor.normalizeWhitespaces( dom );
 
 		// prepare the data array for the linear data
-		var data = converter.getDataForDom( dom, this.store );
+		var data = converter.getDataForDom( dom );
 
 		// document's linear data
-		this.data = new LinearData( data, this.store );
+		this.data = new LinearData( data );
 
 		// create document tree root element
 		this.root = this.makeRoot();
@@ -180,7 +178,7 @@ define( [
 				// use child's data or get it from the linear data
 				var data = child.data || this.getNodeData( child );
 				// create DOM element(s) for a child nnode
-				var elem = child.constructor.toDom( data, doc, this.store );
+				var elem = child.constructor.toDom( data, doc, store );
 
 				// node returns an array of element so there's no point in processing its children again
 				// this happens e.g. for text nodes

@@ -16,10 +16,12 @@ require.config( {
 require( [
 	'editor',
 	'converter',
+	'store',
 	'tools/utils'
 ], function(
 	Editor,
 	converter,
+	store,
 	utils
 ) {
 	'use strict';
@@ -31,7 +33,7 @@ require( [
 		if ( utils.isArray( attributes ) ) {
 			// retrieve attribute values from the store
 			attributes = attributes.map( function( attr ) {
-				return editor.editable.document.store.get( attr );
+				return store.get( attr );
 			} );
 			attributes.unshift( [] );
 			attributes = utils.extend.apply( utils, attributes );
@@ -104,11 +106,11 @@ require( [
 
 	buildTree( editor.editable.document.root, document.getElementById( 'tree' ) );
 
-	var elements = converter.getDomElementsForData( editor.editable.document.data.data, editor.editable.document.store, document );
+	var elements = converter.getDomElementsForData( editor.editable.document.data.data, document );
 
-	/*var output = document.getElementById( 'output' );
+	var output = document.getElementById( 'output' );
 
 	elements.forEach( function( elem ) {
 		output.appendChild( elem );
-	} );*/
+	} );
 } );

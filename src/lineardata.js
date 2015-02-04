@@ -1,15 +1,12 @@
 define( [
-	'store',
 	'tools/utils'
 ], function(
-	Store,
 	utils
 ) {
 	'use strict';
 
-	function LinearData( data, store ) {
+	function LinearData( data ) {
 		this.data = data || [];
-		this.store = store || new Store();
 	}
 
 	// static methods
@@ -76,7 +73,7 @@ define( [
 		},
 
 		clone: function() {
-			return this.constructor( utils.clone( this.data ), this.store );
+			return this.constructor( utils.clone( this.data ) );
 		},
 
 		slice: function() {
