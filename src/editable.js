@@ -7,7 +7,6 @@ define( [
 ], function(
 	Document,
 	def,
-	MutationSummary,
 	Element,
 	Emitter,
 	utils
@@ -62,7 +61,8 @@ define( [
 		handleMutation: function( mutations ) {
 			var target,
 				minOffset = Infinity,
-				currentView,
+				currentNode,
+				currentElement,
 				that = this;
 
 			function findParentView( element ) {
@@ -81,24 +81,72 @@ define( [
 				}
 			}
 
+			// search siblings in order to find one that has a view
+			// and can point to the node representing given element
+			function findNodeBySibling( element ) {
+				var dirs = [ 'nextSibling', 'previousSibling' ],
+					dir = dirs.shift(),
+					sibling = element[ dir ];
+
+				while ( sibling || dirs.length ) {
+					if ( !sibling ) {
+						dir = dirs.shift();
+					} else {
+						if ( sibling.dataset && sibling.dataset.vid ) {
+							var view = that.getView( sibling.dataset.vid );
+
+							if ( view ) {
+								return view.node[ dir === 'nextSibling' ? 'previousSibling' : 'nextSibling' ];
+							}
+						}
+					}
+
+					sibling = element[ dir ];
+				}
+
+				return null;
+			}
+
 			// get the top-most affected node
 			mutations.forEach( function( mutation ) {
-				var type = mutation.type;
+				// try to find the node using the sibling first
+				var target = mutation.target,
+					node, view;
 
-				var view = findParentView( mutation.target );
+				if ( target.dataset && target.dataset.vid ) {
+					view = that.getView( target.dataset.vid );
 
-				if ( view ) {
-					var offset = view.node.getOffset();
+					if ( view ) {
+						node = view.node;
+					}
+				}
 
-					// the model with the lowest offset would represent the top-most node in the modified node tree
+				if ( !node ) {
+					node = findNodeBySibling( target );
+				}
+
+				if ( !node ) {
+					view = findParentView( target );
+
+					if ( view ) {
+						node = view.node;
+					}
+				}
+
+				if ( node ) {
+					var offset = node.getOffset();
+
+					// the node with the lowest offset would represent the top-most node in the modified node tree
 					if ( offset < minOffset ) {
-						currentView = view;
+						currentNode = node;
+						currentElement = node.view ? node.view.getElement() : target;
 						minOffset = offset;
 					}
 				}
 			} );
 
-			console.log( currentView.node );
+			console.log( currentNode );
+			console.log( currentElement );
 		},
 
 		removeView: function( vid ) {
