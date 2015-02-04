@@ -166,7 +166,8 @@ define( [
 			var elementStack = [],
 				textStack = [],
 				currentElement,
-				parentElement;
+				parentElement,
+				hasWrapper;
 
 			function appendToCurrent( child ) {
 				currentElement.appendChild( child );
@@ -206,7 +207,11 @@ define( [
 
 					// opening element
 					if ( LinearData.isOpenElement( item ) ) {
-						// TODO remove temporary wrappers
+						// ignore temporary wrapper opening
+						if ( nodeType === 'paragraph' && item.internal && item.internal.temporary ) {
+							hasWrapper = true;
+							continue;
+						}
 
 						// we're inside of an element so let's make it a parent
 						if ( currentElement ) {
@@ -225,6 +230,12 @@ define( [
 
 						// closing element
 					} else if ( LinearData.isCloseElement( item ) ) {
+						// ignore temporary wrapper closing
+						if ( hasWrapper ) {
+							hasWrapper = false;
+							continue;
+						}
+
 						currentElement = currentElement.parentNode;
 						parentElement = currentElement ? currentElement.parentNode : null;
 					}
