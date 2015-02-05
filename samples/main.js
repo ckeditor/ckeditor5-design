@@ -97,7 +97,7 @@ require( [
 
 	buildTree( editor.editable.document.root, document.getElementById( 'tree' ) );
 
-	var elements = converter.getDomElementsForData( editor.editable.document.data.data, editor.editable.document.store, document );
+	// var elements = converter.getDomElementsForData( editor.editable.document.data.data, editor.editable.document.store, document );
 
 	/*var output = document.getElementById( 'output' );
 

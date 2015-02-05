@@ -33,15 +33,17 @@ define( [
 		dataProcessor.normalizeWhitespaces( dom );
 
 		// prepare the data array for the linear data
-		var data = converter.getDataForDom( dom, this.store );
+		var data = converter.getDataForDom( dom, this.store, null, true );
 
 		// document's linear data
 		this.data = new LinearData( data, this.store );
 
 		// create document tree root element
-		this.root = this.makeRoot();
+		this.root = this.buildTree();
+		this.root.view = new View( this.root, document.createElement( 'div' ) );
+		this.root.document = this;
+		this.editable.addView( this.root.view );
 
-		this.buildTree();
 		this.renderTree( this.root, this.root.view );
 	}
 
@@ -54,9 +56,7 @@ define( [
 				nodeStack = [];
 
 			// start with the topmost element - the document node
-			var currentNode = this.root;
-
-			parentStack.push( currentNode );
+			var currentNode;
 
 			// add the parent and current stacks to start with
 			nodeStack.push( parentStack, currentStack );
@@ -137,8 +137,7 @@ define( [
 				currentNode.length = textLength;
 			}
 
-			// finally push all the children to the root node
-			this.root.spliceArray( 0, 0, currentStack );
+			return currentStack[ 0 ];
 		},
 
 		// retrieve linear data for the given node
@@ -150,22 +149,6 @@ define( [
 			var offset = node.getOffset();
 
 			return this.data.slice( offset, offset + node.length );
-		},
-
-		makeRoot: function() {
-			// document's node tree
-			var RootNode = nodeManager.get( 'root' );
-			// create root node
-			var node = new RootNode();
-			// create root node's DOM element
-			var rootEl = document.createElement( 'div' );
-
-			node.view = new View( node, rootEl );
-			node.document = this;
-
-			this.editable.addView( node.view );
-
-			return node;
 		},
 
 		// render given node tree and append it to the parent

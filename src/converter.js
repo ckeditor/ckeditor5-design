@@ -16,82 +16,70 @@ define( [
 
 	Converter.prototype = {
 		// prepare linear data for the given DOM
-		// the parent argument is used to wrap the result in parent element opening/closing data
-		getDataForDom: function( dom, store, parent, parentAttributes ) {
-			var data = [];
+		getDataForDom: function( elem, store, parentAttributes, root ) {
+			var data = [],
+				attributes,
+				current;
 
-			// add parent element's opening tag
-			if ( utils.isObject( parent ) && parent.type ) {
-				data.push( parent );
+			// element
+			if ( elem.nodeType === Node.ELEMENT_NODE ) {
+				var nodeConstructor;
+
+				nodeConstructor = root ?
+					nodeManager.get( 'root' ) :
+					nodeManager.matchForDom( elem ) || nodeManager.get( 'unknown' );
+
+				// inline text
+				if ( nodeConstructor.prototype instanceof InlineNode ) {
+					// inline node's data contains attributes only
+					attributes = nodeConstructor.toData( elem );
+
+					// get index of a style in the store
+					var index = store.store( attributes );
+
+					// merge child's and parent's styles
+					attributes = [].concat( parentAttributes || [] );
+
+					// add child's style
+					if ( attributes.indexOf( index ) === -1 ) {
+						attributes.push( index );
+					}
+
+					// regular element
+				} else {
+					// create an opening data for current element
+					current = nodeConstructor.toData( elem );
+
+					data.push( current );
+				}
+
+				// collect data for all children
+				[].forEach.call( elem.childNodes, function( child ) {
+					var childData = this.getDataForDom( child, store, attributes );
+
+					if ( childData && childData.length ) {
+						data = data.concat( childData );
+					}
+				}, this );
+				// text
+			} else if ( elem.nodeType === Node.TEXT_NODE ) {
+				var text = elem.data;
+
+				// TODO IMPROOOOOOVE
+				// don't add empty text nodes
+				if ( text === '' || text.match( /^\s+$/ ) ) {
+					return;
+				}
+
+				var textData = this.getDataForText( elem.textContent, parentAttributes );
+
+				data = data.concat( textData );
 			}
 
-			// add data for child nodes
-			[].forEach.call( dom.childNodes, function( child ) {
-				var childData;
-
-				// element
-				if ( child.nodeType === Node.ELEMENT_NODE ) {
-					// TODO allow using multiple constructors no a single node
-					var nodeConstructor = nodeManager.matchForDom( child ) || nodeManager.get( 'unknown' );
-
-					// inline text
-					if ( nodeConstructor.prototype instanceof InlineNode ) {
-						// inline node's data contains attributes only
-						var childAttributes = nodeConstructor.toData( child );
-
-						// get index of a style in the store
-						var index = store.store( childAttributes );
-
-						// merge child's and parent's styles
-						childAttributes = [].concat( parentAttributes || [] );
-
-						// add child's style
-						if ( childAttributes.indexOf( index ) === -1 ) {
-							childAttributes.push( index );
-						}
-
-						// collect data for all children
-						childData = this.getDataForDom( child, store, null, childAttributes );
-						// regular element
-					} else {
-						var parentData = nodeConstructor.toData( child );
-						childData = this.getDataForDom( child, store, parentData );
-					}
-
-					data = data.concat( childData );
-					// text
-				} else if ( child.nodeType === Node.TEXT_NODE ) {
-					var text = child.data;
-
-					// don't add empty text nodes
-					if ( text === '' ) {
-						return;
-					}
-
-					// node contains whitespaces only
-					if ( text.match( /^\s+$/ ) ) {
-						// there's an element opening data before the text so ignore it
-						if ( data[ data.length - 1 ] && data[ data.length - 1 ].type ) {
-							return;
-						}
-
-						// TODO is that enough for now?
-					}
-
-					childData = this.getDataForText( child.textContent, parentAttributes );
-
-					data = data.concat( childData );
-				}
-			}, this );
-
-			// add parent element's closing tag
-			if ( utils.isObject( parent ) && parent.type ) {
-				// TODO should we put a closing tag for a void element?
-
-				// TODO remove empty text before the closing element data
-
+			// close the current element
+			if ( current ) {
 				data.push( {
-					type: '/' + parent.type
+					type: '/' + current.type
 				} );
 			}
 
