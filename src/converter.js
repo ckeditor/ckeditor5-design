@@ -23,9 +23,7 @@ define( [
 
 			// element
 			if ( elem.nodeType === Node.ELEMENT_NODE ) {
-				var nodeConstructor;
-
-				nodeConstructor = root ?
+				var nodeConstructor = root ?
 					nodeManager.get( 'root' ) :
 					nodeManager.matchForDom( elem ) || nodeManager.get( 'unknown' );
 
@@ -55,11 +53,7 @@ define( [
 
 				// collect data for all children
 				[].forEach.call( elem.childNodes, function( child ) {
-					var childData = this.getDataForDom( child, store, attributes );
-
-					if ( childData && childData.length ) {
-						data = data.concat( childData );
-					}
+					data = data.concat( this.getDataForDom( child, store, attributes ) );
 				}, this );
 				// text
 			} else if ( elem.nodeType === Node.TEXT_NODE ) {
@@ -68,7 +62,7 @@ define( [
 				// TODO IMPROOOOOOVE
 				// don't add empty text nodes
 				if ( text === '' || text.match( /^\s+$/ ) ) {
-					return;
+					return data;
 				}
 
 				var textData = this.getDataForText( elem.textContent, parentAttributes );

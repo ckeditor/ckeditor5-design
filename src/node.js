@@ -111,6 +111,12 @@ define( [ 'tools/utils' ], function( utils ) {
 		}
 	} );
 
+	Object.defineProperty( Node.prototype, 'type', {
+		get: function() {
+			return this.constructor.type;
+		}
+	} );
+
 	utils.extend( Node.prototype, {
 		// increase/decrease length by the given difference
 		adjustLength: function( difference ) {

@@ -16,7 +16,6 @@ define( [
 	}
 
 	utils.extend( RootNode, Branch, {
-		isWrapped: false,
 		type: 'root'
 	} );
 

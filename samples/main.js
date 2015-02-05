@@ -80,7 +80,7 @@ require( [
 	function buildTree( node, parentElem ) {
 		var elem = document.createElement( 'li' );
 
-		elem.innerHTML = node.constructor.type + ' <small>[' + node.length + ']</small>';
+		elem.innerHTML = node.type + ' <small>[' + node.length + ']</small>';
 
 		parentElem.appendChild( elem );
 
