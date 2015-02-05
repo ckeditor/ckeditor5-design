@@ -1,10 +1,12 @@
 define( [
+	'converter',
 	'document',
 	'definitions',
 	'tools/element',
 	'tools/emitter',
 	'tools/utils'
 ], function(
+	converter,
 	Document,
 	def,
 	Element,
@@ -91,6 +93,7 @@ define( [
 				while ( sibling || dirs.length ) {
 					if ( !sibling ) {
 						dir = dirs.shift();
+						sibling = element;
 					} else {
 						if ( sibling.dataset && sibling.dataset.vid ) {
 							var view = that.getView( sibling.dataset.vid );
@@ -101,7 +104,9 @@ define( [
 						}
 					}
 
-					sibling = element[ dir ];
+					if ( dir ) {
+						sibling = sibling[ dir ];
+					}
 				}
 
 				return null;
@@ -145,8 +150,11 @@ define( [
 				}
 			} );
 
-			console.log( currentNode );
+			var data = converter.getDataForDom( currentElement, this.document.store );
+
 			console.log( currentElement );
+			console.log( currentNode );
+			console.log( data );
 		},
 
 		removeView: function( vid ) {
