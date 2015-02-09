@@ -1,14 +1,14 @@
 define( [
-	'converter',
 	'document',
 	'definitions',
+	'transaction',
 	'tools/element',
 	'tools/emitter',
 	'tools/utils'
 ], function(
-	converter,
 	Document,
 	def,
+	Transaction,
 	Element,
 	Emitter,
 	utils
@@ -150,11 +150,7 @@ define( [
 				}
 			} );
 
-			var data = converter.getDataForDom( currentElement, this.document.store );
-
-			console.log( currentElement );
-			console.log( currentNode );
-			console.log( data );
+			var transaction = Transaction.createFromDomMutation( this.document, currentNode, currentElement );
 		},
 
 		removeView: function( vid ) {

@@ -25,6 +25,9 @@ define( [
 		// reference to the parent editable object
 		this.editable = editable;
 
+		// a store for applied transactions
+		this.history = [];
+
 		// create a detached copy of the source html
 		var dom = utils.createDocumentFromHTML( $el.html() ).body;
 
@@ -48,6 +51,16 @@ define( [
 	}
 
 	utils.extend( Document.prototype, Emitter, {
+		// apply a transaction to the document - update the linear data and document tree
+		applyTransaction: function( transaction ) {
+			if ( transaction.applied ) {
+				throw new Error( 'The transaction has already been applied.' );
+			}
+
+			transaction.applyTo( this );
+
+			this.history.push( transaction );
+		},
 		// build a node tree, collect the children first and then push them to their parents
 		// we use this oreder to calculate the lengths properly
 		buildTree: function() {
