@@ -45,25 +45,59 @@ define( [
 	}
 
 	function makeOperationsFromDiff( document, offset, oldData, newData ) {
+		console.time( 'diff' );
+		// TODO see if it's worth comparing objects and arrays as strings (via JSON.stringify)
 		var edits = diff( oldData, newData, areEqual );
+		console.timeEnd( 'diff' );
 
-		console.log( oldData );
-		console.log( newData );
+		// TODO see if we really need this
+		var a = utils.clone( oldData );
+		var b = utils.clone( newData );
 
-		edits.forEach( function( op ) {
-			if ( op === diff.INSERT ) {
-				console.log( '+', newData.shift() );
+		var ops = [],
+			retain = 0;
+
+		edits.forEach( function( edit ) {
+			// insert operation
+			if ( edit === diff.INSERT ) {
+				if ( retain ) {
+					ops.push( {
+						retain: retain
+					} );
+
+					retain = 0;
+				}
+
+				ops.push( {
+					insert: b.shift()
+				} );
 			}
 
-			if ( op === diff.DELETE ) {
-				console.log( '-', oldData.shift() );
+			// remove operation
+			if ( edit === diff.DELETE ) {
+				if ( retain ) {
+					ops.push( {
+						retain: retain
+					} );
+
+					retain = 0;
+				}
+
+				ops.push( {
+					remove: a.shift()
+				} );
 			}
 
-			if ( op === diff.EQUAL ) {
-				newData.shift();
-				console.log( '=', oldData.shift() );
+			// retain operation
+			if ( edit === diff.EQUAL ) {
+				retain++;
+
+				a.shift();
+				b.shift();
 			}
 		} );
+
+		return ops;
 	}
 
 	utils.extend( Transaction, {
