@@ -148,6 +148,7 @@ define( [
 
 			this.history.push( transaction );
 
+			// TODO this is just a temporary solution for development purposes
 			this.trigger( 'change' );
 		},
 

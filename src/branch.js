@@ -44,7 +44,7 @@ define( [
 		},
 
 		// we use splice in following methods so we don't have to recalculate the length each time,
-		// nor update child's parent/root
+		// nor update child's parent
 		pop: function() {
 			if ( this.children.length ) {
 				return this.splice( this.children.length - 1, 1 );
@@ -68,13 +68,13 @@ define( [
 				removedLength = 0,
 				addedLength = 0;
 
-			// calculate the overal length of removed items and clear the item's parent/root
+			// calculate the overal length of removed items and clear the item's parent
 			removed.forEach( function( node ) {
 				removedLength += node.length;
 				node.detach();
 			} );
 
-			// calculate the overal length of added items and set the item's parent/root
+			// calculate the overal length of added items and set the item's parent
 			if ( arguments.length > 2 ) {
 				[].slice.call( arguments, 2 ).forEach( function( node ) {
 					addedLength += node.length;

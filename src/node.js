@@ -6,7 +6,6 @@ define( [ 'tools/utils' ], function( utils ) {
 
 		this.document = null;
 		this.parent = null;
-		this.root = null;
 		this.view = null;
 
 		this._length = 0;
@@ -126,14 +125,12 @@ define( [ 'tools/utils' ], function( utils ) {
 		// attach node to the parent element
 		attachTo: function( target ) {
 			this.parent = target;
-			this.root = target.root;
 			this.document = target.document;
 		},
 
 		// detach the node
 		detach: function() {
 			this.parent = null;
-			this.root = null;
 			this.document = null;
 		},
 
@@ -148,7 +145,7 @@ define( [ 'tools/utils' ], function( utils ) {
 			var offset = this.parent.getOffset();
 
 			// add 1 for parent's opening element
-			if ( this.parent !== this.root ) {
+			if ( this.parent ) {
 				offset += 1;
 			}
 
