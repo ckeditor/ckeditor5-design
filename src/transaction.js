@@ -16,89 +16,6 @@ define( [
 		this.applied = false;
 	}
 
-	function areEqual( a, b ) {
-		if ( utils.isArray( a ) && utils.isArray( b ) ) {
-			// different lengths, so nope
-			if ( a.length !== b.length ) {
-				return false;
-			}
-
-			return a.every( function( value, i ) {
-				return areEqual( value, b[ i ] );
-			} );
-
-		} else if ( utils.isObject( a ) && utils.isObject( b ) ) {
-			var aKeys = Object.keys( a ),
-				bKeys = Object.keys( b );
-
-			// different keys, so nope
-			if ( !areEqual( aKeys, bKeys ) ) {
-				return false;
-			}
-
-			return aKeys.every( function( name ) {
-				return areEqual( a[ name ], b[ name ] );
-			} );
-		} else {
-			return a === b;
-		}
-	}
-
-	function makeOperationsFromDiff( document, offset, oldData, newData ) {
-		// TODO see if it's worth comparing objects and arrays as strings (via JSON.stringify)
-		var edits = diff( oldData, newData, areEqual );
-
-		// TODO see if we really need this
-		var a = utils.clone( oldData );
-		var b = utils.clone( newData );
-
-		var ops = [];
-		// include element offset in the first retain
-		var retain = offset;
-
-		edits.forEach( function( edit ) {
-			// insert operation
-			if ( edit === diff.INSERT ) {
-				if ( retain ) {
-					ops.push( {
-						retain: retain
-					} );
-
-					retain = 0;
-				}
-
-				ops.push( {
-					insert: b.shift()
-				} );
-			}
-
-			// remove operation
-			if ( edit === diff.DELETE ) {
-				if ( retain ) {
-					ops.push( {
-						retain: retain
-					} );
-
-					retain = 0;
-				}
-
-				ops.push( {
-					remove: a.shift()
-				} );
-			}
-
-			// retain operation
-			if ( edit === diff.EQUAL ) {
-				retain++;
-
-				a.shift();
-				b.shift();
-			}
-		} );
-
-		return ops;
-	}
-
 	utils.extend( Transaction, {
 		createFromDomMutation: function( document, node, element ) {
 			var oldData = document.getNodeData( node ),
@@ -106,7 +23,7 @@ define( [
 				newData = converter.getDataForDom( element, document.store, null, node.type === 'root' ),
 				transaction = new Transaction();
 
-			transaction.operations = makeOperationsFromDiff( document, offset, oldData, newData );
+			transaction.operations = makeOperationsFromDiff( oldData, newData, offset );
 
 			return transaction;
 		}
@@ -228,6 +145,89 @@ define( [
 			return transaction;
 		}
 	} );
+
+	function areEqual( a, b ) {
+		if ( utils.isArray( a ) && utils.isArray( b ) ) {
+			// different lengths, so nope
+			if ( a.length !== b.length ) {
+				return false;
+			}
+
+			return a.every( function( value, i ) {
+				return areEqual( value, b[ i ] );
+			} );
+
+		} else if ( utils.isObject( a ) && utils.isObject( b ) ) {
+			var aKeys = Object.keys( a ),
+				bKeys = Object.keys( b );
+
+			// different keys, so nope
+			if ( !areEqual( aKeys, bKeys ) ) {
+				return false;
+			}
+
+			return aKeys.every( function( name ) {
+				return areEqual( a[ name ], b[ name ] );
+			} );
+		} else {
+			return a === b;
+		}
+	}
+
+	function makeOperationsFromDiff( oldData, newData, offset ) {
+		// TODO see if it's worth comparing objects and arrays as strings (via JSON.stringify)
+		var edits = diff( oldData, newData, areEqual );
+
+		// TODO see if we really need this
+		var a = utils.clone( oldData );
+		var b = utils.clone( newData );
+
+		var ops = [];
+		// include element offset in the first retain
+		var retain = offset || 0;
+
+		edits.forEach( function( edit ) {
+			// insert operation
+			if ( edit === diff.INSERT ) {
+				if ( retain ) {
+					ops.push( {
+						retain: retain
+					} );
+
+					retain = 0;
+				}
+
+				ops.push( {
+					insert: b.shift()
+				} );
+			}
+
+			// remove operation
+			if ( edit === diff.DELETE ) {
+				if ( retain ) {
+					ops.push( {
+						retain: retain
+					} );
+
+					retain = 0;
+				}
+
+				ops.push( {
+					remove: a.shift()
+				} );
+			}
+
+			// retain operation
+			if ( edit === diff.EQUAL ) {
+				retain++;
+
+				a.shift();
+				b.shift();
+			}
+		} );
+
+		return ops;
+	}
 
 	return Transaction;
 } );
