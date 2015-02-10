@@ -13,8 +13,47 @@ require( [
 ) {
 	'use strict';
 
-	var editor = window.editor = new Editor( '#input' ),
-		html = [];
+	var editor = window.editor = new Editor( '#input' );
+
+	function printLinearData( data ) {
+		var html = [];
+
+		html = data.map( function( op ) {
+			op = utils.clone( op );
+
+			if ( Array.isArray( op ) ) {
+				if ( op[ 0 ] === ' ' ) {
+					op[ 0 ] = '_';
+					op[ 2 ] = 'whitespace';
+				} else {
+					op[ 2 ] = 'text';
+				}
+			} else if ( typeof op == 'string' ) {
+				if ( op === ' ' ) {
+					op = [ '_' ];
+					op[ 2 ] = 'whitespace';
+				} else {
+					op = [ op ];
+					op[ 2 ] = 'text';
+				}
+			} else {
+				op = typeof op == 'object' ? [ op.type, op.attributes ] : [ op ];
+				op[ 2 ] = 'tag';
+			}
+
+			return op;
+		} ).map( function( op, idx ) {
+			return [ '<tr>',
+				'<td>', idx, '</td>',
+				'<td class="', op[ 2 ], '">', op[ 0 ], '</td>',
+				'<td>', formatAttributes( op[ 1 ] ), '</td>',
+				'<td></td>',
+				'</tr>'
+			].join( '' );
+		} );
+
+		document.querySelector( '#data>tbody' ).innerHTML = html.join( '\n' );
+	}
 
 	function formatAttributes( attributes ) {
 		if ( utils.isArray( attributes ) ) {
@@ -37,42 +76,6 @@ require( [
 		}
 	}
 
-	html = editor.editable.document.data.data.map( function( op ) {
-		op = utils.clone( op );
-
-		if ( Array.isArray( op ) ) {
-			if ( op[ 0 ] === ' ' ) {
-				op[ 0 ] = '_';
-				op[ 2 ] = 'whitespace';
-			} else {
-				op[ 2 ] = 'text';
-			}
-		} else if ( typeof op == 'string' ) {
-			if ( op === ' ' ) {
-				op = [ '_' ];
-				op[ 2 ] = 'whitespace';
-			} else {
-				op = [ op ];
-				op[ 2 ] = 'text';
-			}
-		} else {
-			op = typeof op == 'object' ? [ op.type, op.attributes ] : [ op ];
-			op[ 2 ] = 'tag';
-		}
-
-		return op;
-	} ).map( function( op, idx ) {
-		return [ '<tr>',
-			'<td>', idx, '</td>',
-			'<td class="', op[ 2 ], '">', op[ 0 ], '</td>',
-			'<td>', formatAttributes( op[ 1 ] ), '</td>',
-			'<td></td>',
-			'</tr>'
-		].join( '' );
-	} );
-
-	document.querySelector( '#data>tbody' ).innerHTML = html.join( '\n' );
-
 	function buildTree( node, parentElem ) {
 		var elem = document.createElement( 'li' );
 
@@ -91,7 +94,19 @@ require( [
 		}
 	}
 
-	buildTree( editor.editable.document.root, document.getElementById( 'tree' ) );
+	printLinearData( editor.editable.document.data.get() );
+
+	// update the UI on document change
+	editor.editable.on( 'change', function() {
+		printLinearData( editor.editable.document.data.get() );
+		tree.innerHTML = '';
+		buildTree( editor.editable.document.root, tree );
+	} );
+
+	var tree = document.getElementById( 'tree' );
+
+	tree.innerHTML = '';
+	buildTree( editor.editable.document.root, tree );
 
 	// var elements = converter.getDomElementsForData( editor.editable.document.data.data, editor.editable.document.store, document );
 

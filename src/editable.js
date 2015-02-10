@@ -36,10 +36,11 @@ define( [
 		this.$documentView.appendTo( this.$el );
 		this.$documentView.attr( 'contenteditable', true );
 
+		// a store for applied transactions
+		this.history = [];
+
 		this.observer = new MutationObserver( this.handleMutation.bind( this ) );
 		this.observer.observe( this.$documentView.getElement(), config );
-
-		// this.$documentView.addListener( 'keydown', this.handleKeyDown.bind( this ) );
 	}
 
 	utils.extend( Editable.prototype, Emitter, {
@@ -49,15 +50,6 @@ define( [
 
 		getView: function( vid ) {
 			return this._views[ vid ] || null;
-		},
-
-		handleKeyDown: function( e ) {
-			// we want to handle ENTER key ourselves
-			switch ( e.keyCode ) {
-				case def.KEY.ENTER:
-					// TODO handle enter key
-					break;
-			}
 		},
 
 		handleMutation: function( mutations ) {
@@ -151,6 +143,12 @@ define( [
 			} );
 
 			var transaction = Transaction.createFromDomMutation( this.document, currentNode, currentElement );
+
+			transaction.applyTo( this.document );
+
+			this.history.push( transaction );
+
+			this.trigger( 'change' );
 		},
 
 		removeView: function( vid ) {
