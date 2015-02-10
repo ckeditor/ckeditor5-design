@@ -25,9 +25,6 @@ define( [
 		// reference to the parent editable object
 		this.editable = editable;
 
-		// a store for applied transactions
-		this.history = [];
-
 		// create a detached copy of the source html
 		var dom = utils.createDocumentFromHTML( $el.html() ).body;
 
@@ -162,6 +159,42 @@ define( [
 			var offset = node.getOffset();
 
 			return this.data.slice( offset, offset + node.length );
+		},
+
+		// retrieve a node that contains data at the given position
+		getNodeAtPosition: function( position ) {
+			function findNode( node, offset ) {
+				// the position points to this node's opening/closing items
+				if ( position === offset || position === offset + node.length - 1 ) {
+					return node;
+				}
+
+				var result = null;
+
+				if ( position > offset && position < offset + node.length - 1 ) {
+					// node has children so let's check which of them we're looking for
+					if ( node.children ) {
+						// increment the counter for the node's opening item
+						offset++;
+
+						node.children.some( function( child ) {
+							result = findNode( child, offset );
+
+							if ( result ) {
+								return true;
+							} else {
+								offset += child.length;
+							}
+						} );
+					} else {
+						result = node;
+					}
+				}
+
+				return result;
+			}
+
+			return findNode( this.root, 0 );
 		},
 
 		// render given node tree and append it to the parent
