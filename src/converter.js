@@ -162,6 +162,96 @@ define( [
 			}
 
 			return elementStack;
+		},
+
+		// build a node tree, collect the children first and then push them to their parents
+		// we use this order to calculate the lengths properly
+		getTreeForData: function( data, document ) {
+			var currentStack = [],
+				parentStack = [],
+				nodeStack = [];
+
+			// start with the topmost element - the document node
+			var currentNode;
+
+			// add the parent and current stacks to start with
+			nodeStack.push( parentStack, currentStack );
+
+			// length counter for a text node
+			var textLength = 0;
+
+			// flag that says if we're processing a text node
+			var inText = false;
+
+			for ( var i = 0, len = data.length; i < len; i++ ) {
+				// an element
+				if ( data.isElementAt( i ) ) {
+					// previous item was a text
+					if ( inText ) {
+						// set the final length of a text node
+						currentNode.length = textLength;
+						inText = false;
+						textLength = 0;
+						currentNode = parentStack[ parentStack.length - 1 ];
+					}
+
+					// an opening element
+					if ( data.isOpenElementAt( i ) ) {
+						var type = data.getTypeAt( i );
+						var item = data.get( i );
+
+						// create a node for this element and add it to the stack
+						currentNode = nodeManager.create( type, item );
+						currentNode.document = document;
+						currentStack.push( currentNode );
+
+						// node may contain children
+						if ( currentNode.children ) {
+							parentStack = currentStack;
+							currentStack = [];
+							nodeStack.push( currentStack );
+						}
+						// a closing element
+					} else {
+						// node may contain children
+						if ( currentNode.children ) {
+							var children = nodeStack.pop();
+
+							currentStack = parentStack;
+							parentStack = nodeStack[ nodeStack.length - 2 ];
+
+							if ( !parentStack ) {
+								throw new Error( 'This shouldn\'t happen - check the linear data' );
+							}
+
+							currentNode.spliceArray( 0, 0, children );
+						}
+
+						currentNode = parentStack[ parentStack.length - 1 ];
+					}
+
+					// a text
+				} else {
+					// start of a text
+					if ( !inText ) {
+						// create a text node and push it to the stack
+						currentNode = nodeManager.create( 'text' );
+						currentNode.document = document;
+						currentStack.push( currentNode );
+
+						inText = true;
+					}
+
+					textLength++;
+				}
+			}
+
+			// we ended up with text so just update the current node's length
+			if ( inText ) {
+				currentNode.length = textLength;
+			}
+
+			return currentStack[ 0 ];
 		}
 	};
 
