@@ -89,8 +89,8 @@ define( [
 		},
 
 		// an alias to the splice method that accepts an array of new items
-		spliceArray: function( add, remove, items ) {
-			return this.splice.apply( this, [ add, remove ].concat( items ) );
+		spliceArray: function( index, remove, items ) {
+			return this.splice.apply( this, [ index, remove ].concat( items ) );
 		},
 
 		unshift: function( child ) {
