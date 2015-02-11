@@ -46,7 +46,7 @@ define( [
 
 				// TODO this is just a silly workaround
 				// we haven't found a text node, this usually happens when the carret is at the end of a text node
-				if ( !node || !node.isWrapped ) {
+				if ( !node || node.isWrapped ) {
 					node = document.getNodeAtPosition( offset - 1 );
 				}
 
@@ -73,7 +73,10 @@ define( [
 				} );
 			}
 
+			// an iterator representing the current offset in the linear data
 			var offset = 0;
+			// an iterator representing the change in the offset caused by insert/remove operations
+			var offsetDelta = 0;
 
 			this.operations.forEach( function( operation ) {
 				var node, type;
@@ -88,9 +91,11 @@ define( [
 					// update the linear data
 					document.data.splice( offset, 0, operation.insert );
 
+					offsetDelta++;
+
 					// it's a text content so just update the lengths of nodes and their parents
 					if ( utils.isString( operation.insert ) || utils.isArray( operation.insert ) ) {
-						saveToUpdateLength( offset, 1 );
+						saveToUpdateLength( offset - offsetDelta, 1 );
 					} else if ( utils.isObject( operation.insert ) ) {
 						// TODO
 					}
@@ -102,9 +107,11 @@ define( [
 					// update the linear data
 					document.data.splice( offset, 1 );
 
+					offsetDelta--;
+
 					// it's a text content so just update the lengths of nodes and their parents
 					if ( utils.isString( operation.remove ) || utils.isArray( operation.remove ) ) {
-						saveToUpdateLength( offset, -1 );
+						saveToUpdateLength( offset - offsetDelta, -1 );
 					} else {
 						// TODO
 					}
