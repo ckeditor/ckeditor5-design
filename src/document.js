@@ -39,7 +39,7 @@ define( [
 		this.data = new LinearData( data, this.store );
 
 		// create document tree root element
-		this.root = converter.getTreeForData( this.data, this );
+		this.root = converter.getNodesForData( this.data, this )[ 0 ];
 		this.root.view = new View( this.root, document.createElement( 'div' ) );
 		this.root.document = this;
 		this.editable.addView( this.root.view );

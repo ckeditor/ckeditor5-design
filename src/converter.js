@@ -166,7 +166,7 @@ define( [
 
 		// build a node tree, collect the children first and then push them to their parents
 		// we use this order to calculate the lengths properly
-		getTreeForData: function( data, document ) {
+		getNodesForData: function( data, document ) {
 			var currentStack = [],
 				parentStack = [],
 				nodeStack = [];
@@ -251,7 +251,7 @@ define( [
 				currentNode.length = textLength;
 			}
 
-			return currentStack[ 0 ];
+			return currentStack;
 		}
 	};
 
