@@ -39,6 +39,26 @@ define( [
 	} );
 
 	utils.extend( LinearData.prototype, {
+		clone: function() {
+			return this.constructor( utils.clone( this.data ), this.store );
+		},
+
+		cloneSlice: function( start, end ) {
+			var data = this.slice( start, end );
+
+			return new LinearData( utils.clone( data ), this.store );
+		},
+
+		get: function( idx ) {
+			return idx !== undefined ? this.data[ idx ] : this.data;
+		},
+
+		getTypeAt: function( idx ) {
+			var item = this.data[ idx ];
+
+			return item && this.constructor.getType( item );
+		},
+
 		isCloseElementAt: function( idx ) {
 			var item = this.data[ idx ];
 
@@ -57,26 +77,12 @@ define( [
 			return item && this.constructor.isOpenElement( item );
 		},
 
-		get: function( idx ) {
-			return idx !== undefined ? this.data[ idx ] : this.data;
-		},
-
-		getTypeAt: function( idx ) {
-			var item = this.data[ idx ];
-
-			return item && this.constructor.getType( item );
-		},
-
-		set: function( idx, value ) {
-			this.data[ idx ] = value;
-		},
-
 		push: function( value ) {
 			this.data.push( value );
 		},
 
-		clone: function() {
-			return this.constructor( utils.clone( this.data ), this.store );
+		set: function( idx, value ) {
+			this.data[ idx ] = value;
 		},
 
 		slice: function() {
