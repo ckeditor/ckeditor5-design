@@ -80,10 +80,17 @@ define( [
 				} );
 			}
 
-			// an iterator representing the current offset in the linear data
+			// a counter representing the current offset in the linear data
 			var offset = 0;
-			// an iterator representing the change in the offset caused by insert/remove operations
-			var offsetDelta = 0;
+
+			var leftOffset = null;
+
+			// a counter representing the number of inserted data items
+			var added = 0;
+			// a counter representing the number of removed data items
+			var removed = 0;
+			// a flag that tells if the document tree needs to be rebuilt
+			var rebuildTree = false;
 
 			this.operations.forEach( function( operation ) {
 				var node, type;
@@ -93,20 +100,27 @@ define( [
 					offset += operation.retain;
 				}
 
+				// find the first index we're working on
+				if ( leftOffset === null ) {
+					leftOffset = offset;
+				}
+
 				// insert new data
 				if ( operation.insert ) {
 					// update the linear data
 					document.data.splice( offset, 0, operation.insert );
 
-					offsetDelta++;
+					added++;
 
 					// it's a text content so just update the lengths of nodes and their parents
 					if ( utils.isString( operation.insert ) || utils.isArray( operation.insert ) ) {
-						saveToUpdateLength( offset - offsetDelta, 1 );
-					} else if ( utils.isObject( operation.insert ) ) {
-						// TODO
+						saveToUpdateLength( offset - added + removed, 1 );
+					} else {
+						rebuildTree = true;
 					}
 
+					// we must move to the next data element, otherwise a subsequent inserted character
+					// would come in before the previously added character
 					offset++;
 				}
 
@@ -114,18 +128,70 @@ define( [
 					// update the linear data
 					document.data.splice( offset, 1 );
 
-					offsetDelta--;
+					removed++;
 
 					// it's a text content so just update the lengths of nodes and their parents
 					if ( utils.isString( operation.remove ) || utils.isArray( operation.remove ) ) {
-						saveToUpdateLength( offset - offsetDelta, -1 );
+						saveToUpdateLength( offset - added + removed, -1 );
 					} else {
-						// TODO
+						rebuildTree = true;
 					}
 				}
 			}, this );
 
-			updateLengths();
+			// rebuild the document tree structure
+			if ( rebuildTree ) {
+				console.log( 'rebuild the tree' );
+
+				var rightOffset = offset - added + removed - ( removed > 0 ? 1 : 0 );
+
+				var firstNode = document.getNodeAtPosition( leftOffset );
+				var lastNode = document.getNodeAtPosition( rightOffset );
+
+				// we found a text node but we need something that refers to the actual DOM element
+				if ( !firstNode.isWrapped ) {
+					firstNode = firstNode.parent;
+				}
+
+				if ( !lastNode.isWrapped ) {
+					lastNode = lastNode.parent;
+				}
+
+				// beginning of the data to be rebuilt
+				var start = firstNode.getOffset();
+
+				// end of the data to be rebuilt
+				var end = lastNode.getOffset() + lastNode.length + added - removed;
+
+				// a subset of linear data for new tree nodes
+				var data = document.data.cloneSlice( start, end );
+
+				var newNodes = converter.getNodesForData( data, document );
+
+				console.log( 'f', firstNode );
+				console.log( 'l', lastNode );
+
+				console.log( newNodes );
+
+				// TODO what about views? should we point to the elements in the dirty DOM or build new elements
+				// and replace them in the dirty DOM?
+
+				// first node is the last node so inject new nodes in place of the old one
+				if ( firstNode === lastNode ) {
+					firstNode.replace( newNodes );
+					// replace the old nodes and anything between them with new nodes
+				} else {
+					// TODO
+				}
+
+				// TODO add new nodes to the tree and remove missing ones
+				// TODO replace anything between the firstNode and the lastNode
+
+				// just update the lengths of existing document nodes
+			} else {
+				console.log( 'update lengths' );
+				updateLengths();
+			}
 
 			this.applied = true;
 		},
