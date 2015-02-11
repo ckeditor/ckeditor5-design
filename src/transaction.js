@@ -45,9 +45,16 @@ define( [
 				var node = document.getNodeAtPosition( offset );
 
 				// TODO this is just a silly workaround
-				// we haven't found a text node, this usually happens when the carret is at the end of a text node
+				// we haven't found a text node
+				// this usually happens when the carret is at the beginning/end of a text node
+				// let's try on the left
 				if ( !node || node.isWrapped ) {
 					node = document.getNodeAtPosition( offset - 1 );
+				}
+
+				// we still haven't found a text node o let's try on the right
+				if ( !node || node.isWrapped ) {
+					node = document.getNodeAtPosition( offset + 1 );
 				}
 
 				var idx = toUpdate.indexOf( node );
