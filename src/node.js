@@ -163,6 +163,20 @@ define( [ 'tools/utils' ], function( utils ) {
 			}
 
 			return offset;
+		},
+
+		replace: function( nodes ) {
+			if ( !this.parent ) {
+				throw new Error( 'Cannot replace a node that is not a child.' );
+			}
+
+			if ( !utils.isArray( nodes ) ) {
+				nodes = [ nodes ];
+			}
+
+			var idx = this.parent.indexOf( this );
+
+			this.parent.spliceArray( idx, 1, nodes );
 		}
 	} );
 
