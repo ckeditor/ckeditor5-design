@@ -46,7 +46,7 @@ define( [
 
 				// TODO this is just a silly workaround
 				// we haven't found a text node, this usually happens when the carret is at the end of a text node
-				if ( !node.isWrapped ) {
+				if ( !node || !node.isWrapped ) {
 					node = document.getNodeAtPosition( offset - 1 );
 				}
 
@@ -176,11 +176,9 @@ define( [
 
 	function makeOperationsFromDiff( oldData, newData, offset ) {
 		// TODO see if it's worth comparing objects and arrays as strings (via JSON.stringify)
+		console.time( 'diff' );
 		var edits = diff( oldData, newData, areEqual );
-
-		// TODO see if we really need this
-		var a = utils.clone( oldData );
-		var b = utils.clone( newData );
+		console.timeEnd( 'diff' );
 
 		var ops = [];
 		// include element offset in the first retain
@@ -198,7 +196,7 @@ define( [
 				}
 
 				ops.push( {
-					insert: b.shift()
+					insert: newData.shift()
 				} );
 			}
 
@@ -213,7 +211,7 @@ define( [
 				}
 
 				ops.push( {
-					remove: a.shift()
+					remove: oldData.shift()
 				} );
 			}
 
@@ -221,8 +219,8 @@ define( [
 			if ( edit === diff.EQUAL ) {
 				retain++;
 
-				a.shift();
-				b.shift();
+				oldData.shift();
+				newData.shift();
 			}
 		} );
 

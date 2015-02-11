@@ -108,9 +108,9 @@ require( [
 	tree.innerHTML = '';
 	buildTree( editor.editable.document.root, tree );
 
-	// var elements = converter.getDomElementsForData( editor.editable.document.data.data, editor.editable.document.store, document );
+	/*var elements = converter.getDomElementsForData( editor.editable.document.data.data, editor.editable.document.store, document );
 
-	/*var output = document.getElementById( 'output' );
+	var output = document.getElementById( 'output' );
 
 	elements.forEach( function( elem ) {
 		output.appendChild( elem );
