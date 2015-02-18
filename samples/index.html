@@ -4,26 +4,25 @@
 	<meta charset="UTF-8">
 	<title>Document Representation</title>
 	<style>
-	body {
+	html, body {
+		height: 100%;
+		margin: 0;
+		padding: 0;
+		overflow: hidden;
 		font-family: sans-serif;
 	}
 
-	p {
+	#input {
+		width: 50%;
+		height: 100%;
+		overflow-y: scroll;
+	}
+
+	#input p {
 		margin: 0 0 0.5em 0;
 	}
 
 	#input,
-	#output,
-	#tree,
-	#data {
-		box-sizing: border-box;
-		border: 1px solid #ccc;
-		padding: 10px;
-		width: 50%;
-	}
-
-	#input,
-	#output,
 	#tree {
 		float: left;
 	}
@@ -51,6 +50,12 @@
 		padding: 5px;
 	}
 
+	#input,
+	#tree,
+	#data {
+		box-sizing: border-box;
+	}
+
 	td.tag {
 		background: #cef;
 	}
@@ -61,25 +66,6 @@
 
 	td.text {
 		background: #cfc;
-	}
-
-	.float-right {
-		float: right;
-	}
-
-	#input:before {
-		content: 'Input';
-		font-weight: bold;
-	}
-
-	#output:before {
-		content: 'Output';
-		font-weight: bold;
-	}
-
-	#tree:before {
-		content: 'Document Tree';
-		font-weight: bold;
 	}
 
 	#tree, #tree ul {
@@ -107,6 +93,63 @@
 	#tree small {
 		color: #ccc;
 	}
+
+	.wrap {
+		float: right;
+		width: 50%;
+		height: 100%;
+		overflow-y: scroll;
+	}
+
+	.tabs {
+		float: right;
+		list-style: none;
+		position: relative;
+		width: 100%;
+		padding: 0;
+		margin: 0;
+		border-bottom: 1px solid #ccc;
+	}
+
+	.tabs > li {
+		float: left;
+	}
+
+	.tabs input[type=radio] {
+		position: absolute;
+		top: -9999px;
+		left: -9999px;
+	}
+	
+	.tabs label {
+		display: block;
+		padding: 5px 10px;
+		cursor: pointer;
+		position: relative;
+		left: 1px;
+	}
+
+	[id^=tab]:checked + label {
+		border: 1px solid #ccc;
+		border-bottom: 1px solid #fff;
+		font-weight: bold;
+		top: 1px;
+	}
+
+	[id^=tab]:checked ~ .tab-content {
+		display: block;
+	}
+
+	.tab-content {
+		z-index: 2;
+		display: none;
+		text-align: left;
+		width: 100%;
+		position: absolute;
+		left: 0;
+		box-sizing: border-box;
+		padding-top: 10px;
+	}
 	</style>
 </head>
 <body>
@@ -127,19 +170,31 @@
 	<p>Lorem ipsum dolor sit amet,<br> consectetur adipisicing elit.</p>
     <p>by <a href="http://cksource.com">CKSource</a></p>
 	</div>
-	<table id="data">
-		<thead>
-			<tr>
-				<th>Pos</th>
-				<th>Insert</th>
-				<th>Attributes</th>
-				<th>Meta Data</th>
-			</tr>
-		</thead>
-		<tbody>
-		</tbody>
-	</table>
-	<ul id="tree"></ul>
+	<div class="wrap">
+		<ul class="tabs">
+			<li>
+				<input type="radio" checked name="tabs" id="tab1">
+				<label for="tab1">Linear Data</label>
+				<table id="data" class="tab-content">
+					<thead>
+						<tr>
+							<th>Pos</th>
+							<th>Insert</th>
+							<th>Attributes</th>
+							<th>Meta Data</th>
+						</tr>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>
+			</li>
+			<li>
+				<input type="radio" name="tabs" id="tab2">
+				<label for="tab2">Document Tree</label>
+				<ul id="tree" class="tab-content"></ul>
+			</li>
+		</ul>
+	</div>
 	<script src="../lib/require.js" data-main="main"></script>
 </body>
 </html>
