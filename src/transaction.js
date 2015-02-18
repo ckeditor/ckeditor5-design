@@ -153,19 +153,21 @@ define( [
 				var lastItem = document.data.get( offset );
 
 				// this means that we are injecting things between two tags, so none of the existing nodes were affected
-				if ( firstItem === lastItem ) {
-					console.log( 'inject between tags' );
+				if ( utils.isObject( firstItem ) && firstItem.type && firstItem === lastItem ) {
+					console.log( 'inject between tags', firstItem );
 					data = document.data.cloneSlice( leftOffset, offset );
 
 					firstNode = document.getNodeAtPosition( leftOffset );
-
+					newNodes = converter.getNodesForData( data, document );
 					parent = firstNode.parent;
 
-					var firstNodeIndex = parent.indexOf( firstNode );
+					if ( parent ) {
+						parent.spliceArray( parent.indexOf( firstNode ), 0, newNodes );
+					} else {
+						firstNode.spliceArray( firstNode.childLength, 0, newNodes );
+					}
 
-					newNodes = converter.getNodesForData( data, document );
-
-					parent.spliceArray( firstNodeIndex, 0, newNodes );
+					// TODO create views for new nodes and add references to existing DOM elements
 
 				} else {
 
