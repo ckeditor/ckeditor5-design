@@ -21,7 +21,13 @@ define( [
 		return new Element( el );
 	};
 
-	Element.prototype = {
+	Object.defineProperty( Element.prototype, 'detached', {
+		get: function() {
+			return !this._el.parentNode;
+		}
+	} );
+
+	utils.extend( Element.prototype, {
 		addClass: function( value ) {
 			this._el.classList.add( value.split( sepPattern ) );
 
@@ -92,25 +98,31 @@ define( [
 		},
 
 		insertAfter: function( sibling ) {
-			this._el.parentNode.insertBefore(
-				sibling instanceof Element ? sibling._el : sibling,
-				this._el.nextSibling
-			);
+			if ( !this.detached ) {
+				this._el.parentNode.insertBefore(
+					sibling instanceof Element ? sibling._el : sibling,
+					this._el.nextSibling
+				);
+			}
 
 			return this;
 		},
 
 		insertBefore: function( sibling ) {
-			this._el.parentNode.insertBefore(
-				sibling instanceof Element ? sibling._el : sibling,
-				his._el
-			);
+			if ( !this.detached ) {
+				this._el.parentNode.insertBefore(
+					sibling instanceof Element ? sibling._el : sibling,
+					his._el
+				);
+			}
 
 			return this;
 		},
 
 		remove: function() {
-			this._el.parentNode.removeChild( this._el );
+			if ( !this.detached ) {
+				this._el.parentNode.removeChild( this._el );
+			}
 
 			return this;
 		},
@@ -164,7 +176,7 @@ define( [
 
 			return this;
 		}
-	};
+	} );
 
 	return Element;
 } );
