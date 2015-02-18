@@ -142,6 +142,9 @@ define( [
 				}
 			} );
 
+			// TODO optimization:
+			// reduce the amount of data to diff by using a range of nodes and elements affected by the mutation
+
 			var transaction = Transaction.createFromDomMutation( this.document, currentNode, currentElement );
 
 			transaction.applyTo( this.document );

@@ -82,15 +82,16 @@ define( [
 
 			// a counter representing the current offset in the linear data
 			var offset = 0;
-
+			// a beginning offset used later to find out what was the first node affected by changes
 			var leftOffset = null;
-
 			// a counter representing the number of inserted data items
 			var added = 0;
 			// a counter representing the number of removed data items
 			var removed = 0;
 			// a flag that tells if the document tree needs to be rebuilt
 			var rebuildTree = false;
+
+			var firstItem = null;
 
 			this.operations.forEach( function( operation ) {
 				var node, type;
@@ -103,6 +104,7 @@ define( [
 				// find the first index we're working on
 				if ( leftOffset === null ) {
 					leftOffset = offset;
+					firstItem = document.data.get( offset );
 				}
 
 				// insert new data
@@ -124,6 +126,7 @@ define( [
 					offset++;
 				}
 
+				// remove data
 				if ( operation.remove ) {
 					// update the linear data
 					document.data.splice( offset, 1 );
@@ -142,46 +145,74 @@ define( [
 			// rebuild the document tree structure
 			if ( rebuildTree ) {
 				console.log( 'rebuild the tree' );
+				var data, start, end, firstNode, lastNode, newNodes, parent;
 
+				// calculate the ending offset to locate the last affected node
 				var rightOffset = offset - added + removed - ( removed > 0 ? 1 : 0 );
 
-				var firstNode = document.getNodeAtPosition( leftOffset );
-				var lastNode = document.getNodeAtPosition( rightOffset );
+				var lastItem = document.data.get( offset );
 
-				// we found a text node but we need something that refers to the actual DOM element
-				if ( !firstNode.isWrapped ) {
-					firstNode = firstNode.parent;
-				}
+				// this means that we are injecting things between two tags, so none of the existing nodes were affected
+				if ( firstItem === lastItem ) {
+					console.log( 'inject between tags' );
+					data = document.data.cloneSlice( leftOffset, offset );
 
-				if ( !lastNode.isWrapped ) {
-					lastNode = lastNode.parent;
-				}
+					firstNode = document.getNodeAtPosition( leftOffset );
 
-				// beginning of the data to be rebuilt
-				var start = firstNode.getOffset();
+					parent = firstNode.parent;
 
-				// end of the data to be rebuilt
-				var end = lastNode.getOffset() + lastNode.length + added - removed;
+					var firstNodeIndex = parent.indexOf( firstNode );
 
-				// a subset of linear data for new tree nodes
-				var data = document.data.cloneSlice( start, end );
+					newNodes = converter.getNodesForData( data, document );
 
-				var newNodes = converter.getNodesForData( data, document );
+					parent.spliceArray( firstNodeIndex, 0, newNodes );
 
-				console.log( 'f', firstNode );
-				console.log( 'l', lastNode );
-
-				console.log( newNodes );
-
-				// TODO what about views? should we point to the elements in the dirty DOM or build new elements
-				// and replace them in the dirty DOM?
-
-				// first node is the last node so inject new nodes in place of the old one
-				if ( firstNode === lastNode ) {
-					firstNode.replace( newNodes );
-					// replace the old nodes and anything between them with new nodes
 				} else {
-					// TODO
+
+					firstNode = document.getNodeAtPosition( leftOffset );
+					lastNode = document.getNodeAtPosition( rightOffset );
+
+					// we found a text node but we need something that refers to the actual DOM element
+					if ( !firstNode.isWrapped ) {
+						firstNode = firstNode.parent;
+					}
+
+					if ( !lastNode.isWrapped ) {
+						lastNode = lastNode.parent;
+					}
+
+					// beginning of the data to be rebuilt
+					start = firstNode.getOffset();
+
+					// end of the data to be rebuilt
+					end = lastNode.getOffset() + lastNode.length + added - removed;
+
+					// a subset of linear data for new tree nodes
+					data = document.data.cloneSlice( start, end );
+
+					console.log( start, end );
+					console.log( data );
+
+					newNodes = converter.getNodesForData( data, document );
+
+					console.log( 'f', firstNode );
+					console.log( 'l', lastNode );
+					console.log( 'new', newNodes );
+
+					// first node is the last node so inject new nodes in place of the old one
+					if ( firstNode === lastNode ) {
+						console.log( 'a single node was affected, replace it' );
+						// replace the old nodes and anything between them with new nodes
+
+						parent = firstNode.parent;
+
+						// firstNode.replace( newNodes );
+
+
+					} else {
+						console.log( 'a range of nodes was affected' );
+						// TODO
+					}
 				}
 
 				// TODO add new nodes to the tree and remove missing ones
