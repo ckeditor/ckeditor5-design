@@ -100,6 +100,21 @@ define( [
 				return null;
 			}
 
+			// try to identify node representing the given element using its parent
+			function findNodeByParent( element ) {
+				var parent = element.parentElement;
+
+				if ( parent && parent.dataset && parent.dataset.vid ) {
+					var view = that.getView( parent.dataset.vid );
+
+					if ( view && view.node && view.node.children ) {
+						return view.node.childAt( 0 );
+					}
+				}
+
+				return null;
+			}
+
 			var nodes = [];
 			var elements = [];
 
@@ -124,6 +139,11 @@ define( [
 				}
 
 				// node doesn't have syblings, try identify it using its parent
+				if ( !node ) {
+					node = findNodeByParent( target );
+				}
+
+				// node's parent doesn't refer to any view, lets find the closest ancestor that has one
 				if ( !node ) {
 					view = findParentView( target );
 
