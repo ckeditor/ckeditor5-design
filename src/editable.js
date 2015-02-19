@@ -53,11 +53,7 @@ define( [
 		},
 
 		handleMutation: function( mutations ) {
-			var target,
-				minOffset = Infinity,
-				currentNode,
-				currentElement,
-				that = this;
+			var that = this;
 
 			function findParentView( element ) {
 				var topEl = that.$el.getElement();
@@ -104,12 +100,16 @@ define( [
 				return null;
 			}
 
+			var nodes = [];
+			var elements = [];
+
 			// get the top-most affected node
 			mutations.forEach( function( mutation ) {
 				// try to find the node using the sibling first
 				var target = mutation.target,
 					node, view;
 
+				// try identifying a node in the document tree using a view
 				if ( target.dataset && target.dataset.vid ) {
 					view = that.getView( target.dataset.vid );
 
@@ -118,10 +118,12 @@ define( [
 					}
 				}
 
+				// node doesn't have a view attached, try finding it using siblings
 				if ( !node ) {
 					node = findNodeBySibling( target );
 				}
 
+				// node doesn't have syblings, try identify it using its parent
 				if ( !node ) {
 					view = findParentView( target );
 
@@ -130,26 +132,36 @@ define( [
 					}
 				}
 
-				if ( node ) {
-					var offset = node.getOffset();
-
-					// the node with the lowest offset would represent the top-most node in the modified node tree
-					if ( offset < minOffset ) {
-						currentNode = node;
-						currentElement = node.view ? node.view.getElement() : target;
-						minOffset = offset;
-					}
+				// we found a node and it's not in the nodes array yet
+				if ( node && nodes.indexOf( node ) === -1 ) {
+					nodes.push( node );
+					elements.push( node.view ? node.view.getElement() : target );
 				}
 			} );
 
-			// TODO optimization:
-			// reduce the amount of data to diff by using a range of nodes and elements affected by the mutation
+			// go through all the nodes and check if they already have their ancestors in the array
+			// in order to reduce the number of transactions
+			for ( var i = 0; i < nodes.length; i++ ) {
+				var node = nodes[ i ];
+				for ( var j = 0; j < nodes.length; j++ ) {
+					if ( node.hasAncestor( nodes[ j ] ) ) {
+						nodes.splice( i, 1 );
+						elements.splice( i, 1 );
+						i--;
+					}
+				}
+			}
 
-			var transaction = Transaction.createFromDomMutation( this.document, currentNode, currentElement );
+			console.log( nodes );
 
-			transaction.applyTo( this.document );
+			nodes.forEach( function( node, i ) {
+				var transaction = Transaction.createFromNodeAndElement( this.document, node, elements[ i ] );
 
-			this.history.push( transaction );
+				transaction.applyTo( this.document );
+
+				this.history.push( transaction );
+			}, this );
+
 
 			// TODO this is just a temporary solution for development purposes
 			this.trigger( 'change' );

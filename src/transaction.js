@@ -17,7 +17,7 @@ define( [
 	}
 
 	utils.extend( Transaction, {
-		createFromDomMutation: function( document, node, element ) {
+		createFromNodeAndElement: function( document, node, element ) {
 			var oldData = document.getNodeData( node ),
 				offset = node.getOffset(),
 				newData = converter.getDataForDom( element, document.store, null, node.type === 'root' ),
@@ -205,12 +205,7 @@ define( [
 					if ( firstNode === lastNode ) {
 						console.log( 'a single node was affected, replace it' );
 						// replace the old nodes and anything between them with new nodes
-
-						parent = firstNode.parent;
-
-						// firstNode.replace( newNodes );
-
-
+						firstNode.replace( newNodes );
 					} else {
 						console.log( 'a range of nodes was affected' );
 						// TODO

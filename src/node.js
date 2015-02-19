@@ -165,6 +165,19 @@ define( [ 'tools/utils' ], function( utils ) {
 			return offset;
 		},
 
+		// check if the given node is this node's ancestor
+		hasAncestor: function( node ) {
+			var current = this;
+
+			while ( ( current = current.parent ) ) {
+				if ( current === node ) {
+					return true;
+				}
+			}
+
+			return false;
+		},
+
 		replace: function( nodes ) {
 			if ( !this.parent ) {
 				throw new Error( 'Cannot replace a node that is not a child.' );
