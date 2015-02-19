@@ -80,6 +80,26 @@ define( [
 				} );
 			}
 
+			// go through all view's children and unsets their data-vid property they are pointing to
+			// if such view refers to a detached node
+			function cleanViews( view ) {
+				var children = view.getElement().children;
+
+				for ( var i = 0, len = children.length; i < len; i++ ) {
+					var child = children[ i ],
+						vid;
+
+					if ( child.dataset && ( vid = child.dataset.vid ) ) {
+						var childView = document.editable.getView( child.dataset.vid );
+
+						if ( !childView || ( childView.node && !childView.node.document ) ) {
+							delete child.dataset.vid;
+							document.editable.removeView( vid );
+						}
+					}
+				}
+			}
+
 			// a counter representing the current offset in the linear data
 			var offset = 0;
 			// a beginning offset used later to find out what was the first node affected by changes
@@ -93,8 +113,8 @@ define( [
 
 			var firstItem = null;
 
-			this.operations.forEach( function( operation ) {
-				var node, type;
+			for ( var i = 0, len = this.operations.length; i < len; i++ ) {
+				var operation = this.operations[ i ];
 
 				// update the offset
 				if ( operation.retain ) {
@@ -140,7 +160,7 @@ define( [
 						rebuildTree = true;
 					}
 				}
-			}, this );
+			}
 
 			// rebuild the document tree structure
 			if ( rebuildTree ) {
@@ -204,8 +224,14 @@ define( [
 					// first node is the last node so inject new nodes in place of the old one
 					if ( firstNode === lastNode ) {
 						console.log( 'a single node was affected, replace it' );
+						parent = firstNode.parent;
+
+						var parentView = parent.view;
+
 						// replace the old nodes and anything between them with new nodes
 						firstNode.replace( newNodes );
+
+						cleanViews( parentView );
 					} else {
 						console.log( 'a range of nodes was affected' );
 						// TODO
