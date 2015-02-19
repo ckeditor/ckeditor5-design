@@ -44,13 +44,9 @@ define( function() {
 			_DELETE = DELETE;
 		}
 
-		// add empty items at the beginning because we want to compare the first array items as well
-		a = [ null ].concat( a );
-		b = [ null ].concat( b );
-
 		// -1 the length to balance "null" at the beginning
-		var m = a.length - 1,
-			n = b.length - 1,
+		var m = a.length,
+			n = b.length,
 			delta = n - m;
 
 		// edit scripts
@@ -61,10 +57,9 @@ define( function() {
 		function snake( k ) {
 			// we use -1 below to handle initial values ( instead of filling the fp with -1 first )
 			// y on the diagonal below k
-			var y1 = ( fp[ k - 1 ] || -1 ) + 1;
+			var y1 = ( fp[ k - 1 ] !== undefined ? fp[ k - 1 ] : -1 ) + 1;
 			// y on the diagonal above k
-			var y2 = fp[ k + 1 ] || -1;
-
+			var y2 = fp[ k + 1 ] !== undefined ? fp[ k + 1 ] : -1;
 			var dir = y1 > y2 ? -1 : 1;
 
 			// clone previous operations array (if any)
@@ -85,7 +80,7 @@ define( function() {
 				x = y - k;
 
 			// traverse the diagonal as long as the values match
-			while ( x < m && y < n && cmp( a[ x + 1 ], b[ y + 1 ] ) ) {
+			while ( x < m && y < n && cmp( a[ x ], b[ y ] ) ) {
 				x++;
 				y++;
 				// push no change operation
@@ -115,7 +110,6 @@ define( function() {
 
 			p++;
 		} while ( fp[ delta ] !== n );
-
 
 		// return the final list of edit operations
 		// we remove the first item that represents the opration for the injected nulls
