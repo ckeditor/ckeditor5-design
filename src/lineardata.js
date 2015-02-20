@@ -15,7 +15,9 @@ define( [
 	// static methods
 	utils.extend( LinearData, {
 		getType: function( item ) {
-			return this.isOpenElement( item ) ? item.type : item.type.substr( 1 );
+			return this.isOpenElement( item ) ? item.type :
+				this.isCloseElement( item ) ? item.type.substr( 1 ) :
+				null;
 		},
 
 		isElement: function( item ) {
@@ -49,6 +51,75 @@ define( [
 			return new LinearData( utils.clone( data ), this.store );
 		},
 
+		findCloseElement: function( item ) {
+			var i;
+
+			// we accept opening elements only
+			if ( !utils.isObject( item ) || !LinearData.isOpenElement( item ) ||
+				( i = this.data.indexOf( item ) ) === -1 ) {
+				return null;
+			}
+
+			var openingStack = [],
+				type = LinearData.getType( item ),
+				len = this.length;
+
+			// we don't want to check the given item again
+			i++;
+
+			while ( i < len ) {
+				if ( this.getTypeAt( i ) === type ) {
+					if ( this.isOpenElementAt( i ) ) {
+						openingStack.push( this.get( i ) );
+					} else if ( this.isCloseElementAt( i ) ) {
+						if ( openingStack.length ) {
+							openingStack.pop();
+						} else {
+							return this.get( i );
+						}
+					}
+				}
+
+				i++;
+			}
+
+			return null;
+		},
+
+		findOpenElement: function( item ) {
+			var i;
+
+			// we accept opening items only
+			if ( !utils.isObject( item ) || !LinearData.isCloseElement( item ) ||
+				( i = this.data.indexOf( item ) ) === -1 ) {
+				return null;
+			}
+
+			var closingStack = [],
+				type = LinearData.getType( item );
+
+			// we don't want to check the given item again
+			i--;
+
+			while ( i >= 0 ) {
+				if ( this.getTypeAt( i ) === type ) {
+					if ( this.isCloseElementAt( i ) ) {
+						closingStack.push( this.get( i ) );
+					} else if ( this.isOpenElementAt( i ) ) {
+						if ( closingStack.length ) {
+							closingStack.pop();
+						} else {
+							return this.get( i );
+						}
+					}
+				}
+
+				i--;
+			}
+
+			return null;
+		},
+
 		get: function( idx ) {
 			return idx !== undefined ? this.data[ idx ] : this.data;
 		},
@@ -62,7 +133,7 @@ define( [
 		isCloseElementAt: function( idx ) {
 			var item = this.data[ idx ];
 
-			return item && this.constructor.isClosingElement( item );
+			return item && this.constructor.isCloseElement( item );
 		},
 
 		isElementAt: function( idx ) {
