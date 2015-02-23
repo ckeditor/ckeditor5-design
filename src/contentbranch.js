@@ -17,28 +17,27 @@ define( [
 	utils.inherit( ContentBranch, Branch );
 
 	utils.extend( ContentBranch.prototype, {
-		renderContent: function( doc ) {
-			var store = this.document.store,
-				container = this.constructor.toDom( this.data, doc );
+		handleUpdate: function() {
+			if ( this.isRendered ) {
+				this.renderContent();
+			}
+		},
 
+		renderContent: function() {
 			this.children.forEach( function( child ) {
 				// retrieve child node's data from the linear data
 				var data = this.document.getNodeData( child );
 				// build child element(s)
-				var childElem = child.constructor.toDom( data, doc, store );
+				var childElem = child.constructor.toDom( data, document, this.document.store );
 
 				if ( !utils.isArray( childElem ) ) {
 					childElem = [ childElem ];
 				}
 
 				childElem.forEach( function( elem ) {
-					if ( elem ) {
-						container.appendChild( elem );
-					}
-				} );
+					this.view.append( elem );
+				}, this );
 			}, this );
-
-			return container;
 		}
 	} );
 

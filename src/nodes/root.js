@@ -16,6 +16,7 @@ define( [
 	}
 
 	utils.extend( RootNode, Branch, {
+		tags: [ 'div' ],
 		type: 'root'
 	} );
 

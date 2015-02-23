@@ -1,8 +1,18 @@
-define( [ 'tools/utils' ], function( utils ) {
+define( [
+	'view',
+	'tools/emitter',
+	'tools/utils'
+], function(
+	View,
+	Emitter,
+	utils
+) {
 	'use strict';
 
 	function Node( data ) {
 		this.data = data || null;
+
+		this.isRendered = false;
 
 		this.document = null;
 		this.parent = null;
@@ -67,6 +77,22 @@ define( [ 'tools/utils' ], function( utils ) {
 	};
 
 	// prototype
+
+	Object.defineProperty( Node.prototype, 'depth', {
+		get: function() {
+			var depth = 0,
+				parent = this.parent;
+
+			while ( parent ) {
+				depth++;
+
+				parent = parent.parent;
+			}
+
+			return depth;
+		}
+	} );
+
 	Object.defineProperty( Node.prototype, 'length', {
 		get: function() {
 			// include the opening and closing element data in the final node length
@@ -116,7 +142,7 @@ define( [ 'tools/utils' ], function( utils ) {
 		}
 	} );
 
-	utils.extend( Node.prototype, {
+	utils.extend( Node.prototype, Emitter, {
 		// increase/decrease length by the given difference
 		adjustLength: function( difference ) {
 			this._length += difference;
@@ -178,6 +204,18 @@ define( [ 'tools/utils' ], function( utils ) {
 			return false;
 		},
 
+		render: function() {
+			// TODO what document should we use?
+			var elem = this.constructor.toDom( this.data || {}, document );
+
+			this.view = new View( this, elem );
+
+			this.document.editable.addView( this.view );
+
+			this.isRendered = true;
+		},
+
+		// replace this node with the given one
 		replace: function( nodes ) {
 			if ( !this.parent ) {
 				throw new Error( 'Cannot replace a node that is not a child.' );

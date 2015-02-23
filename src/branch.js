@@ -15,6 +15,8 @@ define( [
 		if ( utils.isArray( children ) ) {
 			this.spliceArray( 0, 0, children );
 		}
+
+		this.on( 'update', this.handleUpdate );
 	}
 
 	// inherit statics
@@ -37,6 +39,44 @@ define( [
 	utils.extend( Branch.prototype, {
 		childAt: function( index ) {
 			return this.children[ index ] || null;
+		},
+
+		handleUpdate: function( index, removed, added ) {
+			if ( !this.isRendered ) {
+				return;
+			}
+
+			removed.forEach( function( child ) {
+				if ( child.view ) {
+					child.view.remove();
+				}
+			} );
+
+			added.forEach( function( child ) {
+				var views = [];
+
+				if ( child.isWrapped ) {
+					if ( !child.view ) {
+						child.render();
+					}
+
+					views = [ child.view ];
+				} else {
+					var data = this.document.getNodeData( child );
+					// build child element(s)
+					views = child.constructor.toDom( data, document, this.document.store );
+				}
+
+				if ( !utils.isArray( views ) ) {
+					views = [ views ];
+				}
+
+				views.forEach( function( view ) {
+					this.view.append( view );
+				}, this );
+
+
+			}, this );
 		},
 
 		indexOf: function( node ) {
@@ -65,18 +105,20 @@ define( [
 
 		splice: function() {
 			var removed = this.children.splice.apply( this.children, arguments ),
+				added = [].slice.call( arguments, 2 ),
+				index = arguments[ 0 ],
 				removedLength = 0,
 				addedLength = 0;
 
-			// calculate the overal length of removed items and clear the item's parent
+			// calculate the overall length of removed items and clear the item's parent
 			removed.forEach( function( node ) {
 				removedLength += node.length;
 				node.detach();
 			} );
 
-			// calculate the overal length of added items and set the item's parent
+			// calculate the overall length of added items and attach new children
 			if ( arguments.length > 2 ) {
-				[].slice.call( arguments, 2 ).forEach( function( node ) {
+				added.forEach( function( node ) {
 					addedLength += node.length;
 					node.attachTo( this );
 				}, this );
@@ -84,6 +126,8 @@ define( [
 
 			// update the length
 			this.adjustLength( addedLength - removedLength );
+
+			this.trigger( 'update', index, removed, added );
 
 			return removed;
 		},
