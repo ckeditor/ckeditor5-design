@@ -227,6 +227,10 @@ define( [
 
 			var idx = this.parent.indexOf( this );
 
+			if ( idx < 0 ) {
+				throw new Error( 'Node not found in its parent\'s children array.' );
+			}
+
 			this.parent.spliceArray( idx, 1, nodes );
 		}
 	} );

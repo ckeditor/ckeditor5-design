@@ -42,17 +42,30 @@ define( [
 		},
 
 		handleUpdate: function( index, removed, added ) {
+			var that = this,
+				child,
+				len,
+				i;
+
 			if ( !this.isRendered ) {
 				return;
 			}
 
-			removed.forEach( function( child ) {
+			// get rid of views for removed children
+			for ( i = 0, len = removed.length; i < len; i++ ) {
+				child = removed[ i ];
+
 				if ( child.view ) {
 					child.view.remove();
 				}
-			} );
+			}
 
-			added.forEach( function( child ) {
+			var childBeforeIndex = this.childAt( index - 1 ),
+				viewBeforeIndex = childBeforeIndex && childBeforeIndex.view;
+
+			for ( i = added.length - 1; i >= 0; i-- ) {
+				child = added[ i ];
+
 				var views = [];
 
 				if ( child.isWrapped ) {
@@ -71,12 +84,16 @@ define( [
 					views = [ views ];
 				}
 
-				views.forEach( function( view ) {
-					this.view.append( view );
-				}, this );
+				for ( var j = views.length - 1; j >= 0; j-- ) {
+					var view = views[ j ];
 
-
-			}, this );
+					if ( index ) {
+						viewBeforeIndex.insertAfter( view );
+					} else {
+						this.view.prepend( view );
+					}
+				}
+			}
 		},
 
 		indexOf: function( node ) {

@@ -27,6 +27,18 @@ define( [
 		}
 	} );
 
+	Object.defineProperty( Element.prototype, 'firstChild', {
+		get: function() {
+			return this._el.firstChild;
+		}
+	} );
+
+	Object.defineProperty( Element.prototype, 'lastChild', {
+		get: function() {
+			return this._el.lastChild;
+		}
+	} );
+
 	utils.extend( Element.prototype, {
 		addClass: function( value ) {
 			this._el.classList.add( value.split( sepPattern ) );
@@ -112,11 +124,19 @@ define( [
 			if ( !this.detached ) {
 				this._el.parentNode.insertBefore(
 					sibling instanceof Element ? sibling._el : sibling,
-					his._el
+					this._el
 				);
 			}
 
 			return this;
+		},
+
+		prepend: function( child ) {
+			if ( this._el.childNodes.length ) {
+				this._el.insertBefore( child instanceof Element ? child._el : child, this._el.firstChild );
+			} else {
+				this.append( child );
+			}
 		},
 
 		remove: function() {
