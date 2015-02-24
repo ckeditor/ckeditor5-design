@@ -41,7 +41,7 @@ define( [
 		// create document tree root element
 		this.root = converter.getNodesForData( this.data, this )[ 0 ];
 
-		this.renderTree();
+		this.root.render();
 	}
 
 	utils.extend( Document.prototype, Emitter, {
@@ -101,25 +101,6 @@ define( [
 			}
 
 			return findNode( this.root, 0 );
-		},
-
-		// force all tree nodes to re-render their children by simulating a change
-		renderTree: function() {
-			function triggerUpdate( node ) {
-				// we want to render only the wrapped nodes, unwrapped nodes should be rendered by their parents
-				if ( node.isWrapped ) {
-					if ( !node.isRendered ) {
-						node.render();
-					}
-
-					if ( node.children ) {
-						node.trigger( 'update', 0, [], node.children );
-						node.children.forEach( triggerUpdate );
-					}
-				}
-			}
-
-			triggerUpdate( this.root );
 		}
 	} );
 

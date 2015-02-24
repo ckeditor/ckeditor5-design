@@ -40,12 +40,21 @@ define( [
 		this.history = [];
 
 		this.observer = new MutationObserver( this.handleMutation.bind( this ) );
-		this.observer.observe( this.$documentView.getElement(), config );
+
+		this.enableObserver();
 	}
 
 	utils.extend( Editable.prototype, Emitter, {
 		addView: function( view ) {
 			this._views[ view.vid ] = view;
+		},
+
+		disableObserver: function() {
+			this.observer.disconnect();
+		},
+
+		enableObserver: function() {
+			this.observer.observe( this.$documentView.getElement(), config );
 		},
 
 		getView: function( vid ) {
@@ -117,6 +126,8 @@ define( [
 
 			var nodes = [];
 			var elements = [];
+			// nodes to be removed after applying the mutation's outcome
+			var toRemove = [];
 
 			// get the top-most affected node
 			mutations.forEach( function( mutation ) {
@@ -130,6 +141,12 @@ define( [
 
 					if ( view ) {
 						node = view.node;
+					}
+
+					if ( mutation.type === 'childList' ) {
+						[].forEach.call( mutation.addedNodes, function( addedNode ) {
+							toRemove.push( addedNode );
+						} );
 					}
 				}
 
@@ -161,10 +178,11 @@ define( [
 
 			// go through all the nodes and check if they already have their ancestors in the array
 			// in order to reduce the number of transactions
+			// TODO maybe we could combine it with mutation processing to speed things up
 			for ( var i = 0; i < nodes.length; i++ ) {
 				var node = nodes[ i ];
 				for ( var j = 0; j < nodes.length; j++ ) {
-					if ( node.hasAncestor( nodes[ j ] ) ) {
+					if ( node && node.hasAncestor( nodes[ j ] ) ) {
 						nodes.splice( i, 1 );
 						elements.splice( i, 1 );
 						i--;
@@ -172,7 +190,8 @@ define( [
 				}
 			}
 
-			console.log( nodes );
+			// disable the mutation observer while manipulating nodes
+			this.disableObserver();
 
 			nodes.forEach( function( node, i ) {
 				var transaction = Transaction.createFromNodeAndElement( this.document, node, elements[ i ] );
@@ -182,9 +201,18 @@ define( [
 				this.history.push( transaction );
 			}, this );
 
-
 			// TODO this is just a temporary solution for development purposes
 			this.trigger( 'change' );
+
+			// clean up all unneeded nodes
+			toRemove.forEach( function( node ) {
+				if ( node.parentElement ) {
+					node.parentElement.removeChild( node );
+				}
+			} );
+
+			// re-enable the mutation observer
+			this.enableObserver();
 		},
 
 		removeView: function( vid ) {

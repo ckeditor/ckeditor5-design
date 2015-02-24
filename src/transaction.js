@@ -174,15 +174,20 @@ define( [
 
 				// this means that we are injecting things between two tags, so none of the existing nodes were affected
 				if ( utils.isObject( firstItem ) && firstItem.type && firstItem === lastItem ) {
-					console.log( 'inject between tags', firstItem );
-					data = document.data.cloneSlice( leftOffset, offset );
+					console.log( 'inject between tags' );
 
 					firstNode = document.getNodeAtPosition( leftOffset );
-					newNodes = converter.getNodesForData( data, document );
 					parent = firstNode.parent;
 
+					data = document.data.cloneSlice( leftOffset, offset );
+					newNodes = converter.getNodesForData( data, document );
+
+					// TODO need to render injected nodes
+
+					// add new nodes to the parent
 					if ( parent ) {
 						parent.spliceArray( parent.indexOf( firstNode ), 0, newNodes );
+						// append new nodes to the first node
 					} else {
 						firstNode.spliceArray( firstNode.childLength, 0, newNodes );
 					}
@@ -190,7 +195,6 @@ define( [
 					// TODO create views for new nodes and add references to existing DOM elements
 
 				} else {
-
 					firstNode = document.getNodeAtPosition( leftOffset );
 					lastNode = document.getNodeAtPosition( rightOffset );
 
@@ -212,14 +216,9 @@ define( [
 					// a subset of linear data for new tree nodes
 					data = document.data.cloneSlice( start, end );
 
-					console.log( start, end );
-					console.log( data );
-
-					newNodes = converter.getNodesForData( data, document );
-
-					console.log( 'f', firstNode );
-					console.log( 'l', lastNode );
-					console.log( 'new', newNodes );
+					console.log( 'f', firstNode, firstNode.depth );
+					console.log( 'l', lastNode, lastNode.depth );
+					console.log( 'data', data );
 
 					// first node is the last node so inject new nodes in place of the old one
 					if ( firstNode === lastNode ) {
@@ -228,13 +227,17 @@ define( [
 
 						var parentView = parent.view;
 
+						newNodes = converter.getNodesForData( data, document );
+						console.log( 'new', newNodes );
+
 						// replace the old nodes and anything between them with new nodes
 						firstNode.replace( newNodes );
 
 						cleanViews( parentView );
 					} else {
 						console.log( 'a range of nodes was affected' );
-						// TODO
+
+
 					}
 				}
 

@@ -42,8 +42,7 @@ define( [
 		},
 
 		handleUpdate: function( index, removed, added ) {
-			var that = this,
-				child,
+			var child,
 				len,
 				i;
 
@@ -74,6 +73,7 @@ define( [
 					}
 
 					views = [ child.view ];
+					// build views for unwrapped nodes, such as textNode
 				} else {
 					var data = this.document.getNodeData( child );
 					// build child element(s)
@@ -100,8 +100,8 @@ define( [
 			return this.children.indexOf( node );
 		},
 
-		// we use splice in following methods so we don't have to recalculate the length each time,
-		// nor update child's parent
+		// we reuse splice in pop, push, shift and unshift methods so we don't have to recalculate the length,
+		// trigger updates or update children's parents each time
 		pop: function() {
 			if ( this.children.length ) {
 				return this.splice( this.children.length - 1, 1 );
@@ -112,6 +112,19 @@ define( [
 			this.splice( this.children.length - 1, 0, child );
 
 			return this.children.length;
+		},
+
+		// render the branch and all its descendants
+		render: function() {
+			if ( this.isWrapped ) {
+				if ( !this.isRendered ) {
+					Node.prototype.render.call( this );
+				}
+
+				if ( this.children ) {
+					this.trigger( 'update', 0, [], this.children );
+				}
+			}
 		},
 
 		shift: function() {
