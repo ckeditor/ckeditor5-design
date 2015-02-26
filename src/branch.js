@@ -42,8 +42,8 @@ define( [
 		},
 
 		handleUpdate: function( index, removed, added ) {
-			var that = this,
-				doc = this.document,
+			var doc = this.document,
+				that = this,
 				child,
 				views,
 				view,
@@ -71,7 +71,9 @@ define( [
 					}
 
 					// mark a child to be re-added
-					added[ dir > 0 ? 'push' : 'unshift' ]( anchor );
+					if ( added.indexOf( anchor ) == -1 ) {
+						added[ dir > 0 ? 'push' : 'unshift' ]( anchor );
+					}
 					i += dir;
 				}
 
@@ -120,8 +122,6 @@ define( [
 				leftAnchor = findAnchor( index, -1 );
 				rightAnchor = findAnchor( index, 1 );
 
-				console.log( leftAnchor, rightAnchor );
-
 				var sibling;
 
 				// remove all elements between the left and right anchors
@@ -158,7 +158,7 @@ define( [
 			if ( index && ( leftAnchor || rightAnchor ) ) {
 				// we have a child view on the left which we can refer to
 				if ( leftAnchor ) {
-					for ( i = 0, len = added.length; i < len; i++ ) {
+					for ( i = added.length - 1; i >= 0; i-- ) {
 						views = getChildViews( added[ i ] );
 
 						for ( j = 0, jLen = views.length; j < jLen; j++ ) {
@@ -167,7 +167,7 @@ define( [
 					}
 					// we have a child view on the right which we can refer to
 				} else if ( rightAnchor ) {
-					for ( i = added.length - 1; i >= 0; i-- ) {
+					for ( i = 0, len = added.length; i < len; i++ ) {
 						views = getChildViews( added[ i ] );
 
 						for ( j = views.length - 1; j >= 0; j-- ) {
