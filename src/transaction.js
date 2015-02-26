@@ -68,50 +68,18 @@ define( [
 				deltas[ idx ] = oldDelta + delta;
 			}
 
-			// update lengths of nodes and their parents
-			function updateLengths() {
-				toUpdate.forEach( function( node, i ) {
-					var delta = deltas[ i ];
-
-					while ( node ) {
-						node.adjustLength( delta );
-						node = node.parent;
-					}
-				} );
-			}
-
-			// go through all view's children and unsets their data-vid property they are pointing to
-			// if such view refers to a detached node
-			function cleanViews( view ) {
-				var children = view.getElement().children;
-
-				for ( var i = 0, len = children.length; i < len; i++ ) {
-					var child = children[ i ],
-						vid;
-
-					if ( child.dataset && ( vid = child.dataset.vid ) ) {
-						var childView = document.editable.getView( child.dataset.vid );
-
-						if ( !childView || ( childView.node && !childView.node.document ) ) {
-							delete child.dataset.vid;
-							document.editable.removeView( vid );
-						}
-					}
-				}
-			}
-
 			// a counter representing the current offset in the linear data
 			var offset = 0;
-			// a beginning offset used later to find out what was the first node affected by changes
-			var leftOffset = null;
 			// a counter representing the number of inserted data items
 			var added = 0;
 			// a counter representing the number of removed data items
 			var removed = 0;
+			// a beginning offset used later to find out what was the first node affected by changes
+			var leftOffset = null;
 			// a flag that tells if the document tree needs to be rebuilt
 			var rebuildTree = false;
-
-			var firstItem = null;
+			// the first affected data item
+			var firstItem;
 
 			for ( var i = 0, len = this.operations.length; i < len; i++ ) {
 				var operation = this.operations[ i ];
@@ -121,7 +89,7 @@ define( [
 					offset += operation.retain;
 				}
 
-				// find the first index we're working on
+				// find the first offset we'll work on
 				if ( leftOffset === null ) {
 					leftOffset = offset;
 					firstItem = document.data.get( offset );
@@ -137,6 +105,7 @@ define( [
 					// it's a text content so just update the lengths of nodes and their parents
 					if ( utils.isString( operation.insert ) || utils.isArray( operation.insert ) ) {
 						saveToUpdateLength( offset - added + removed, 1 );
+						// node affected - we'll have to rebuild the tree
 					} else {
 						rebuildTree = true;
 					}
@@ -156,6 +125,7 @@ define( [
 					// it's a text content so just update the lengths of nodes and their parents
 					if ( utils.isString( operation.remove ) || utils.isArray( operation.remove ) ) {
 						saveToUpdateLength( offset - added + removed, -1 );
+						// node affected - we'll have to rebuild the tree
 					} else {
 						rebuildTree = true;
 					}
@@ -165,24 +135,24 @@ define( [
 			// rebuild the document tree structure
 			if ( rebuildTree ) {
 				console.log( 'rebuild the tree' );
-				var data, start, end, firstNode, lastNode, newNodes, parent;
+				var data, firstNode, lastNode, newNodes, parent;
 
 				// calculate the ending offset to locate the last affected node
 				var rightOffset = offset - added + removed - ( removed > 0 ? 1 : 0 );
 
 				var lastItem = document.data.get( offset );
 
+				firstNode = document.getNodeAtPosition( leftOffset );
+				lastNode = document.getNodeAtPosition( rightOffset );
+
 				// this means that we are injecting things between two tags, so none of the existing nodes were affected
 				if ( utils.isObject( firstItem ) && firstItem.type && firstItem === lastItem ) {
 					console.log( 'inject between tags' );
 
-					firstNode = document.getNodeAtPosition( leftOffset );
 					parent = firstNode.parent;
 
 					data = document.data.cloneSlice( leftOffset, offset );
 					newNodes = converter.getNodesForData( data, document );
-
-					// TODO need to render injected nodes
 
 					// add new nodes to the parent
 					if ( parent ) {
@@ -191,13 +161,7 @@ define( [
 					} else {
 						firstNode.spliceArray( firstNode.childLength, 0, newNodes );
 					}
-
-					// TODO create views for new nodes and add references to existing DOM elements
-
 				} else {
-					firstNode = document.getNodeAtPosition( leftOffset );
-					lastNode = document.getNodeAtPosition( rightOffset );
-
 					// we found a text node but we need something that refers to the actual DOM element
 					if ( !firstNode.isWrapped ) {
 						firstNode = firstNode.parent;
@@ -208,14 +172,13 @@ define( [
 					}
 
 					// beginning of the data to be rebuilt
-					start = firstNode.getOffset();
-
+					var start = firstNode.getOffset();
 					// end of the data to be rebuilt
-					end = lastNode.getOffset() + lastNode.length + added - removed;
-
+					var end = lastNode.getOffset() + lastNode.length + added - removed;
 					// a subset of linear data for new tree nodes
 					data = document.data.cloneSlice( start, end );
 
+					console.log( 'lo', leftOffset, 'ro', rightOffset );
 					console.log( 'f', firstNode, firstNode.depth );
 					console.log( 'l', lastNode, lastNode.depth );
 					console.log( 'data', data );
@@ -223,31 +186,41 @@ define( [
 					// first node is the last node so inject new nodes in place of the old one
 					if ( firstNode === lastNode ) {
 						console.log( 'a single node was affected, replace it' );
-						parent = firstNode.parent;
-
-						var parentView = parent.view;
-
+						// build new nodes for the data
 						newNodes = converter.getNodesForData( data, document );
-						console.log( 'new', newNodes );
-
-						// replace the old nodes and anything between them with new nodes
+						// replace the old node with new nodes
 						firstNode.replace( newNodes );
-
-						cleanViews( parentView );
 					} else {
 						console.log( 'a range of nodes was affected' );
 
+						var nodeStack = [];
 
+						for ( i = 0, len = data.length; i < len; i++ ) {
+							if ( data.isOpenElementAt( i ) ) {
+
+							} else if ( data.isCloseElementAt( i ) ) {
+
+							}
+						}
+
+						// TODO process a range of nodes, check which one still appear in the DOM
 					}
 				}
-
-				// TODO add new nodes to the tree and remove missing ones
-				// TODO replace anything between the firstNode and the lastNode
 
 				// just update the lengths of existing document nodes
 			} else {
 				console.log( 'update lengths' );
-				updateLengths();
+
+				for ( i = 0, len = toUpdate.length; i < len; i++ ) {
+					var delta = deltas[ i ];
+					var node = toUpdate[ i ];
+
+					// adjust the length of node and its ancestors
+					while ( node ) {
+						node.adjustLength( delta );
+						node = node.parent;
+					}
+				}
 			}
 
 			this.applied = true;
@@ -321,7 +294,9 @@ define( [
 		// include element offset in the first retain
 		var retain = offset || 0;
 
-		edits.forEach( function( edit ) {
+		for ( var i = 0, len = edits.length; i < len; i++ ) {
+			var edit = edits[ i ];
+
 			// insert operation
 			if ( edit === diff.INSERT ) {
 				if ( retain ) {
@@ -359,7 +334,7 @@ define( [
 				oldData.shift();
 				newData.shift();
 			}
-		} );
+		}
 
 		return ops;
 	}
