@@ -42,31 +42,47 @@ define( [
 		},
 
 		handleUpdate: function( index, removed, added ) {
-			var child,
+			var that = this,
+				doc = this.document,
+				child,
+				views,
+				view,
 				len,
-				i;
+				jLen,
+				i,
+				j;
 
 			if ( !this.isRendered ) {
 				return;
 			}
 
-			// get rid of views for removed children
-			for ( i = 0, len = removed.length; i < len; i++ ) {
-				child = removed[ i ];
+			// TODO find an anchor, where we should put new nodes
+			function findAnchor( index, dir ) {
+				var i = index + dir,
+					len = that.childLength,
+					anchor;
 
-				if ( child.view ) {
-					child.view.remove();
+				while (
+					( anchor = that.childAt( i ) ) &&
+					( ( dir < 0 && i >= 0 ) || ( dir > 0 && i < len ) )
+				) {
+					if ( anchor.view ) {
+						return anchor;
+					}
+
+					// mark a child to be re-added
+					added[ dir > 0 ? 'push' : 'unshift' ]( anchor );
+					i += dir;
 				}
+
+				return null;
 			}
 
-			var childBeforeIndex = this.childAt( index - 1 ),
-				viewBeforeIndex = childBeforeIndex && childBeforeIndex.view;
-
-			for ( i = added.length - 1; i >= 0; i-- ) {
-				child = added[ i ];
-
+			// collect views for a given child node
+			function getChildViews( child ) {
 				var views = [];
 
+				// child has a wrapping element
 				if ( child.isWrapped ) {
 					if ( !child.view ) {
 						child.render();
@@ -75,21 +91,97 @@ define( [
 					views = [ child.view ];
 					// build views for unwrapped nodes, such as textNode
 				} else {
-					var data = this.document.getNodeData( child );
+					var data = doc.getNodeData( child );
 					// build child element(s)
-					views = child.constructor.toDom( data, document, this.document.store );
+					views = child.constructor.toDom( data, document, doc.store );
 				}
 
 				if ( !utils.isArray( views ) ) {
 					views = [ views ];
 				}
 
-				for ( var j = views.length - 1; j >= 0; j-- ) {
-					var view = views[ j ];
+				return views;
+			}
 
-					if ( index ) {
-						viewBeforeIndex.insertAfter( view );
-					} else {
+			// get rid of views for removed children
+			for ( i = 0, len = removed.length; i < len; i++ ) {
+				child = removed[ i ];
+
+				if ( child.view ) {
+					child.view.remove();
+					doc.editable.removeView( child.view.vid );
+				}
+			}
+
+			var leftAnchor, rightAnchor;
+
+			// get the nearest anchor
+			if ( index ) {
+				leftAnchor = findAnchor( index, -1 );
+				rightAnchor = findAnchor( index, 1 );
+
+				console.log( leftAnchor, rightAnchor );
+
+				var sibling;
+
+				// remove all elements between the left and right anchors
+				if ( leftAnchor && rightAnchor ) {
+					console.log( 'remove elements between left and right anchors' );
+					var rightElem = rightAnchor.view.getElement();
+
+					while (
+						( sibling = leftAnchor.view.nextSibling ) &&
+						sibling !== rightElem
+					) {
+						sibling.parentElement.removeChild( sibling );
+					}
+					// remove all elements after the left anchor
+				} else if ( leftAnchor ) {
+					console.log( 'remove elements after the left anchor' );
+					while ( ( sibling = leftAnchor.view.nextSibling ) ) {
+						sibling.parentElement.removeChild( sibling );
+					}
+					// remove all elements before the right anchor
+				} else if ( rightAnchor ) {
+					console.log( 'remove elements before the right anchor' );
+					while ( ( sibling = rightAnchor.view.previousSibling ) ) {
+						sibling.parentElement.removeChild( sibling );
+					}
+					// remove all children
+				} else {
+					console.log( 'remove all child elements' );
+					this.view.html( '' );
+				}
+			}
+
+			// insert new child views
+			if ( index && ( leftAnchor || rightAnchor ) ) {
+				// we have a child view on the left which we can refer to
+				if ( leftAnchor ) {
+					for ( i = 0, len = added.length; i < len; i++ ) {
+						views = getChildViews( added[ i ] );
+
+						for ( j = 0, jLen = views.length; j < jLen; j++ ) {
+							leftAnchor.view.insertAfter( views[ j ] );
+						}
+					}
+					// we have a child view on the right which we can refer to
+				} else if ( rightAnchor ) {
+					for ( i = added.length - 1; i >= 0; i-- ) {
+						views = getChildViews( added[ i ] );
+
+						for ( j = views.length - 1; j >= 0; j-- ) {
+							rightAnchor.view.insertBefore( views[ j ] );
+						}
+					}
+				}
+				// index === 0 or no anchors found so just prepend all children (reverse order)
+			} else {
+				for ( i = added.length - 1; i >= 0; i-- ) {
+					views = getChildViews( added[ i ] );
+
+					for ( j = views.length - 1; j >= 0; j-- ) {
+						view = views[ j ];
 						this.view.prepend( view );
 					}
 				}
