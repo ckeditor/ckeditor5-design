@@ -160,6 +160,10 @@ define( [
 			return [].slice.apply( this.data, arguments );
 		},
 
+		sliceInstance: function() {
+			return new LinearData( this.slice.apply( this, arguments ), this.store );
+		},
+
 		splice: function() {
 			return [].splice.apply( this.data, arguments );
 		}
