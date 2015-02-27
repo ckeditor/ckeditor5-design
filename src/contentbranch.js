@@ -24,6 +24,7 @@ define( [
 		},
 
 		renderContent: function() {
+			this.view.html( '' );
 			this.children.forEach( function( child ) {
 				// retrieve child node's data from the linear data
 				var data = this.document.getNodeData( child );
