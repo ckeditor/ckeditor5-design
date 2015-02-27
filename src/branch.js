@@ -42,6 +42,7 @@ define( [
 		},
 
 		handleUpdate: function( index, removed, added ) {
+			// console.log( 'update', index, removed, added );
 			var doc = this.document,
 				that = this,
 				child,
@@ -112,6 +113,8 @@ define( [
 				if ( child.view ) {
 					child.view.remove();
 					doc.editable.removeView( child.view.vid );
+				} else {
+					// TODO we need to remove the stuff  produced for this node somehow
 				}
 			}
 
@@ -120,10 +123,15 @@ define( [
 			// get the nearest anchor
 			if ( index ) {
 				leftAnchor = findAnchor( index, -1 );
-				rightAnchor = findAnchor( index, 1 );
+			}
 
-				var sibling;
+			rightAnchor = findAnchor( index, 1 );
 
+			var sibling;
+
+			// console.log( 'la', leftAnchor );
+			// console.log( 'ra', rightAnchor );
+			if ( removed.length ) {
 				// remove all elements between the left and right anchors
 				if ( leftAnchor && rightAnchor ) {
 					console.log( 'remove elements between left and right anchors' );
@@ -152,6 +160,7 @@ define( [
 					console.log( 'remove all child elements' );
 					this.view.html( '' );
 				}
+
 			}
 
 			// insert new child views
@@ -161,7 +170,7 @@ define( [
 					for ( i = added.length - 1; i >= 0; i-- ) {
 						views = getChildViews( added[ i ] );
 
-						for ( j = 0, jLen = views.length; j < jLen; j++ ) {
+						for ( j = views.length - 1; j >= 0; j-- ) {
 							leftAnchor.view.insertAfter( views[ j ] );
 						}
 					}
@@ -170,7 +179,7 @@ define( [
 					for ( i = 0, len = added.length; i < len; i++ ) {
 						views = getChildViews( added[ i ] );
 
-						for ( j = views.length - 1; j >= 0; j-- ) {
+						for ( j = 0, jLen = views.length; j < jLen; j++ ) {
 							rightAnchor.view.insertBefore( views[ j ] );
 						}
 					}

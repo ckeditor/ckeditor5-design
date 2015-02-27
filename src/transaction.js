@@ -34,40 +34,11 @@ define( [
 		remove: 'insert'
 	};
 
+	var rebuildTree = false;
+
 	utils.extend( Transaction.prototype, {
 		// apply a transaction to a document
 		applyTo: function( document ) {
-			var toUpdate = [];
-			var deltas = [];
-
-			// save a node on the given offset and the delta for it to update lengths in the document tree just once
-			function saveToUpdateLength( offset, delta ) {
-				var node = document.getNodeAtPosition( offset );
-
-				// TODO this is just a silly workaround
-				// we haven't found a text node
-				// this usually happens when the carret is at the beginning/end of a text node
-				// let's try on the left
-				if ( !node || node.isWrapped ) {
-					node = document.getNodeAtPosition( offset - 1 );
-				}
-
-				// we still haven't found a text node o let's try on the right
-				if ( !node || node.isWrapped ) {
-					node = document.getNodeAtPosition( offset + 1 );
-				}
-
-				var idx = toUpdate.indexOf( node );
-
-				if ( idx === -1 ) {
-					idx = toUpdate.push( node ) - 1;
-				}
-
-				var oldDelta = deltas[ idx ] || 0;
-
-				deltas[ idx ] = oldDelta + delta;
-			}
-
 			// a counter representing the current offset in the linear data
 			var offset = 0;
 			// a counter representing the number of inserted data items
@@ -76,11 +47,8 @@ define( [
 			var removed = 0;
 			// a beginning offset used later to find out what was the first node affected by changes
 			var leftOffset = null;
-			// a flag that tells if the document tree needs to be rebuilt
-			var rebuildTree = false;
-			// the first affected data item
-			var firstItem;
 
+			// apply operations to the document's linear data
 			for ( var i = 0, len = this.operations.length; i < len; i++ ) {
 				var operation = this.operations[ i ];
 
@@ -92,7 +60,6 @@ define( [
 				// find the first offset we'll work on
 				if ( leftOffset === null ) {
 					leftOffset = offset;
-					firstItem = document.data.get( offset );
 				}
 
 				// insert new data
@@ -102,11 +69,7 @@ define( [
 
 					added++;
 
-					// it's a text content so just update the lengths of nodes and their parents
-					if ( utils.isString( operation.insert ) || utils.isArray( operation.insert ) ) {
-						saveToUpdateLength( offset - added + removed, 1 );
-						// node affected - we'll have to rebuild the tree
-					} else {
+					if ( utils.isObject( operation.insert ) && operation.insert.type ) {
 						rebuildTree = true;
 					}
 
@@ -122,108 +85,205 @@ define( [
 
 					removed++;
 
-					// it's a text content so just update the lengths of nodes and their parents
-					if ( utils.isString( operation.remove ) || utils.isArray( operation.remove ) ) {
-						saveToUpdateLength( offset - added + removed, -1 );
-						// node affected - we'll have to rebuild the tree
-					} else {
+					if ( utils.isObject( operation.remove ) && operation.remove.type ) {
 						rebuildTree = true;
 					}
 				}
 			}
 
-			// rebuild the document tree structure
+			// calculate the ending offset to locate the last affected node
+			var rightOffset = offset - added + removed - ( removed > 0 ? 1 : 0 );
+
+			var firstNode = document.getNodeAtPosition( leftOffset );
+			var lastNode = document.getNodeAtPosition( rightOffset );
+
+			console.log( 'f', firstNode );
+			console.log( 'l', lastNode );
+
 			if ( rebuildTree ) {
-				console.log( 'rebuild the tree' );
-				var data, firstNode, lastNode, newNodes, parent;
-
-				// calculate the ending offset to locate the last affected node
-				var rightOffset = offset - added + removed - ( removed > 0 ? 1 : 0 );
-
-				var lastItem = document.data.get( offset );
-
-				firstNode = document.getNodeAtPosition( leftOffset );
-				lastNode = document.getNodeAtPosition( rightOffset );
-
-				// this means that we are injecting things between two tags, so none of the existing nodes were affected
-				if ( utils.isObject( firstItem ) && firstItem.type && firstItem === lastItem ) {
-					console.log( 'inject between tags' );
-
-					parent = firstNode.parent;
-
-					data = document.data.cloneSlice( leftOffset, offset );
-					newNodes = converter.getNodesForData( data, document );
-
-					// add new nodes to the parent
-					if ( parent ) {
-						parent.spliceArray( parent.indexOf( firstNode ), 0, newNodes );
-						// append new nodes to the first node
-					} else {
-						firstNode.spliceArray( firstNode.childLength, 0, newNodes );
-					}
-				} else {
-					// we found a text node but we need something that refers to the actual DOM element
-					if ( !firstNode.isWrapped ) {
-						firstNode = firstNode.parent;
-					}
-
-					if ( !lastNode.isWrapped ) {
-						lastNode = lastNode.parent;
-					}
-
-					// beginning of the data to be rebuilt
-					var start = firstNode.getOffset();
-					// end of the data to be rebuilt
-					var end = lastNode.getOffset() + lastNode.length + added - removed;
-					// a subset of linear data for new tree nodes
-					data = document.data.cloneSlice( start, end );
-
-					console.log( 'lo', leftOffset, 'ro', rightOffset );
-					console.log( 'f', firstNode, firstNode.depth );
-					console.log( 'l', lastNode, lastNode.depth );
-					console.log( 'data', data );
-
-					// first node is the last node so inject new nodes in place of the old one
-					if ( firstNode === lastNode ) {
-						console.log( 'a single node was affected, replace it' );
-						// build new nodes for the data
-						newNodes = converter.getNodesForData( data, document );
-						// replace the old node with new nodes
-						firstNode.replace( newNodes );
-					} else {
-						console.log( 'a range of nodes was affected' );
-
-						var nodeStack = [];
-
-						for ( i = 0, len = data.length; i < len; i++ ) {
-							if ( data.isOpenElementAt( i ) ) {
-
-							} else if ( data.isCloseElementAt( i ) ) {
-
-							}
-						}
-
-						// TODO process a range of nodes, check which one still appear in the DOM
-					}
+				// we found a text node but to rebuild the tree we need something that refers to the actual DOM element
+				if ( !firstNode.isWrapped ) {
+					firstNode = firstNode.parent;
+					console.log( 'f2', firstNode );
 				}
 
-				// just update the lengths of existing document nodes
-			} else {
-				console.log( 'update lengths' );
-
-				for ( i = 0, len = toUpdate.length; i < len; i++ ) {
-					var delta = deltas[ i ];
-					var node = toUpdate[ i ];
-
-					// adjust the length of node and its ancestors
-					while ( node ) {
-						node.adjustLength( delta );
-						node = node.parent;
-					}
+				if ( !lastNode.isWrapped ) {
+					lastNode = lastNode.parent;
+					console.log( 'l2', lastNode );
 				}
 			}
 
+			// the first node is an ancestor of the last node so let's rework that one
+			if ( lastNode.hasAncestor( firstNode ) ) {
+				lastNode = firstNode;
+			}
+
+			// first affected node's parent
+			var parent = firstNode.parent;
+			// beginning of the data to be rebuilt
+			var start = firstNode.getOffset();
+			// end of the data to be rebuilt
+			var end = lastNode.getOffset() + lastNode.length + added - removed;
+			// a subset of linear data for new tree nodes
+			var data = document.data.sliceInstance( start, end );
+
+			var newNodes, index;
+
+			var matchIndex = -1;
+			var addBefore = [];
+			var addAfter = [];
+
+			console.log( 'lo', leftOffset, 'ro', rightOffset );
+			console.log( 'data', data );
+
+			// first node is the last node so inject new nodes in place of the old one
+			if ( firstNode === lastNode ) {
+				console.log( 'a single node was affected' );
+				// build new nodes for the data
+				newNodes = converter.getNodesForData( data, document );
+
+				console.log( 'new nodes', newNodes );
+
+				// TODO is it possible to perform below section recursively? And does that even make sense?
+
+				for ( i = 0, len = newNodes.length; i < len; i++ ) {
+					// nodes represent the same data so we don't have to recreate the entire node but its contents only
+					if ( newNodes[ i ].data && newNodes[ i ].data === firstNode.data ) {
+						console.log( 'found matching at', i );
+						matchIndex = i;
+					} else {
+						if ( matchIndex > -1 ) {
+							addAfter.push( newNodes[ i ] );
+						} else {
+							addBefore.push( newNodes[ i ] );
+						}
+					}
+				}
+
+				index = parent.indexOf( firstNode );
+
+				// add new nodes before the affected node
+				if ( addBefore.length ) {
+					console.log( 'add before', addBefore );
+					parent.spliceArray( index, matchIndex > -1 ? 0 : 1, addBefore );
+				}
+
+				// replace children of the affected node
+				if ( matchIndex > -1 && firstNode.children ) {
+					console.log( 'replace children' );
+					firstNode.spliceArray( 0, firstNode.childLength, newNodes[ matchIndex ].children );
+				}
+
+				// add new nodes after the affected node
+				if ( addAfter.length ) {
+					console.log( 'add after', addAfter );
+					parent.spliceArray( index + 1, 0, addAfter );
+				}
+
+			} else {
+				console.log( 'a range of nodes was affected' );
+
+				// all the elements were opened/closed properly meaning they are located on the same level
+				if ( data.isValid() && firstNode.parent === lastNode.parent ) {
+					console.log( 'valid data' );
+					var firstIndex = parent.indexOf( firstNode );
+					var lastIndex = parent.indexOf( lastNode );
+
+					newNodes = converter.getNodesForData( data, document );
+					console.log( 'new nodes', newNodes );
+
+					parent.spliceArray( firstIndex, lastIndex - firstIndex + 1, newNodes );
+				} else {
+					console.log( 'invalid data' );
+
+					data = validateData( data );
+
+					newNodes = converter.getNodesForData( data, document );
+					console.log( 'new nodes', newNodes );
+
+					index = parent.indexOf( firstNode );
+
+					if ( newNodes.length > 1 ) {
+						// we skip the last node that will require more work
+						for ( i = 0, len = newNodes.length - 1; i < len; i++ ) {
+							if ( newNodes[ i ].data && newNodes[ i ].data === firstNode.data ) {
+								console.log( 'found matching at', i );
+								matchIndex = i;
+							} else {
+								if ( matchIndex > -1 ) {
+									addAfter.push( newNodes[ i ] );
+								} else {
+									addBefore.push( newNodes[ i ] );
+								}
+							}
+						}
+
+						// add new nodes before the affected node
+						if ( addBefore.length ) {
+							console.log( 'add before', addBefore );
+							parent.spliceArray( index, matchIndex > -1 ? 0 : 1, addBefore );
+						}
+
+						// replace children of the affected node
+						if ( matchIndex > -1 ) {
+							console.log( 'replace children' );
+							firstNode.spliceArray( 0, firstNode.childLength, newNodes[ matchIndex ].children );
+						}
+
+						// add new nodes after the affected node
+						if ( addAfter.length ) {
+							console.log( 'add after', addAfter );
+							parent.spliceArray( index + 1, 0, addAfter );
+						}
+
+						var lastNewNode = newNodes[ newNodes.length - 1 ];
+
+						console.log( 'last', lastNewNode );
+
+						if ( lastNewNode.data && lastNewNode.data === lastNode.data ) {
+							console.log( 'last nodes match' );
+						} else {
+							console.log( 'last nodes don\'t match' );
+
+						}
+					} else {
+						console.log( 'what?' );
+					}
+					// we can assume the last node was incomplete, any other can be replaced/injected as is
+				}
+
+				// TODO process a range of nodes, check which one still appear in the DOM
+			}
+
 			this.applied = true;
+
+			// checks if all the elements were properly closed and adds missing closing elements
+			function validateData( data ) {
+				var open = [],
+					len, i;
+
+				for ( i = 0, len = data.length; i < len; i++ ) {
+					if ( data.isOpenElementAt( i ) ) {
+						open.push( data.get( i ) );
+					} else if ( data.isCloseElementAt( i ) ) {
+						var lastOpened = open.pop();
+						if ( data.getTypeAt( i ) !== data.constructor.getType( lastOpened ) ) {
+							open.push( lastOpened );
+						}
+					}
+				}
+
+				// close remaining elements
+				if ( open.length ) {
+					for ( i = 0, len = open.length; i < len; i++ ) {
+						data.push( {
+							type: '/' + open[ i ].type
+						} );
+					}
+				}
+
+				return data;
+			}
 		},
 		// return a copy of the transaction
 		clone: function() {

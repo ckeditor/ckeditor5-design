@@ -51,6 +51,10 @@ define( [
 			return new LinearData( utils.clone( data ), this.store );
 		},
 
+		concat: function( data ) {
+			this.data = this.data.concat( data );
+		},
+
 		findCloseElement: function( item ) {
 			var i;
 
@@ -146,6 +150,26 @@ define( [
 			var item = this.data[ idx ];
 
 			return item && this.constructor.isOpenElement( item );
+		},
+
+		isValid: function() {
+			var open = [];
+
+			for ( var i = 0, len = this.length; i < len; i++ ) {
+				if ( this.isElementAt( i ) ) {
+					if ( this.isOpenElementAt( i ) ) {
+						open.push( this.get( i ) );
+					} else if ( this.isCloseElementAt( i ) ) {
+						var lastOpen = open.pop();
+
+						if ( this.getTypeAt( i ) !== this.constructor.getType( lastOpen ) ) {
+							return false;
+						}
+					}
+				}
+			}
+
+			return open.length === 0;
 		},
 
 		push: function( value ) {
