@@ -70,28 +70,30 @@ define( [
 		// retrieve a node that contains data at the given position
 		getNodeAtPosition: function( position ) {
 			function findNode( node, offset ) {
-				// the position points to this node's opening/closing items
-				if ( position === offset || position === offset + node.length - 1 ) {
+				// the position points to this node's first/last item
+				if ( position === offset || position === offset + node.length ) {
 					return node;
 				}
 
 				var result = null;
 
-				if ( position > offset && position < offset + node.length - 1 ) {
+				if ( position > offset && position < offset + node.length ) {
 					// node has children so let's check which of them we're looking for
 					if ( node.children ) {
 						// increment the counter for the node's opening item
 						offset++;
 
-						node.children.some( function( child ) {
-							result = findNode( child, offset );
+						for ( var i = 0, len = node.children.length; i < len; i++ ) {
+							var child = node.children[ i ];
+
+							result = findNode( child, offset ) || null;
 
 							if ( result ) {
-								return true;
+								return result;
 							} else {
 								offset += child.length;
 							}
-						} );
+						}
 					} else {
 						result = node;
 					}
