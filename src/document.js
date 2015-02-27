@@ -70,14 +70,16 @@ define( [
 		// retrieve a node that contains data at the given position
 		getNodeAtPosition: function( position ) {
 			function findNode( node, offset ) {
+				var last = offset + node.length - 1;
+
 				// the position points to this node's first/last item
-				if ( position === offset || position === offset + node.length ) {
+				if ( position === offset || position === last ) {
 					return node;
 				}
 
 				var result = null;
 
-				if ( position > offset && position < offset + node.length ) {
+				if ( position > offset && position < last ) {
 					// node has children so let's check which of them we're looking for
 					if ( node.children ) {
 						// increment the counter for the node's opening item
