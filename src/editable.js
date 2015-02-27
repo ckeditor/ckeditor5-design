@@ -39,9 +39,9 @@ define( [
 		// a store for applied transactions
 		this.history = [];
 
-		this.observer = new MutationObserver( this.handleMutation.bind( this ) );
+		this.mutationObserver = new MutationObserver( this.handleMutations.bind( this ) );
 
-		this.enableObserver();
+		this.enableMutationObserver();
 	}
 
 	utils.extend( Editable.prototype, Emitter, {
@@ -49,19 +49,19 @@ define( [
 			this._views[ view.vid ] = view;
 		},
 
-		disableObserver: function() {
-			this.observer.disconnect();
+		disableMutationObserver: function() {
+			this.mutationObserver.disconnect();
 		},
 
-		enableObserver: function() {
-			this.observer.observe( this.$documentView.getElement(), config );
+		enableMutationObserver: function() {
+			this.mutationObserver.observe( this.$documentView.getElement(), config );
 		},
 
 		getView: function( vid ) {
 			return this._views[ vid ] || null;
 		},
 
-		handleMutation: function( mutations ) {
+		handleMutations: function( mutations ) {
 			var that = this;
 
 			function findParentView( element ) {
@@ -143,22 +143,34 @@ define( [
 						node = view.node;
 					}
 
+					// collet nodes created by CE to be removed later
 					if ( mutation.type === 'childList' ) {
 						[].forEach.call( mutation.addedNodes, function( addedNode ) {
-							toRemove.push( addedNode );
+							if ( toRemove.indexOf( addedNode ) === -1 ) {
+								toRemove.push( addedNode );
+							}
+						} );
+
+						[].forEach.call( mutation.removedNodes, function( removedNode ) {
+							var idx;
+
+							if ( ( idx = toRemove.indexOf( removedNode ) ) !== -1 ) {
+								toRemove.splice( idx, 1 );
+							}
 						} );
 					}
+					//*/
 				}
 
-				// node doesn't have a view attached, try finding it using siblings
-				if ( !node ) {
-					node = findNodeBySibling( target );
-				}
+				// // node doesn't have a view attached, try finding it using siblings
+				// if ( !node ) {
+				// 	node = findNodeBySibling( target );
+				// }
 
-				// node doesn't have syblings, try identify it using its parent
-				if ( !node ) {
-					node = findNodeByParent( target );
-				}
+				// // node doesn't have syblings, try identify it using its parent
+				// if ( !node ) {
+				// 	node = findNodeByParent( target );
+				// }
 
 				// node's parent doesn't refer to any view, lets find the closest ancestor that has one
 				if ( !node ) {
@@ -190,9 +202,12 @@ define( [
 				}
 			}
 
-			// disable the mutation observer while manipulating nodes
-			this.disableObserver();
+			// disable the mutation observer while manipulating "dirty" DOM elements
+			this.disableMutationObserver();
 
+			console.log( 'affected nodes', nodes );
+
+			// create and apply transactions to the document
 			nodes.forEach( function( node, i ) {
 				var transaction = Transaction.createFromNodeAndElement( this.document, node, elements[ i ] );
 
@@ -201,9 +216,6 @@ define( [
 				this.history.push( transaction );
 			}, this );
 
-			// TODO this is just a temporary solution for development purposes
-			this.trigger( 'change' );
-
 			// clean up all unneeded nodes
 			toRemove.forEach( function( node ) {
 				if ( node.parentElement ) {
@@ -211,8 +223,11 @@ define( [
 				}
 			} );
 
+			// TODO this is just a temporary solution for development purposes
+			this.trigger( 'change' );
+
 			// re-enable the mutation observer
-			this.enableObserver();
+			this.enableMutationObserver();
 		},
 
 		removeView: function( vid ) {
