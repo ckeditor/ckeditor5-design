@@ -39,6 +39,18 @@ define( [
 		}
 	} );
 
+	Object.defineProperty( Element.prototype, 'nextSibling', {
+		get: function() {
+			return this._el.nextSibling;
+		}
+	} );
+
+	Object.defineProperty( Element.prototype, 'previousSibling', {
+		get: function() {
+			return this._el.previousSibling;
+		}
+	} );
+
 	utils.extend( Element.prototype, {
 		addClass: function( value ) {
 			this._el.classList.add( value.split( sepPattern ) );
