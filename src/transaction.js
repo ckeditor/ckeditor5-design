@@ -133,6 +133,8 @@ define( [
 			var addBefore = [];
 			var addAfter = [];
 
+			var parentLength = parent.length;
+
 			console.log( 'lo', leftOffset, 'ro', rightOffset );
 			console.log( 'data', data );
 
@@ -146,38 +148,57 @@ define( [
 
 				// TODO is it possible to perform below section recursively? And does that even make sense?
 
-				for ( i = 0, len = newNodes.length; i < len; i++ ) {
-					// nodes represent the same data so we don't have to recreate the entire node but its contents only
-					if ( newNodes[ i ].data && newNodes[ i ].data === firstNode.data ) {
-						console.log( 'found matching at', i );
-						matchIndex = i;
-					} else {
-						if ( matchIndex > -1 ) {
-							addAfter.push( newNodes[ i ] );
+				if ( newNodes.length ) {
+					for ( i = 0, len = newNodes.length; i < len; i++ ) {
+						// nodes represent the same data so we don't have to recreate the entire node but its contents only
+						if ( newNodes[ i ].data && newNodes[ i ].data === firstNode.data ) {
+							console.log( 'found matching at', i );
+							matchIndex = i;
 						} else {
-							addBefore.push( newNodes[ i ] );
+							if ( matchIndex > -1 ) {
+								addAfter.push( newNodes[ i ] );
+							} else {
+								addBefore.push( newNodes[ i ] );
+							}
 						}
 					}
+
+					index = parent.indexOf( firstNode );
+
+					// add new nodes before the affected node
+					if ( addBefore.length ) {
+						console.log( 'add before', addBefore );
+						parent.spliceArray( index, matchIndex > -1 ? 0 : 1, addBefore );
+					}
+
+					// replace children of the affected node
+					if ( matchIndex > -1 && firstNode.children ) {
+						console.log( 'replace children' );
+
+						var firstLength = firstNode.length;
+
+						firstNode.spliceArray( 0, firstNode.childLength, newNodes[ matchIndex ].children );
+
+						// update parent's length
+						parent.adjustLength( firstNode.length - firstLength );
+					}
+
+					// add new nodes after the affected node
+					if ( addAfter.length ) {
+						console.log( 'add after', addAfter );
+						parent.spliceArray( index + 1, 0, addAfter );
+					}
+				} else {
+					// TODO no nodes added - just removed
 				}
 
-				index = parent.indexOf( firstNode );
+				// update lengths of all parent's ancestors
+				var deltaLength = parent.length - parentLength;
 
-				// add new nodes before the affected node
-				if ( addBefore.length ) {
-					console.log( 'add before', addBefore );
-					parent.spliceArray( index, matchIndex > -1 ? 0 : 1, addBefore );
-				}
+				var parentNode = parent;
 
-				// replace children of the affected node
-				if ( matchIndex > -1 && firstNode.children ) {
-					console.log( 'replace children' );
-					firstNode.spliceArray( 0, firstNode.childLength, newNodes[ matchIndex ].children );
-				}
-
-				// add new nodes after the affected node
-				if ( addAfter.length ) {
-					console.log( 'add after', addAfter );
-					parent.spliceArray( index + 1, 0, addAfter );
+				while ( deltaLength && ( parentNode = parentNode.parent ) ) {
+					parentNode.adjustLength( deltaLength );
 				}
 
 			} else {
@@ -267,7 +288,7 @@ define( [
 						open.push( data.get( i ) );
 					} else if ( data.isCloseElementAt( i ) ) {
 						var lastOpened = open.pop();
-						if ( data.getTypeAt( i ) !== data.constructor.getType( lastOpened ) ) {
+						if ( lastOpened && data.getTypeAt( i ) !== data.constructor.getType( lastOpened ) ) {
 							open.push( lastOpened );
 						}
 					}
