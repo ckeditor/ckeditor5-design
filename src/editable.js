@@ -207,6 +207,8 @@ define( [
 
 			console.log( 'affected nodes', nodes );
 
+			// TODO save current selection
+
 			// create and apply transactions to the document
 			nodes.forEach( function( node, i ) {
 				var transaction = Transaction.createFromNodeAndElement( this.document, node, elements[ i ] );
@@ -222,6 +224,8 @@ define( [
 					node.parentElement.removeChild( node );
 				}
 			} );
+
+			// TODO restore the selection
 
 			// TODO this is just a temporary solution for development purposes
 			this.trigger( 'change' );

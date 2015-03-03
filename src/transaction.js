@@ -34,8 +34,6 @@ define( [
 		remove: 'insert'
 	};
 
-	var rebuildTree = false;
-
 	utils.extend( Transaction.prototype, {
 		// apply a transaction to a document
 		applyTo: function( document ) {
@@ -69,10 +67,6 @@ define( [
 
 					added++;
 
-					if ( utils.isObject( operation.insert ) && operation.insert.type ) {
-						rebuildTree = true;
-					}
-
 					// we must move to the next data element, otherwise a subsequent inserted character
 					// would come in before the previously added character
 					offset++;
@@ -84,15 +78,13 @@ define( [
 					document.data.splice( offset, 1 );
 
 					removed++;
-
-					if ( utils.isObject( operation.remove ) && operation.remove.type ) {
-						rebuildTree = true;
-					}
 				}
 			}
 
 			// calculate the ending offset to locate the last affected node
 			var rightOffset = offset - added + removed - ( removed > 0 ? 1 : 0 );
+
+			console.log( 'lo', leftOffset, 'ro', rightOffset );
 
 			var firstNode = document.getNodeAtPosition( leftOffset );
 			var lastNode = document.getNodeAtPosition( rightOffset );
@@ -100,18 +92,20 @@ define( [
 			console.log( 'f', firstNode );
 			console.log( 'l', lastNode );
 
-			if ( rebuildTree ) {
-				// we found a text node but to rebuild the tree we need something that refers to the actual DOM element
-				if ( !firstNode.isWrapped ) {
-					firstNode = firstNode.parent;
-					console.log( 'f2', firstNode );
-				}
-
-				if ( !lastNode.isWrapped ) {
-					lastNode = lastNode.parent;
-					console.log( 'l2', lastNode );
-				}
+			// we found a text node but to rebuild the tree we need something that refers to the actual DOM element
+			if ( !firstNode.isWrapped ) {
+				firstNode = firstNode.parent;
+				console.log( 'f2', firstNode );
 			}
+
+			if ( !lastNode.isWrapped ) {
+				lastNode = lastNode.parent;
+				console.log( 'l2', lastNode );
+			}
+			// } else {
+			// TODO cover a scenario, where a text is added right before a node
+			// (right now a change in the subsequent node will be recognized, but we should process a text node)
+			// }
 
 			// the first node is an ancestor of the last node so let's rework that one
 			if ( lastNode.hasAncestor( firstNode ) ) {
@@ -127,156 +121,102 @@ define( [
 			// a subset of linear data for new tree nodes
 			var data = document.data.sliceInstance( start, end );
 
-			var newNodes, index;
-
-			var matchIndex = -1;
-			var addBefore = [];
-			var addAfter = [];
-
+			// initial length of the parent node, will be used later to update lengths of its ancestors
 			var parentLength = parent.length;
 
-			console.log( 'lo', leftOffset, 'ro', rightOffset );
-			console.log( 'data', data );
+			// TODO optimize this case - just insert and remove necessary nodes leaving the rest of the node as is
+			if ( !data.isValid() ) {
+				// depth of the invalid node
+				var depth = validateData( data );
 
-			// first node is the last node so inject new nodes in place of the old one
-			if ( firstNode === lastNode ) {
-				console.log( 'a single node was affected' );
-				// build new nodes for the data
-				newNodes = converter.getNodesForData( data, document );
-
-				console.log( 'new nodes', newNodes );
-
-				// TODO is it possible to perform below section recursively? And does that even make sense?
-
-				if ( newNodes.length ) {
-					for ( i = 0, len = newNodes.length; i < len; i++ ) {
-						// nodes represent the same data so we don't have to recreate the entire node but its contents only
-						if ( newNodes[ i ].data && newNodes[ i ].data === firstNode.data ) {
-							console.log( 'found matching at', i );
-							matchIndex = i;
-						} else {
-							if ( matchIndex > -1 ) {
-								addAfter.push( newNodes[ i ] );
-							} else {
-								addBefore.push( newNodes[ i ] );
-							}
-						}
-					}
-
-					index = parent.indexOf( firstNode );
-
-					// add new nodes before the affected node
-					if ( addBefore.length ) {
-						console.log( 'add before', addBefore );
-						parent.spliceArray( index, matchIndex > -1 ? 0 : 1, addBefore );
-					}
-
-					// replace children of the affected node
-					if ( matchIndex > -1 && firstNode.children ) {
-						console.log( 'replace children' );
-
-						var firstLength = firstNode.length;
-
-						firstNode.spliceArray( 0, firstNode.childLength, newNodes[ matchIndex ].children );
-
-						// update parent's length
-						parent.adjustLength( firstNode.length - firstLength );
-					}
-
-					// add new nodes after the affected node
-					if ( addAfter.length ) {
-						console.log( 'add after', addAfter );
-						parent.spliceArray( index + 1, 0, addAfter );
-					}
-				} else {
-					// TODO no nodes added - just removed
+				// go up to a valid parent
+				while ( depth ) {
+					lastNode = lastNode.parent;
+					depth--;
 				}
 
-				// update lengths of all parent's ancestors
-				var deltaLength = parent.length - parentLength;
-
-				var parentNode = parent;
-
-				while ( deltaLength && ( parentNode = parentNode.parent ) ) {
-					parentNode.adjustLength( deltaLength );
-				}
-
-			} else {
-				console.log( 'a range of nodes was affected' );
-
-				// all the elements were opened/closed properly meaning they are located on the same level
-				if ( data.isValid() && firstNode.parent === lastNode.parent ) {
-					console.log( 'valid data' );
-					var firstIndex = parent.indexOf( firstNode );
-					var lastIndex = parent.indexOf( lastNode );
-
-					newNodes = converter.getNodesForData( data, document );
-					console.log( 'new nodes', newNodes );
-
-					parent.spliceArray( firstIndex, lastIndex - firstIndex + 1, newNodes );
-				} else {
-					console.log( 'invalid data' );
-
-					data = validateData( data );
-
-					newNodes = converter.getNodesForData( data, document );
-					console.log( 'new nodes', newNodes );
-
-					index = parent.indexOf( firstNode );
-
-					if ( newNodes.length > 1 ) {
-						// we skip the last node that will require more work
-						for ( i = 0, len = newNodes.length - 1; i < len; i++ ) {
-							if ( newNodes[ i ].data && newNodes[ i ].data === firstNode.data ) {
-								console.log( 'found matching at', i );
-								matchIndex = i;
-							} else {
-								if ( matchIndex > -1 ) {
-									addAfter.push( newNodes[ i ] );
-								} else {
-									addBefore.push( newNodes[ i ] );
-								}
-							}
-						}
-
-						// add new nodes before the affected node
-						if ( addBefore.length ) {
-							console.log( 'add before', addBefore );
-							parent.spliceArray( index, matchIndex > -1 ? 0 : 1, addBefore );
-						}
-
-						// replace children of the affected node
-						if ( matchIndex > -1 ) {
-							console.log( 'replace children' );
-							firstNode.spliceArray( 0, firstNode.childLength, newNodes[ matchIndex ].children );
-						}
-
-						// add new nodes after the affected node
-						if ( addAfter.length ) {
-							console.log( 'add after', addAfter );
-							parent.spliceArray( index + 1, 0, addAfter );
-						}
-
-						var lastNewNode = newNodes[ newNodes.length - 1 ];
-
-						console.log( 'last', lastNewNode );
-
-						if ( lastNewNode.data && lastNewNode.data === lastNode.data ) {
-							console.log( 'last nodes match' );
-						} else {
-							console.log( 'last nodes don\'t match' );
-
-						}
-					} else {
-						console.log( 'what?' );
-					}
-					// we can assume the last node was incomplete, any other can be replaced/injected as is
-				}
-
-				// TODO process a range of nodes, check which one still appear in the DOM
+				end = lastNode.getOffset() + lastNode.length + added - removed;
+				data = document.data.sliceInstance( start, end );
 			}
 
+			var newNodes = converter.getNodesForData( data, document );
+
+			var firstIdx = parent.indexOf( firstNode );
+			var lastIdx = parent.indexOf( lastNode );
+
+			updateTree( parent, parent.children.slice( firstIdx, lastIdx + 1 ), newNodes );
+
+			var parentNode = parent;
+			var deltaLength = parentNode.length - parentLength;
+
+			// update lengths of all the parent's ancestors
+			while ( deltaLength && ( parentNode = parentNode.parent ) ) {
+				parentNode.adjustLength( deltaLength );
+			}
+
+			// mark the transaction as applied
 			this.applied = true;
+
+			// recursively compares arrays of nodes and applies necessary changes to the given parent
+			function updateTree( parent, oldChildren, newChildren ) {
+				// console.log( 'upd', oldChildren, newChildren );
+				var edits = diff( oldChildren, newChildren, function( a, b ) {
+					// nodes are "equal" if their data matches
+					return a.data && a.children && a.data === b.data;
+				} );
+
+				var added = 0,
+					removed = 0,
+					lastMatching = null,
+					// the first index on which we should add new children to the parent
+					addIndex = oldChildren[ 0 ] && parent.indexOf( oldChildren[ 0 ] ) || 0;
+
+				// process the edits
+				for ( var i = 0, len = edits.length; i < len; i++ ) {
+					var edit = edits[ i ];
+
+					var oldChild = oldChildren[ i - added ];
+					var newChild = newChildren[ i - removed ];
+
+					// nodes match so we have to rework the children of the old node
+					if ( edit === diff.EQUAL ) {
+						lastMatching = oldChild;
+
+						console.log( '=', oldChild );
+
+						var oldChildLength = oldChild.length;
+
+						updateTree( oldChild, [].concat( oldChild.children ), [].concat( newChild.children ) );
+
+						// adjust the length of the parent node
+						parent.adjustLength( oldChild.length - oldChildLength );
+					}
+
+					// insert new child node
+					if ( edit === diff.INSERT ) {
+						if ( lastMatching ) {
+							addIndex = parent.indexOf( lastMatching ) + 1;
+						}
+
+						console.log( '+', newChild );
+
+						// place new children relative to the old matching child
+						parent.splice( addIndex, 0, newChild );
+
+						lastMatching = newChild;
+
+						added++;
+					}
+
+					// remove the old child node
+					if ( edit === diff.DELETE ) {
+						console.log( '-', oldChild );
+						parent.splice( parent.indexOf( oldChild ), 1 );
+
+						removed++;
+					}
+				}
+			}
 
 			// checks if all the elements were properly closed and adds missing closing elements
 			function validateData( data ) {
@@ -294,16 +234,17 @@ define( [
 					}
 				}
 
-				// close remaining elements
-				if ( open.length ) {
-					for ( i = 0, len = open.length; i < len; i++ ) {
-						data.push( {
-							type: '/' + open[ i ].type
-						} );
-					}
-				}
+				// // close remaining elements
+				// if ( open.length ) {
+				// 	for ( i = 0, len = open.length; i < len; i++ ) {
 
-				return data;
+				// 		data.push( {
+				// 			type: '/' + open[ i ].type
+				// 		} );
+				// 	}
+				// }
+
+				return open.length;
 			}
 		},
 		// return a copy of the transaction
