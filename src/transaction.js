@@ -127,14 +127,11 @@ define( [
 			// TODO optimize this case - just insert and remove necessary nodes leaving the rest of the node as is
 			if ( !data.isValid() ) {
 				// depth of the invalid node
-				var depth = validateData( data );
+				validateData( data );
 
-				// go up to a valid parent
-				while ( depth ) {
-					lastNode = lastNode.parent;
-					depth--;
-				}
-
+				parent = firstNode.parent;
+				parentLength = parent.length;
+				start = firstNode.getOffset();
 				end = lastNode.getOffset() + lastNode.length + added - removed;
 				data = document.data.sliceInstance( start, end );
 			}
@@ -218,9 +215,10 @@ define( [
 				}
 			}
 
-			// checks if all the elements were properly closed and adds missing closing elements
+			// checks if all the elements were properly closed, if not, update firstNode and lastNode
 			function validateData( data ) {
 				var open = [],
+					close = [],
 					len, i;
 
 				for ( i = 0, len = data.length; i < len; i++ ) {
@@ -228,23 +226,30 @@ define( [
 						open.push( data.get( i ) );
 					} else if ( data.isCloseElementAt( i ) ) {
 						var lastOpened = open.pop();
+
 						if ( lastOpened && data.getTypeAt( i ) !== data.constructor.getType( lastOpened ) ) {
 							open.push( lastOpened );
+						} else if ( !lastOpened ) {
+							close.push( data.get( i ) );
 						}
 					}
 				}
 
-				// // close remaining elements
-				// if ( open.length ) {
-				// 	for ( i = 0, len = open.length; i < len; i++ ) {
+				var depth = open.length;
 
-				// 		data.push( {
-				// 			type: '/' + open[ i ].type
-				// 		} );
-				// 	}
-				// }
+				// go up to a valid parent
+				while ( depth ) {
+					lastNode = lastNode.parent;
+					depth--;
+				}
 
-				return open.length;
+				depth = close.length;
+
+				// go up to a valid parent
+				while ( depth ) {
+					firstNode = firstNode.parent;
+					depth--;
+				}
 			}
 		},
 		// return a copy of the transaction
