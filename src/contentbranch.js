@@ -29,7 +29,18 @@ define( [
 				// retrieve child node's data from the linear data
 				var data = this.document.getNodeData( child );
 				// build child element(s)
-				var childElem = child.constructor.toDom( data, document, this.document.store );
+				var childElem;
+
+				// render wrapped children within content branches
+				if ( child.isWrapped ) {
+					if ( !child.isRendered ) {
+						child.render();
+					}
+
+					childElem = child.view;
+				} else {
+					childElem = child.constructor.toDom( data, document, this.document.store );
+				}
 
 				if ( !utils.isArray( childElem ) ) {
 					childElem = [ childElem ];
