@@ -80,50 +80,6 @@ define( [
 				}
 			}
 
-			// search siblings in order to find one that has a view
-			// and can point to the node representing given element
-			function findNodeBySibling( element ) {
-				var dirs = [ 'nextSibling', 'previousSibling' ],
-					dir = dirs.shift(),
-					sibling = element[ dir ];
-
-				while ( sibling || dirs.length ) {
-					if ( !sibling ) {
-						dir = dirs.shift();
-						sibling = element;
-					} else {
-						if ( sibling.dataset && sibling.dataset.vid ) {
-							var view = that.getView( sibling.dataset.vid );
-
-							if ( view ) {
-								return view.node[ dir === 'nextSibling' ? 'previousSibling' : 'nextSibling' ];
-							}
-						}
-					}
-
-					if ( dir ) {
-						sibling = sibling[ dir ];
-					}
-				}
-
-				return null;
-			}
-
-			// try to identify node representing the given element using its parent
-			function findNodeByParent( element ) {
-				var parent = element.parentElement;
-
-				if ( parent && parent.dataset && parent.dataset.vid ) {
-					var view = that.getView( parent.dataset.vid );
-
-					if ( view && view.node && view.node.children ) {
-						return view.node.childAt( 0 );
-					}
-				}
-
-				return null;
-			}
-
 			var nodes = [];
 			var elements = [];
 			// nodes to be removed after applying the mutation's outcome
@@ -161,16 +117,6 @@ define( [
 					}
 					//*/
 				}
-
-				// // node doesn't have a view attached, try finding it using siblings
-				// if ( !node ) {
-				// 	node = findNodeBySibling( target );
-				// }
-
-				// // node doesn't have syblings, try identify it using its parent
-				// if ( !node ) {
-				// 	node = findNodeByParent( target );
-				// }
 
 				// node's parent doesn't refer to any view, lets find the closest ancestor that has one
 				if ( !node ) {
@@ -215,7 +161,10 @@ define( [
 
 				transaction.applyTo( this.document );
 
-				this.history.push( transaction );
+				// store applied transactions only
+				if ( transaction.applied ) {
+					this.history.push( transaction );
+				}
 			}, this );
 
 			// clean up all unneeded nodes
