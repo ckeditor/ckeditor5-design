@@ -86,6 +86,12 @@ define( [
 
 			console.log( 'lo', leftOffset, 'ro', rightOffset );
 
+			// rework the adjacent text node instead of inserting another one next to it
+			if ( !document.data.isElementAt( leftOffset ) &&
+				!document.data.isElementAt( leftOffset - 1 ) ) {
+				leftOffset--;
+			}
+
 			var firstNode = document.getNodeAtPosition( leftOffset );
 			var lastNode = document.getNodeAtPosition( rightOffset );
 
@@ -124,7 +130,7 @@ define( [
 			// initial length of the parent node, will be used later to update lengths of its ancestors
 			var parentLength = parent.length;
 
-			// TODO optimize this case - just insert and remove necessary nodes leaving the rest of the node as is
+			// extend the range to produce a valid set of nodes
 			if ( !data.isValid() ) {
 				// depth of the invalid node
 				validateData( data );
@@ -159,6 +165,8 @@ define( [
 				// console.log( 'upd', oldChildren, newChildren );
 				var edits = diff( oldChildren, newChildren, function( a, b ) {
 					// nodes are "equal" if their data matches
+					// TODO what about text nodes? how to force rerender without replacing the nodes
+					// TODO what aobut changing type of a node leaving the children as they are
 					return a.data && a.children && a.data === b.data;
 				} );
 

@@ -42,7 +42,7 @@ define( [
 		},
 
 		handleUpdate: function( index, removed, added ) {
-			// console.log( 'update', index, removed, added );
+			// console.log( 'update', this, index, removed, added );
 			var doc = this.document,
 				that = this;
 
