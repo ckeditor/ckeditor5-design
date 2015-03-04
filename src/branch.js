@@ -49,7 +49,7 @@ define( [
 				return;
 			}
 
-			// console.log( 'update branch view', this, index, removed, added );
+			console.log( 'update branch view', this, index, removed, added );
 			var len, i;
 
 			// get rid of views for removed children
@@ -58,9 +58,8 @@ define( [
 
 				if ( child.view ) {
 					child.view.remove();
+					// TODO remove child views
 					doc.editable.removeView( child.view.vid );
-				} else {
-					// TODO we need to remove the stuff produced for this node somehow
 				}
 			}
 

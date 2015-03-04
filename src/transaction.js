@@ -37,6 +37,11 @@ define( [
 	utils.extend( Transaction.prototype, {
 		// apply a transaction to a document
 		applyTo: function( document ) {
+			// don't re-apply a transaction
+			if ( this.applied || !this.operations.length ) {
+				return;
+			}
+
 			// a counter representing the current offset in the linear data
 			var offset = 0;
 			// a counter representing the number of inserted data items
@@ -108,10 +113,6 @@ define( [
 				lastNode = lastNode.parent;
 				console.log( 'l2', lastNode );
 			}
-			// } else {
-			// TODO cover a scenario, where a text is added right before a node
-			// (right now a change in the subsequent node will be recognized, but we should process a text node)
-			// }
 
 			// the first node is an ancestor of the last node so let's rework that one
 			if ( lastNode.hasAncestor( firstNode ) ) {
@@ -119,42 +120,55 @@ define( [
 			}
 
 			// first affected node's parent
-			var parent = firstNode.parent;
-			// beginning of the data to be rebuilt
-			var start = firstNode.getOffset();
-			// end of the data to be rebuilt
-			var end = lastNode.getOffset() + lastNode.length + added - removed;
-			// a subset of linear data for new tree nodes
-			var data = document.data.sliceInstance( start, end );
+			var parent = firstNode.parent,
+				start, end, data, newNodes;
 
-			// initial length of the parent node, will be used later to update lengths of its ancestors
-			var parentLength = parent.length;
-
-			// extend the range to produce a valid set of nodes
-			if ( !data.isValid() ) {
-				// depth of the invalid node
-				validateData( data );
-
-				parent = firstNode.parent;
-				parentLength = parent.length;
+			if ( parent ) {
+				// beginning of the data to be rebuilt
 				start = firstNode.getOffset();
+				// end of the data to be rebuilt
 				end = lastNode.getOffset() + lastNode.length + added - removed;
+				// a subset of linear data for new tree nodes
 				data = document.data.sliceInstance( start, end );
-			}
+				// initial length of the parent node, will be used later to update lengths of its ancestors
+				var parentLength = parent.length;
 
-			var newNodes = converter.getNodesForData( data, document );
+				// extend the range to produce a valid set of nodes
+				if ( !data.isValid() ) {
+					// depth of the invalid node
+					validateData( data );
 
-			var firstIdx = parent.indexOf( firstNode );
-			var lastIdx = parent.indexOf( lastNode );
+					parent = firstNode.parent;
+					parentLength = parent.length;
+					start = firstNode.getOffset();
+					end = lastNode.getOffset() + lastNode.length + added - removed;
+					data = document.data.sliceInstance( start, end );
+				}
 
-			updateTree( parent, parent.children.slice( firstIdx, lastIdx + 1 ), newNodes );
+				newNodes = converter.getNodesForData( data, document );
 
-			var parentNode = parent;
-			var deltaLength = parentNode.length - parentLength;
+				var firstIdx = parent.indexOf( firstNode );
+				var lastIdx = parent.indexOf( lastNode );
 
-			// update lengths of all the parent's ancestors
-			while ( deltaLength && ( parentNode = parentNode.parent ) ) {
-				parentNode.adjustLength( deltaLength );
+				updateTree( parent, parent.children.slice( firstIdx, lastIdx + 1 ), newNodes );
+
+				var parentNode = parent;
+				var deltaLength = parentNode.length - parentLength;
+
+				// update lengths of all the parent's ancestors
+				while ( deltaLength && ( parentNode = parentNode.parent ) ) {
+					parentNode.adjustLength( deltaLength );
+				}
+				// we're working with the root node
+			} else if ( firstNode.type === 'root' ) {
+				start = leftOffset;
+				end = start + added - removed;
+				data = document.data.sliceInstance( start, end );
+				newNodes = converter.getNodesForData( data, document );
+				// inject new nodes at the end of the root node
+				firstNode.spliceArray( firstNode.childLength, 0, newNodes );
+			} else {
+				throw new Error( 'WAT?' );
 			}
 
 			// mark the transaction as applied
