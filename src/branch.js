@@ -42,7 +42,6 @@ define( [
 		},
 
 		handleUpdate: function( index, removed, added ) {
-			// console.log( 'update', this, index, removed, added );
 			var doc = this.document,
 				that = this;
 
@@ -50,6 +49,7 @@ define( [
 				return;
 			}
 
+			// console.log( 'update branch view', this, index, removed, added );
 			var len, i;
 
 			// get rid of views for removed children
@@ -60,7 +60,7 @@ define( [
 					child.view.remove();
 					doc.editable.removeView( child.view.vid );
 				} else {
-					// TODO we need to remove the stuff  produced for this node somehow
+					// TODO we need to remove the stuff produced for this node somehow
 				}
 			}
 
@@ -145,22 +145,38 @@ define( [
 			function findAnchor( index, dir ) {
 				var i = index + ( dir < 0 ? dir : 0 ),
 					len = that.childLength,
+					toAdd = [],
 					anchor;
+
+				function readd() {
+					if ( removed.length ) {
+						if ( dir > 0 ) {
+							added = added.concat( toAdd );
+						} else {
+							added = toAdd.concat( added );
+						}
+					}
+				}
 
 				while (
 					( anchor = that.childAt( i ) ) &&
 					( ( dir < 0 && i >= 0 ) || ( dir > 0 && i < len ) )
 				) {
+					// we've found an anchor
 					if ( anchor.view && !anchor.view.detached ) {
+						readd();
 						return anchor;
 					}
 
 					// mark a child to be re-added
 					if ( added.indexOf( anchor ) == -1 ) {
-						added[ dir > 0 ? 'push' : 'unshift' ]( anchor );
+						toAdd[ dir > 0 ? 'push' : 'unshift' ]( anchor );
 					}
+
 					i += dir;
 				}
+
+				readd();
 
 				return null;
 			}

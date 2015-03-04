@@ -33,11 +33,11 @@ define( [
 
 				// render wrapped children within content branches
 				if ( child.isWrapped ) {
-					if ( !child.isRendered ) {
+					if ( !child.view ) {
 						child.render();
 					}
 
-					childElem = child.view;
+					childElem = [ child.view ];
 				} else {
 					childElem = child.constructor.toDom( data, document, this.document.store );
 				}

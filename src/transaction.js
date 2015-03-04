@@ -162,11 +162,11 @@ define( [
 
 			// recursively compares arrays of nodes and applies necessary changes to the given parent
 			function updateTree( parent, oldChildren, newChildren ) {
-				// console.log( 'upd', oldChildren, newChildren );
+				// console.log( 'update tree', oldChildren, newChildren );
 				var edits = diff( oldChildren, newChildren, function( a, b ) {
 					// nodes are "equal" if their data matches
-					// TODO what about text nodes? how to force rerender without replacing the nodes
-					// TODO what aobut changing type of a node leaving the children as they are
+					// TODO what about text nodes? how to force re-render without replacing the nodes
+					// TODO what about changing type of a node leaving the children as they are
 					return a.data && a.children && a.data === b.data;
 				} );
 
@@ -174,51 +174,70 @@ define( [
 					removed = 0,
 					lastMatching = null,
 					// the first index on which we should add new children to the parent
-					addIndex = oldChildren[ 0 ] && parent.indexOf( oldChildren[ 0 ] ) || 0;
+					addIndex = oldChildren[ 0 ] && parent.indexOf( oldChildren[ 0 ] ) || 0,
+					stack = [],
+					last;
 
 				// process the edits
-				for ( var i = 0, len = edits.length; i < len; i++ ) {
+				for ( var i = 0, len = edits.length + 1; i < len; i++ ) {
 					var edit = edits[ i ];
+
+					// dump the stack
+					if ( last !== edit ) {
+						// insert new child nodes
+						if ( last === diff.INSERT ) {
+							if ( lastMatching ) {
+								addIndex = parent.indexOf( lastMatching ) + 1;
+							}
+							// console.log( '+', stack );
+
+							// place new children relative to the old matching child
+							parent.spliceArray( addIndex, 0, stack );
+
+							// last added node becomes the last matching item
+							lastMatching = stack[ stack.length - 1 ];
+
+							added += stack.length;
+						}
+
+						// remove old child nodes
+						if ( last === diff.DELETE ) {
+							// console.log( '-', stack );
+							parent.splice( parent.indexOf( stack[ 0 ] ), stack.length );
+
+							removed += stack.length;
+						}
+
+						stack = [];
+
+						last = edit;
+					}
 
 					var oldChild = oldChildren[ i - added ];
 					var newChild = newChildren[ i - removed ];
 
+					// save a new child node to be added
+					if ( edit === diff.INSERT ) {
+						stack.push( newChild );
+					}
+
+					// save an old child node to be removed
+					if ( edit === diff.DELETE ) {
+						stack.push( oldChild );
+					}
+
 					// nodes match so we have to rework the children of the old node
 					if ( edit === diff.EQUAL ) {
-						lastMatching = oldChild;
-
-						console.log( '=', oldChild );
-
+						// console.log( '=', oldChild );
 						var oldChildLength = oldChild.length;
 
 						updateTree( oldChild, [].concat( oldChild.children ), [].concat( newChild.children ) );
 
 						// adjust the length of the parent node
 						parent.adjustLength( oldChild.length - oldChildLength );
-					}
 
-					// insert new child node
-					if ( edit === diff.INSERT ) {
-						if ( lastMatching ) {
-							addIndex = parent.indexOf( lastMatching ) + 1;
-						}
-
-						console.log( '+', newChild );
-
-						// place new children relative to the old matching child
-						parent.splice( addIndex, 0, newChild );
-
-						lastMatching = newChild;
-
-						added++;
-					}
-
-					// remove the old child node
-					if ( edit === diff.DELETE ) {
-						console.log( '-', oldChild );
-						parent.splice( parent.indexOf( oldChild ), 1 );
-
-						removed++;
+						// the old nodes becomes the last matching item
+						lastMatching = oldChild;
 					}
 				}
 			}
