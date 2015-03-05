@@ -153,6 +153,7 @@ define( [
 
 			console.log( 'affected nodes', nodes );
 
+			var applied = false;
 			// TODO save current selection
 
 			// create and apply transactions to the document
@@ -163,16 +164,20 @@ define( [
 
 				// store applied transactions only
 				if ( transaction.applied ) {
+					applied = true;
 					this.history.push( transaction );
 				}
 			}, this );
 
-			// clean up all unneeded nodes
-			toRemove.forEach( function( node ) {
-				if ( node.parentElement ) {
-					node.parentElement.removeChild( node );
-				}
-			} );
+			// remove nodes from the mutation only if some transactions were applied
+			if ( applied ) {
+				// clean up all unneeded nodes
+				toRemove.forEach( function( node ) {
+					if ( node.parentElement ) {
+						node.parentElement.removeChild( node );
+					}
+				} );
+			}
 
 			// TODO restore the selection
 
