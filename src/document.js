@@ -2,6 +2,7 @@ define( [
 	'converter',
 	'dataprocessor',
 	'lineardocumentdata',
+	'linearmetadata',
 	'nodemanager',
 	'store',
 	'view',
@@ -11,6 +12,7 @@ define( [
 	converter,
 	dataProcessor,
 	LinearDocumentData,
+	LinearMetaData,
 	nodeManager,
 	Store,
 	View,
@@ -37,6 +39,7 @@ define( [
 
 		// document's linear data
 		this.data = new LinearDocumentData( data, this.store );
+		this.metadata = new LinearMetaData();
 
 		// create document tree root element
 		this.root = converter.getNodesForData( this.data, this )[ 0 ];

@@ -7,4 +7,5 @@ define( [ 'lineardata', 'tools/utils' ], function( LinearData, utils ) {
 
 	utils.inherit( LinearMetaData, LinearData );
 
+	return LinearMetaData;
 } );
