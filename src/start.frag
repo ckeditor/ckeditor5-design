@@ -1,6 +1,6 @@
 ( function( root, factory ) {
 		if ( typeof define === 'function' && define.amd ) {
-			define( [], factory );
+			define('CKEDITOR', [], factory );
 		} else {
 			root.CKEDITOR = factory();
 		}

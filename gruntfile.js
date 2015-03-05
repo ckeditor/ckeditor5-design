@@ -9,9 +9,9 @@ module.exports = function( grunt ) {
 		requirejs: {
 			options: {
 				baseUrl: 'src',
-				include: [ 'CKEDITOR' ],
+				include: [ 'editor' ],
 				out: 'build/ckeditor.js',
-				optimize: 'none'
+				optimize: 'uglify2'
 			},
 			almond: {
 				options: {
