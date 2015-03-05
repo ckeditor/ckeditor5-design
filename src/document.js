@@ -1,7 +1,7 @@
 define( [
 	'converter',
 	'dataprocessor',
-	'lineardata',
+	'lineardocumentdata',
 	'nodemanager',
 	'store',
 	'view',
@@ -10,7 +10,7 @@ define( [
 ], function(
 	converter,
 	dataProcessor,
-	LinearData,
+	LinearDocumentData,
 	nodeManager,
 	Store,
 	View,
@@ -36,7 +36,7 @@ define( [
 		var data = converter.getDataForDom( dom, this.store, null, true );
 
 		// document's linear data
-		this.data = new LinearData( data, this.store );
+		this.data = new LinearDocumentData( data, this.store );
 
 		// create document tree root element
 		this.root = converter.getNodesForData( this.data, this )[ 0 ];
