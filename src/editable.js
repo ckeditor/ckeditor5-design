@@ -148,12 +148,6 @@ define( [
 				}
 			}
 
-			// disable the mutation observer while manipulating "dirty" DOM elements
-			this.disableMutationObserver();
-
-			console.log( 'affected nodes', nodes );
-
-			var applied = false;
 			// TODO save current selection
 
 			// create and apply transactions to the document
@@ -164,28 +158,27 @@ define( [
 
 				// store applied transactions only
 				if ( transaction.applied ) {
-					applied = true;
 					this.history.push( transaction );
 				}
 			}, this );
 
-			// remove nodes from the mutation only if some transactions were applied
-			if ( applied ) {
-				// clean up all unneeded nodes
-				toRemove.forEach( function( node ) {
-					if ( node.parentElement ) {
-						node.parentElement.removeChild( node );
-					}
-				} );
-			}
+			// disable the mutation observer while manipulating "dirty" DOM elements
+			this.disableMutationObserver();
+
+			// clean up all unneeded nodes
+			toRemove.forEach( function( node ) {
+				if ( node.parentElement ) {
+					node.parentElement.removeChild( node );
+				}
+			} );
+
+			// re-enable the mutation observer
+			this.enableMutationObserver();
 
 			// TODO restore the selection
 
 			// TODO this is just a temporary solution for development purposes
 			this.trigger( 'change' );
-
-			// re-enable the mutation observer
-			this.enableMutationObserver();
 		},
 
 		removeView: function( vid ) {

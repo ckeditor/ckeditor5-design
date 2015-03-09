@@ -86,10 +86,10 @@ define( [
 				}
 			}
 
+			document.editable.disableMutationObserver();
+
 			// calculate the ending offset to locate the last affected node
 			var rightOffset = offset - added + removed - ( removed > 0 ? 1 : 0 );
-
-			console.log( 'lo', leftOffset, 'ro', rightOffset );
 
 			// rework the adjacent text node instead of inserting another one next to it
 			if ( !document.data.isElementAt( leftOffset ) &&
@@ -100,18 +100,13 @@ define( [
 			var firstNode = document.getNodeAtPosition( leftOffset );
 			var lastNode = document.getNodeAtPosition( rightOffset );
 
-			console.log( 'f', firstNode );
-			console.log( 'l', lastNode );
-
 			// we found a text node but to rebuild the tree we need something that refers to the actual DOM element
 			if ( !firstNode.isWrapped ) {
 				firstNode = firstNode.parent;
-				console.log( 'f2', firstNode );
 			}
 
 			if ( !lastNode.isWrapped ) {
 				lastNode = lastNode.parent;
-				console.log( 'l2', lastNode );
 			}
 
 			// the first node is an ancestor of the last node so let's rework that one
@@ -170,6 +165,8 @@ define( [
 			} else {
 				throw new Error( 'WAT?' );
 			}
+
+			document.editable.enableMutationObserver();
 
 			// mark the transaction as applied
 			this.applied = true;

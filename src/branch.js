@@ -49,7 +49,7 @@ define( [
 				return;
 			}
 
-			console.log( 'update branch view', this, index, removed, added );
+			// console.log( 'update branch view', this, index, removed, added );
 			var len, i;
 
 			// get rid of views for removed children
