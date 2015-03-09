@@ -51,7 +51,7 @@ define( [
 		// a store for applied transactions
 		this.history = [];
 
-		this.mutationObserver = new MutationObserver( this.handleMutations.bind( this ) );
+		this.mutationObserver = new MutationObserver( utils.debounce( this.handleMutations.bind( this ), 200 ) );
 	}
 
 	var config = {

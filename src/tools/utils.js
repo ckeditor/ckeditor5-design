@@ -12,13 +12,27 @@ define( function() {
 	var utils = {
 		// create a new detached document from an HTML string
 		createDocumentFromHTML: function( html ) {
-			if ( DOMParser ) {
-				var parser = new DOMParser();
+			var parser = new DOMParser();
 
-				return parser.parseFromString( html, 'text/html' );
-			} else {
-				// TODO handle IE < 10
-			}
+			return parser.parseFromString( html, 'text/html' );
+		},
+
+		// produces a function that delays invoking "fn" until "wait" milliseconds have elapsed
+		// since the last time it was invoked
+		debounce: function( fn, wait ) {
+			var timeout;
+
+			return function() {
+				var that = this,
+					args = arguments;
+
+				function done() {
+					fn.apply( that, args );
+				}
+
+				clearTimeout( timeout );
+				timeout = setTimeout( done, wait );
+			};
 		},
 
 		extend: function( target, source ) {
