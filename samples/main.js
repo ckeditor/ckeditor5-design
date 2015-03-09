@@ -95,7 +95,7 @@ require( [
 	printLinearData( editor.editable.document.data.get() );
 
 	// update the UI on document change
-	editor.editable.on( 'change', function() {
+	editor.editable.document.on( 'change', function() {
 		printLinearData( editor.editable.document.data.get() );
 		tree.innerHTML = '';
 		buildTree( editor.editable.document.root, tree );

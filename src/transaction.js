@@ -86,7 +86,7 @@ define( [
 				}
 			}
 
-			document.editable.disableMutationObserver();
+			document.disableMutationObserver();
 
 			// calculate the ending offset to locate the last affected node
 			var rightOffset = offset - added + removed - ( removed > 0 ? 1 : 0 );
@@ -166,7 +166,7 @@ define( [
 				throw new Error( 'WAT?' );
 			}
 
-			document.editable.enableMutationObserver();
+			document.enableMutationObserver();
 
 			// mark the transaction as applied
 			this.applied = true;
