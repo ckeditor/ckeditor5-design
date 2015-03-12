@@ -18,11 +18,15 @@ define( [
 			tnis.node = null;
 		},
 
-		update: function( from, to ) {
+		update: function( from, to, node ) {
 			var range = new Range( from, to );
 
 			if ( !this.range || !this.range.equals( range ) ) {
 				this.range = range;
+			}
+
+			if ( !this.node || this.node !== node ) {
+				this.node = node;
 			}
 		}
 	} );

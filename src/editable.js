@@ -81,10 +81,8 @@ define( [
 			// nodes to be removed after applying the mutation's outcome
 			var toRemove = [];
 
-			var doc = this.$document;
-			var selection = doc.getSelection();
-			// TODO temporarily force selection change trigger
-			this.watcher.trigger( 'selectionChange', selection );
+			// disable the mutation observer while manipulating "dirty" DOM elements
+			this.disableMutationObserver();
 
 			// get the top-most affected node
 			mutations.forEach( function( mutation ) {
@@ -150,6 +148,9 @@ define( [
 			}
 
 			// TODO save current selection
+			var selection = this.$document.getSelection();
+			// TODO temporarily force selection change trigger
+			this.watcher.trigger( 'selectionChange', selection );
 
 			// create and apply transactions to the document
 			nodes.forEach( function( node, i ) {
@@ -162,9 +163,6 @@ define( [
 					this.history.push( transaction );
 				}
 			}, this );
-
-			// disable the mutation observer while manipulating "dirty" DOM elements
-			this.disableMutationObserver();
 
 			// clean up all unneeded nodes
 			toRemove.forEach( function( node ) {
@@ -220,7 +218,11 @@ define( [
 				endOffset = getOffset( selection.focusNode, selection.focusOffset );
 			}
 
-			this.selection.update( startOffset, endOffset );
+			var node = this.document.getNodeAtPosition( startOffset );
+
+			this.selection.update( startOffset, endOffset, node );
+
+			console.log( 'sel', this.selection.range );
 
 			// TODO exclude internal elements from the offset calculation
 			// calculates the offset in the linear data
