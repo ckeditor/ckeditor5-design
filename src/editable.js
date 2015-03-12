@@ -2,6 +2,7 @@ define( [
 	'document',
 	'definitions',
 	'editablewatcher',
+	'selection',
 	'transaction',
 	'tools/element',
 	'tools/emitter',
@@ -10,6 +11,7 @@ define( [
 	Document,
 	def,
 	EditableWatcher,
+	Selection,
 	Transaction,
 	Element,
 	Emitter,
@@ -35,6 +37,8 @@ define( [
 
 		// a store for applied transactions
 		this.history = [];
+
+		this.selection = new Selection();
 
 		this.mutationObserver = new MutationObserver( this.handleMutations.bind( this ) );
 
@@ -77,6 +81,11 @@ define( [
 			// nodes to be removed after applying the mutation's outcome
 			var toRemove = [];
 
+			var doc = this.$document;
+			var selection = doc.getSelection();
+			// TODO temporarily force selection change trigger
+			this.watcher.trigger( 'selectionChange', selection );
+
 			// get the top-most affected node
 			mutations.forEach( function( mutation ) {
 				// try to find the node using the sibling first
@@ -91,7 +100,7 @@ define( [
 						node = view.node;
 					}
 
-					// collet nodes created by CE to be removed later
+					// collect nodes created by contenteditable to be removed later
 					if ( mutation.type === 'childList' ) {
 						[].forEach.call( mutation.addedNodes, function( addedNode ) {
 							if ( toRemove.indexOf( addedNode ) === -1 ) {
@@ -200,22 +209,18 @@ define( [
 
 			// no range or outside of the editable area
 			if ( !range || !hasAncestor( range.commonAncestorContainer, topEl ) ) {
-				console.log( 'no selection' );
+				this.selection.empty();
 				return;
 			}
 
-			if ( selection.isCollapsed ) {
-				var offset = getOffset( selection.anchorNode, selection.anchorOffset );
+			var startOffset = getOffset( selection.anchorNode, selection.anchorOffset ),
+				endOffset;
 
-				console.log( 'offset', offset );
-			} else {
-				var startOffset = getOffset( selection.anchorNode, selection.anchorOffset );
-				var endOffset = getOffset( selection.focusNode, selection.focusOffset );
-
-				console.log( 'start', startOffset, 'end', endOffset );
+			if ( !selection.isCollapsed ) {
+				endOffset = getOffset( selection.focusNode, selection.focusOffset );
 			}
 
-
+			this.selection.update( startOffset, endOffset );
 
 			// TODO exclude internal elements from the offset calculation
 			// calculates the offset in the linear data
