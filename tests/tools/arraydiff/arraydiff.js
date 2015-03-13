@@ -15,6 +15,23 @@ bender.require( [ 'tools/arraydiff' ], function( diff ) {
 			expect( result ).to.deep.equal( [ -1, 0, 0, -1, 1, 0, -1, 1 ] );
 		} );
 
+		it( 'should produce a valid set of edits for two different arrays', function() {
+			var a = [ 'a', 'b', 'c', 'd', 'e', 'f' ],
+				b = [ 'g', 'h', 'i', 'j', 'k', 'l' ];
+
+			var result = diff( a, b );
+
+			expect( result ).to.deep.equal( [ 1, 1, 1, 1, 1, 1, -1, -1, -1, -1, -1, -1 ] );
+		} );
+
+		it( 'should produce a valid set of edits for two equal arrays', function() {
+			var a = [ 'a', 'b', 'c', 'd', 'e', 'f' ];
+
+			var result = diff( a, a );
+
+			expect( result ).to.deep.equal( [ 0, 0, 0, 0, 0, 0 ] );
+		} );
+
 		it( 'should allow defining the comparator function', function() {
 			var a = [ {
 					a: 1
