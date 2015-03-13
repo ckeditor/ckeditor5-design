@@ -74,7 +74,7 @@ define( [
 		},
 
 		handleMutations: function( mutations ) {
-			var that = this;
+			var node, len, i;
 
 			var nodes = [];
 			var elements = [];
@@ -85,10 +85,11 @@ define( [
 			this.disableMutationObserver();
 
 			// get the top-most affected node
-			mutations.forEach( function( mutation ) {
+			for ( i = 0, len = mutations.length; i < len; i++ ) {
+				var mutation = mutations[ i ];
 				// try to find the node using the sibling first
 				var target = mutation.target,
-					node, view;
+					view;
 
 				// try identifying a node in the document tree using a view
 				if ( target.dataset && target.dataset.vid ) {
@@ -100,19 +101,8 @@ define( [
 
 					// collect nodes created by contenteditable to be removed later
 					if ( mutation.type === 'childList' ) {
-						[].forEach.call( mutation.addedNodes, function( addedNode ) {
-							if ( toRemove.indexOf( addedNode ) === -1 ) {
-								toRemove.push( addedNode );
-							}
-						} );
-
-						[].forEach.call( mutation.removedNodes, function( removedNode ) {
-							var idx;
-
-							if ( ( idx = toRemove.indexOf( removedNode ) ) !== -1 ) {
-								toRemove.splice( idx, 1 );
-							}
-						} );
+						addRemove( mutation.addedNodes );
+						delRemove( mutation.removedNodes );
 					}
 					//*/
 				}
@@ -131,13 +121,13 @@ define( [
 					nodes.push( node );
 					elements.push( node.view ? node.view.getElement() : target );
 				}
-			}, this );
+			}
 
 			// go through all the nodes and check if they already have their ancestors in the array
 			// in order to reduce the number of transactions
 			// TODO maybe we could combine it with mutation processing to speed things up
-			for ( var i = 0; i < nodes.length; i++ ) {
-				var node = nodes[ i ];
+			for ( i = 0; i < nodes.length; i++ ) {
+				node = nodes[ i ];
 				for ( var j = 0; j < nodes.length; j++ ) {
 					if ( node && node.hasAncestor( nodes[ j ] ) ) {
 						nodes.splice( i, 1 );
@@ -153,7 +143,9 @@ define( [
 			this.watcher.trigger( 'selectionChange', selection );
 
 			// create and apply transactions to the document
-			nodes.forEach( function( node, i ) {
+			for ( i = 0, len = nodes.length; i < len; i++ ) {
+				node = nodes[ i ];
+
 				var transaction = Transaction.createFromNodeAndElement( this.document, node, elements[ i ] );
 
 				transaction.applyTo( this.document );
@@ -162,14 +154,19 @@ define( [
 				if ( transaction.applied ) {
 					this.history.push( transaction );
 				}
-			}, this );
+			}
+
+			// disable the mutation observer again before removing unneeded DOM elements
+			this.disableMutationObserver();
 
 			// clean up all unneeded nodes
-			toRemove.forEach( function( node ) {
+			for ( i = 0, len = toRemove.length; i < len; i++ ) {
+				node = toRemove[ i ];
+
 				if ( node.parentElement ) {
 					node.parentElement.removeChild( node );
 				}
-			} );
+			}
 
 			// re-enable the mutation observer
 			this.enableMutationObserver();
@@ -178,6 +175,30 @@ define( [
 
 			// TODO this is just a temporary solution for development purposes
 			this.trigger( 'change' );
+
+			function addRemove( addedNodes ) {
+				for ( var i = 0, len = addedNodes.length; i < len; i++ ) {
+					var addedNode = addedNodes[ i ];
+
+					if ( toRemove.indexOf( addedNode ) === -1 ) {
+						toRemove.push( addedNode );
+					}
+				}
+			}
+
+			function delRemove( removedNodes ) {
+				var idx;
+
+				for ( var i = 0, len = removedNodes.length; i < len; i++ ) {
+					var removedNode = removedNodes[ i ];
+
+					if ( ( idx = toRemove.indexOf( removedNode ) ) !== -1 ) {
+						toRemove.splice( idx, 1 );
+					}
+				}
+			}
+
+			var that = this;
 
 			function findParentView( element ) {
 				var topEl = that.$el.getElement();
