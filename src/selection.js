@@ -7,27 +7,40 @@ define( [
 ) {
 	'use strict';
 
-	function Selection( range ) {
+	function Selection( document, range ) {
+		this.document = document;
+		// TODO what about multiple ranges (in ff)?
 		this.range = null;
 		this.node = null;
+		this.anchorAttributes = [];
+		this.focusAttributes = [];
+
+		this.update( range );
 	}
 
+	utils.extend( Selection, {
+		EMPTY: 'empty',
+		CARRET: 'carret',
+		RANGE: 'range'
+	} );
+
+	Object.defineProperty( Selection.prototype, 'collapsed', {
+		get: function() {
+			return this.range && this.range.collapsed;
+		}
+	} );
+
 	utils.extend( Selection.prototype, {
-		empty: function() {
-			this.range = null;
-			tnis.node = null;
-		},
+		update: function( range ) {
+			this.range = range;
 
-		update: function( from, to, node ) {
-			var range = new Range( from, to );
-
-			if ( !this.range || !this.range.equals( range ) ) {
-				this.range = range;
+			if ( this.range ) {
+				this.node = this.document.getNodeAtPosition( this.range.from );
 			}
 
-			if ( !this.node || this.node !== node ) {
-				this.node = node;
-			}
+			this.type = range ? range.collapsed ? Selection.CARRET : Selection.RANGE : Selection.EMPTY;
+
+			// TODO get attributes
 		}
 	} );
 
