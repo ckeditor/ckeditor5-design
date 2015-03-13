@@ -44,7 +44,6 @@ define( function() {
 			_DELETE = DELETE;
 		}
 
-		// -1 the length to balance "null" at the beginning
 		var m = a.length,
 			n = b.length,
 			delta = n - m;
@@ -55,7 +54,7 @@ define( function() {
 		var fp = {};
 
 		function snake( k ) {
-			// we use -1 below to handle initial values ( instead of filling the fp with -1 first )
+			// we use -1 as an alternative below to handle initial values ( instead of filling the fp with -1 first )
 			// y on the diagonal below k
 			var y1 = ( fp[ k - 1 ] !== undefined ? fp[ k - 1 ] : -1 ) + 1;
 			// y on the diagonal above k
