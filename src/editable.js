@@ -74,6 +74,8 @@ define( [
 		},
 
 		handleMutations: function( mutations ) {
+			var that = this;
+
 			var node, len, i;
 
 			var nodes = [];
@@ -97,6 +99,10 @@ define( [
 
 					if ( view ) {
 						node = view.node;
+					}
+
+					if ( !node || node.type !== 'root' ) {
+						delete target.dataset.vid;
 					}
 
 					// collect nodes created by contenteditable to be removed later
@@ -140,8 +146,10 @@ define( [
 			// TODO save current selection
 			var selection = this.$document.getSelection();
 			// TODO temporarily force selection change trigger
+			console.log( 'trigger' );
 			this.watcher.trigger( 'selectionChange', selection );
 
+			// TODO merge transactions (?)
 			// create and apply transactions to the document
 			for ( i = 0, len = nodes.length; i < len; i++ ) {
 				node = nodes[ i ];
@@ -197,8 +205,6 @@ define( [
 					}
 				}
 			}
-
-			var that = this;
 
 			function findParentView( element ) {
 				var topEl = that.$el.getElement();
