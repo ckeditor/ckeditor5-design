@@ -46,7 +46,7 @@ var config = {
 			applications: [ 'prototype' ],
 			basePath: 'tests/',
 			paths: [
-				'**/*.js'
+				'**/*'
 			]
 		}
 	}
