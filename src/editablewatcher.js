@@ -242,16 +242,29 @@ define( [
 		var rOld = ranges.get( doc );
 		var rNew = getSelectionRange( doc );
 
-		if ( !sameRange( rNew, rOld ) ) {
+		if ( !areSameRanges( rNew, rOld ) ) {
 			ranges.set( doc, rNew );
 			setTimeout( doc.dispatchEvent.bind( doc, new Event( 'selectionchange' ) ), 0 );
 		}
 	}
 
 	function getSelectionRange( doc ) {
-		var s = doc.getSelection();
+		var selection = doc.getSelection(),
+			count = selection.rangeCount;
 
-		return s.rangeCount ? s.getRangeAt( 0 ) : null;
+		if ( count > 1 ) {
+			var ranges = [];
+
+			for ( var i = 0; i < count; i++ ) {
+				ranges.push( selection.getRangeAt( i ) );
+			}
+
+			return ranges;
+		} else if ( count === 1 ) {
+			return selection.getRangeAt( 0 );
+		} else {
+			return null;
+		}
 	}
 
 	function hasNativeSupport( doc ) {
@@ -304,12 +317,22 @@ define( [
 
 	/*jshint validthis:false */
 
-	function sameRange( r1, r2 ) {
-		return r1 === r2 || r1 && r2 &&
-			r1.startContainer === r2.startContainer &&
-			r1.startOffset === r2.startOffset &&
-			r1.endContainer === r2.endContainer &&
-			r1.endOffset === r2.endOffset;
+	function areSameRanges( r1, r2 ) {
+		if ( Array.isArray( r1 ) && Array.isArray( r2 ) ) {
+			if ( r1.length !== r2.length ) {
+				return false;
+			}
+
+			return r1.every( function( range, i ) {
+				return areSameRanges( range, r2[ i ] );
+			} );
+		} else {
+			return r1 === r2 || r1 && r2 &&
+				r1.startContainer === r2.startContainer &&
+				r1.startOffset === r2.startOffset &&
+				r1.endContainer === r2.endContainer &&
+				r1.endOffset === r2.endOffset;
+		}
 	}
 
 	return EditableWatcher;
