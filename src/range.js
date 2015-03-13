@@ -2,7 +2,7 @@ define( [ 'tools/utils' ], function( utils ) {
 	'use strict';
 
 	function Range( from, to ) {
-		this.from = from;
+		this.from = from || 0;
 		this.to = to === undefined ? from : to;
 		this.start = this.from > this.to ? this.to : this.from;
 		this.end = this.from > this.to ? this.from : this.to;
