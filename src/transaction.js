@@ -86,7 +86,8 @@ define( [
 				}
 			}
 
-			document.editable.disableMutationObserver();
+			// disable the editable's mutation observer while applying changes in the dirty DOM
+			document.editable.mutationObserver.disable();
 
 			// calculate the ending offset to locate the last affected node
 			var rightOffset = offset - added + removed - ( removed > 0 ? 1 : 0 );
@@ -166,7 +167,8 @@ define( [
 				throw new Error( 'WAT?' );
 			}
 
-			document.editable.enableMutationObserver();
+			// re-enable the editable's mutation observer
+			document.editable.mutationObserver.enable();
 
 			// mark the transaction as applied
 			this.applied = true;

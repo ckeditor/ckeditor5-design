@@ -2,6 +2,7 @@ define( [
 	'document',
 	'definitions',
 	'editablewatcher',
+	'mutationobserver',
 	'selection',
 	'transaction',
 	'tools/element',
@@ -11,6 +12,7 @@ define( [
 	Document,
 	def,
 	EditableWatcher,
+	MutationObserver,
 	Selection,
 	Transaction,
 	Element,
@@ -40,33 +42,18 @@ define( [
 
 		this.selection = new Selection( this.document );
 
-		this.mutationObserver = new MutationObserver( this.handleMutations.bind( this ) );
+		this.mutationObserver = new MutationObserver( this.$documentView.getElement(), this.handleMutations.bind( this ) );
 
 		// start listening for DOM mutations
-		this.enableMutationObserver();
+		this.mutationObserver.enable();
 
 		this.watcher = new EditableWatcher( this );
 		this.watcher.on( 'selectionChange', this.updateSelection, this );
 	}
 
-	var config = {
-		childList: true,
-		attributes: true,
-		characterData: true,
-		subtree: true
-	};
-
 	utils.extend( Editable.prototype, Emitter, {
 		addView: function( view ) {
 			this._views[ view.vid ] = view;
-		},
-
-		disableMutationObserver: function() {
-			this.mutationObserver.disconnect();
-		},
-
-		enableMutationObserver: function() {
-			this.mutationObserver.observe( this.$documentView.getElement(), config );
 		},
 
 		getView: function( vid ) {
@@ -84,7 +71,7 @@ define( [
 			var toRemove = [];
 
 			// disable the mutation observer while manipulating "dirty" DOM elements
-			this.disableMutationObserver();
+			this.mutationObserver.disable();
 
 			// get the top-most affected node
 			for ( i = 0, len = mutations.length; i < len; i++ ) {
@@ -162,7 +149,7 @@ define( [
 			}
 
 			// disable the mutation observer again before removing unneeded DOM elements
-			this.disableMutationObserver();
+			this.mutationObserver.disable();
 
 			// clean up all unneeded nodes
 			for ( i = 0, len = toRemove.length; i < len; i++ ) {
@@ -174,7 +161,7 @@ define( [
 			}
 
 			// re-enable the mutation observer
-			this.enableMutationObserver();
+			this.mutationObserver.enable();
 
 			// TODO restore the selection
 
