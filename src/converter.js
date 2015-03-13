@@ -23,6 +23,7 @@ define( [
 
 			// element
 			if ( elem.nodeType === Node.ELEMENT_NODE ) {
+				// we want to treat the topmost element as a root node
 				var nodeConstructor = root ?
 					nodeManager.get( 'root' ) :
 					nodeManager.matchForDom( elem ) || nodeManager.get( 'unknown' );
@@ -52,9 +53,11 @@ define( [
 				}
 
 				// collect data for all children
-				[].forEach.call( elem.childNodes, function( child ) {
+				for ( var i = 0, len = elem.childNodes.length; i < len; i++ ) {
+					var child = elem.childNodes[ i ];
+
 					data = data.concat( this.getDataForDom( child, store, attributes ) );
-				}, this );
+				}
 				// text
 			} else if ( elem.nodeType === Node.TEXT_NODE ) {
 				var text = elem.data;
@@ -65,7 +68,7 @@ define( [
 					return data;
 				}
 
-				var textData = this.getDataForText( elem.textContent, parentAttributes );
+				var textData = this._getDataForText( elem.textContent, parentAttributes );
 
 				data = data.concat( textData );
 			}
@@ -78,19 +81,6 @@ define( [
 			}
 
 			return data;
-		},
-
-		// prepare linear data for the given text
-		getDataForText: function( text, parentAttributes ) {
-			text = text.split( '' );
-
-			if ( !parentAttributes ) {
-				return text;
-			}
-
-			return text.map( function( char ) {
-				return [ char, parentAttributes ];
-			} );
 		},
 
 		// prepare DOM elements for the given data
@@ -252,6 +242,19 @@ define( [
 			}
 
 			return currentStack;
+		},
+
+		// prepare linear data for the given text
+		_getDataForText: function( text, parentAttributes ) {
+			text = text.split( '' );
+
+			if ( !parentAttributes ) {
+				return text;
+			}
+
+			return text.map( function( char ) {
+				return [ char, parentAttributes ];
+			} );
 		}
 	};
 
