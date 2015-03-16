@@ -12,9 +12,36 @@ define( [
 ) {
 	'use strict';
 
-	function Converter() {}
+	var converter = {
+		// retrieve an array of attributes for the given element
+		getAttributesForDomElement: function( element, store ) {
+			var result = [],
+				nodeConstructor;
 
-	Converter.prototype = {
+			// we care about actual elements only
+			if ( element.nodeType === Node.TEXT_NODE ) {
+				element = element.parentNode;
+			}
+
+			while ( element && ( nodeConstructor = nodeManager.matchForDom( element ) ) ) {
+				// at the moment we don't expect having branch nodes wrapped by inline nodes (?)
+				if ( !( nodeConstructor.prototype instanceof InlineNode ) ) {
+					return result;
+				}
+
+				var attributes = nodeConstructor.toData( element );
+				// get index of a style in the store
+				var index = store.store( attributes );
+
+				if ( result.indexOf( index ) === -1 ) {
+					result.unshift( index );
+				}
+
+				element = element.parentNode;
+			}
+
+			return result;
+		},
 		// prepare linear data for the given DOM
 		getDataForDom: function( elem, store, parentAttributes, root ) {
 			var data = [],
@@ -258,5 +285,5 @@ define( [
 		}
 	};
 
-	return new Converter();
+	return converter;
 } );
