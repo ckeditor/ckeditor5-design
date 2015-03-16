@@ -23,7 +23,7 @@ define( [ 'tools/utils' ], function( utils ) {
 
 	utils.extend( Range.prototype, {
 		equals: function( range ) {
-			return range.from === this.from && range.to === this.to && this.equalsSelection( range );
+			return range && range.from === this.from && range.to === this.to && this.equalsSelection( range );
 		},
 
 		equalsSelection: function( range ) {
