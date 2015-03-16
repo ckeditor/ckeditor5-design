@@ -59,6 +59,96 @@ define( [
 			this.history.push( transaction );
 		},
 
+		// return an element and offset representing the given position in the linear data
+		getDomNodeAndOffset: function( position, attributes ) {
+			var node = this.getViewNodeAtPosition( position );
+
+			if ( !node ) {
+				return null;
+			}
+
+			// TODO take the attributes into account
+
+			var view = node.view;
+			var offset = node.getOffset() + ( node.isWrapped ? 1 : 0 );
+
+			var current = {
+				children: view.getElement().childNodes,
+				index: 0
+			};
+
+			var stack = [ current ];
+
+			console.log( 'offset', offset );
+
+			while ( stack.length ) {
+				console.log( current.index, current.children.length );
+				// we went through all nodes in the current stack
+				if ( current.index >= current.children.length ) {
+					stack.pop();
+					current = stack[ stack.length - 1 ];
+					// process current stack
+				} else {
+					var child = current.children[ current.index ];
+
+					// child  is a text node, check if the position sits within the child
+					if ( child.nodeType === Node.TEXT_NODE ) {
+						// position fits this node
+						if ( position >= offset && position < offset + child.data.length ) {
+							return {
+								node: child,
+								offset: position - offset
+							};
+						} else {
+							offset += child.data.length;
+						}
+						// child  is an element
+					} else if ( child.nodeType === Node.ELEMENT_NODE ) {
+						var vid;
+
+						// see if we have a view attached to this node
+						if ( child.dataset && ( vid = child.dataset.vid ) && ( view = this.editable.getView( vid ) ) ) {
+							node = view.node;
+
+							var nodeOffset = node.getOffset();
+
+							if ( position >= nodeOffset && position < nodeOffset + node.length ) {
+								current.index++;
+								current = {
+									children: child.childNodes,
+									index: 0
+								};
+
+								stack.push( current );
+
+								if ( node.isWrapped ) {
+									offset += 1;
+								}
+
+								continue;
+							} else {
+								offset += node.length;
+							}
+						} else {
+							current.index++;
+
+							current = {
+								children: child.childNodes,
+								index: 0
+							};
+
+							stack.push( current );
+
+							continue;
+						}
+					}
+
+					current.index++;
+				}
+			}
+
+		},
+
 		// retrieve linear data for the given node
 		getNodeData: function( node ) {
 			if ( !node ) {
@@ -108,6 +198,17 @@ define( [
 			}
 
 			return findNode( this.root, 0 );
+		},
+
+		// retrieve a node with view attached to it located at the given position
+		getViewNodeAtPosition: function( position ) {
+			var node = this.getNodeAtPosition( position );
+
+			while ( !node.view ) {
+				node = node.parent;
+			}
+
+			return node;
 		}
 	} );
 
