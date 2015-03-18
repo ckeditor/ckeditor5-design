@@ -1,11 +1,9 @@
 define( [
 	'converter',
-	'nodemanager',
 	'tools/arraydiff',
 	'tools/utils'
 ], function(
 	converter,
-	nodeManager,
 	diff,
 	utils
 ) {

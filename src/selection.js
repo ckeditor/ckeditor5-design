@@ -1,8 +1,6 @@
 define( [
-	'range',
 	'tools/utils'
 ], function(
-	Range,
 	utils
 ) {
 	'use strict';

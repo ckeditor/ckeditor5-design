@@ -1,6 +1,5 @@
 define( [
 	'document',
-	'definitions',
 	'editablewatcher',
 	'mutationobserver',
 	'selection',
@@ -11,7 +10,6 @@ define( [
 	'tools/utils'
 ], function(
 	Document,
-	def,
 	EditableWatcher,
 	MutationObserver,
 	Selection,

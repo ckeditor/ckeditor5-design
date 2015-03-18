@@ -1,4 +1,8 @@
-define( [ 'tools/utils' ], function( utils ) {
+define( [
+	'tools/utils'
+], function(
+	utils
+) {
 	'use strict';
 
 	function Range( from, to ) {

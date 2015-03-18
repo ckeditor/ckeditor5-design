@@ -1,13 +1,11 @@
 // contains pieces of 'selectionchange' event polyfill: github.com/2is10/selectionchange-polyfill
 
 define( [
-	'converter',
 	'range',
 	'tools/element',
 	'tools/emitter',
 	'tools/utils'
 ], function(
-	converter,
 	Range,
 	Element,
 	Emitter,

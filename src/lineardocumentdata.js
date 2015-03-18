@@ -1,4 +1,10 @@
-define( [ 'lineardata', 'tools/utils' ], function( LinearData, utils ) {
+define( [
+	'lineardata',
+	'tools/utils'
+], function(
+	LinearData,
+	utils
+) {
 	'use strict';
 
 	function LinearDocumentData() {
