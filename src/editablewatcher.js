@@ -19,7 +19,8 @@ define( [
 
 	function EditableWatcher( editable ) {
 		this.editable = editable;
-		this.document = editable.$document || document;
+		this.document = editable.document;
+		this.$document = editable.$document || document;
 		this.range = null;
 
 		this._changeHandler = this.checkSelectionChange.bind( this );
@@ -32,7 +33,7 @@ define( [
 
 	utils.extend( EditableWatcher.prototype, Emitter, {
 		checkSelectionChange: function() {
-			var selection = this.document.getSelection(),
+			var selection = this.$document.getSelection(),
 				// TODO what about other ranges?
 				range = selection && selection.rangeCount && selection.getRangeAt( 0 ) || null,
 				topEl = this.editable.$el.getElement();
@@ -41,11 +42,11 @@ define( [
 			if ( !range || !Element.hasAncestor( range.commonAncestorContainer, topEl ) ) {
 				range = null;
 			} else {
-				var start = this.editable.document.getOffsetAndAttributes( selection.anchorNode, selection.anchorOffset ),
+				var start = this.document.getOffsetAndAttributes( selection.anchorNode, selection.anchorOffset ),
 					end;
 
 				if ( !selection.isCollapsed ) {
-					end = this.editable.document.getOffsetAndAttributes( selection.focusNode, selection.focusOffset );
+					end = this.document.getOffsetAndAttributes( selection.focusNode, selection.focusOffset );
 				}
 
 				range = new Range( start, end );
@@ -62,11 +63,11 @@ define( [
 		},
 
 		enable: function() {
-			this.document.addEventListener( 'selectionchange', this._changeHandler );
+			this.$document.addEventListener( 'selectionchange', this._changeHandler );
 		},
 
 		disable: function() {
-			this.document.removeEventListener( 'selectionchange', this._changeHandler );
+			this.$document.removeEventListener( 'selectionchange', this._changeHandler );
 		},
 
 		startWatching: function() {
@@ -85,30 +86,30 @@ define( [
 
 		_startSelectionChangePolyfill: function() {
 			if (
-				( ranges || !hasNativeSupport( this.document ) && ( ranges = newWeakMap() ) ) &&
-				!ranges.has( this.document )
+				( ranges || !hasNativeSupport( this.$document ) && ( ranges = newWeakMap() ) ) &&
+				!ranges.has( this.$document )
 			) {
-				ranges.set( this.document, getSelectionRange( this.document ) );
+				ranges.set( this.$document, getSelectionRange( this.$document ) );
 
-				this.document.addEventListener( 'keydown', dispatchChange );
-				this.document.addEventListener( 'mousedown', onMouseDown );
-				this.document.addEventListener( 'mousemove', onMouseMove );
-				this.document.addEventListener( 'mouseup', onMouseUp );
-				this.document.defaultView.addEventListener( 'focus', dispatchChange );
+				this.$document.addEventListener( 'keydown', dispatchChange );
+				this.$document.addEventListener( 'mousedown', onMouseDown );
+				this.$document.addEventListener( 'mousemove', onMouseMove );
+				this.$document.addEventListener( 'mouseup', onMouseUp );
+				this.$document.defaultView.addEventListener( 'focus', dispatchChange );
 
 				this.checkSelectionChange();
 			}
 		},
 
 		_stopSelectionChangePolyfill: function() {
-			if ( ranges && ranges.has( this.document ) ) {
-				ranges[ 'delete' ]( this.document );
+			if ( ranges && ranges.has( this.$document ) ) {
+				ranges[ 'delete' ]( this.$document );
 
-				this.document.removeEventListener( 'keydown', dispatchChange );
-				this.document.removeEventListener( 'mousedown', onMouseDown );
-				this.document.removeEventListener( 'mousemove', onMouseMove );
-				this.document.removeEventListener( 'mouseup', onMouseUp );
-				this.document.defaultView.removeEventListener( 'focus', dispatchChange );
+				this.$document.removeEventListener( 'keydown', dispatchChange );
+				this.$document.removeEventListener( 'mousedown', onMouseDown );
+				this.$document.removeEventListener( 'mousemove', onMouseMove );
+				this.$document.removeEventListener( 'mouseup', onMouseUp );
+				this.$document.defaultView.removeEventListener( 'focus', dispatchChange );
 
 				this.checkSelectionChange();
 			}
