@@ -12,8 +12,6 @@ define( [
 		// TODO what about multiple ranges (in ff)?
 		this.range = null;
 		this.node = null;
-		this.anchorAttributes = [];
-		this.focusAttributes = [];
 
 		this.update( range );
 	}
@@ -34,6 +32,7 @@ define( [
 		update: function( range ) {
 			this.range = range;
 
+			// set current node
 			if ( this.range ) {
 				this.node = this.document.getNodeAtPosition( this.range.from );
 			}

@@ -2,16 +2,23 @@ define( [ 'tools/utils' ], function( utils ) {
 	'use strict';
 
 	function Range( from, to ) {
-		this.from = from || 0;
-		this.to = to === undefined ? from : to;
+		this.from = from.offset;
+		this.fromAttributes = from.attributes;
+
+		this.to = to ? to.offset : this.from;
+		this.toAttributes = to ? to.attributes : this.fromAttributes;
+
 		this.start = this.from > this.to ? this.to : this.from;
+		this.startAttributes = this.from > this.to ? this.toAttributes : this.fromAttributes;
+
 		this.end = this.from > this.to ? this.from : this.to;
+		this.endAttributes = this.from > this.to ? this.fromAttributes : this.toAttributes;
 	}
 
 	// prototype
 	Object.defineProperty( Range.prototype, 'collapsed', {
 		get: function() {
-			return this.from === this.to;
+			return this.start === this.end;
 		}
 	} );
 
@@ -23,17 +30,30 @@ define( [ 'tools/utils' ], function( utils ) {
 
 	utils.extend( Range.prototype, {
 		equals: function( range ) {
-			return range && range.from === this.from && range.to === this.to && this.equalsSelection( range );
+			return range && range.from === this.from && range.to === this.to &&
+				areEqualArrays( range.fromAttributes, this.fromAttributes ) &&
+				areEqualArrays( range.toAttributes, this.toAttributes );
 		},
 
 		equalsSelection: function( range ) {
-			return range.start === this.start && range.end === this.end;
+			return range && range.start === this.start && range.end === this.end &&
+				areEqualArrays( range.startAttributes, this.startAttributes ) &&
+				areEqualArrays( range.endAttributes, this.endAttributes );
 		},
 
-		translate: function( offset ) {
+		translateOffset: function( offset ) {
 			return new this.constructor( this.from + offset, this.to + offset );
 		}
+
+		// TODO transalte attributes
 	} );
+
+	function areEqualArrays( a, b ) {
+		return Array.isArray( a ) && Array.isArray( b ) && a.length === b.length &&
+			a.every( function( item, i ) {
+				return item === b[ i ];
+			} );
+	}
 
 	return Range;
 
