@@ -1,11 +1,15 @@
 // contains pieces of 'selectionchange' event polyfill: github.com/2is10/selectionchange-polyfill
 
 define( [
+	'converter',
 	'range',
+	'tools/element',
 	'tools/emitter',
 	'tools/utils'
 ], function(
+	converter,
 	Range,
+	Element,
 	Emitter,
 	utils
 ) {
@@ -29,172 +33,54 @@ define( [
 	utils.extend( EditableWatcher.prototype, Emitter, {
 		checkSelectionChange: function() {
 			var selection = this.document.getSelection(),
+				// TODO what about other ranges?
 				range = selection && selection.rangeCount && selection.getRangeAt( 0 ) || null,
-				topEl = this.editable.$el.getElement(),
-				that = this;
+				topEl = this.editable.$el.getElement();
 
 			// no range or outside of the editable area
-			if ( !range || !hasAncestor( range.commonAncestorContainer, topEl ) ) {
-				return;
+			if ( !range || !Element.hasAncestor( range.commonAncestorContainer, topEl ) ) {
+				range = null;
+			} else {
+				var start = this.editable.document.getOffsetAndAttributes( selection.anchorNode, selection.anchorOffset ),
+					end;
+
+				if ( !selection.isCollapsed ) {
+					end = this.editable.document.getOffsetAndAttributes( selection.focusNode, selection.focusOffset );
+				}
+
+				range = new Range( start, end );
 			}
-
-			var startOffset = getOffset( selection.anchorNode, selection.anchorOffset ),
-				endOffset;
-
-			if ( !selection.isCollapsed ) {
-				endOffset = getOffset( selection.focusNode, selection.focusOffset );
-			}
-
-			range = new Range( startOffset, endOffset );
 
 			// check if the range changed and trigger selectionChange if needed
-			if ( !this.range || !this.range.equals( range ) ) {
+			if (
+				( this.range && !this.range.equals( range ) ) ||
+				( !this.range && range )
+			) {
 				this.range = range;
 				this.trigger( 'selectionChange', this.range );
 			}
+		},
 
-			// TODO exclude internal elements from the offset calculation
-			// calculates the offset in the linear data
-			function getOffset( element, offset ) {
-				var length = 0,
-					view, node, searchElem;
+		enable: function() {
+			this.document.addEventListener( 'selectionchange', this._changeHandler );
+		},
 
-				// validate the offset first
-				if (
-					offset < 0 ||
-					offset > ( element.nodeType === Node.ELEMENT_NODE ? element.childNodes.length : element.data.length )
-				) {
-					throw new Error( 'Invalid offset.' );
-				}
-
-				if ( element.nodeType === Node.ELEMENT_NODE ) {
-					// the selection is at the beginning or end of the element
-					if ( element.childNodes.length === 0 || element.childNodes.length === offset ) {
-						// the element has a view so we can easily get its offset in the linear data
-						if ( ( view = getView( element ) ) ) {
-							node = view.node;
-
-							// node's offset +
-							// node's length if we're looking for the node's closing element
-							// or + 1 for the opening element
-							return node.getOffset() + ( offset ? node.length : 1 );
-						}
-
-						searchElem = element;
-
-						// we'll try to get the offset using the element last child's offset (or its descendant's offset)
-						if ( offset ) {
-							while ( searchElem.lastChild ) {
-								searchElem = searchElem.lastChild;
-
-								if ( ( view = getView( searchElem ) ) ) {
-									node = view.node;
-
-									// node's offset + length to get the closing element's offset
-									return node.getOffset() + node.length;
-								}
-							}
-						}
-					} else {
-						searchElem = element.childNodes[ offset ];
-						element = searchPrecedingElem( searchElem );
-					}
-				} else {
-					// include the offset within a text node
-					length += offset;
-
-					searchElem = element;
-					element = searchPrecedingElem( element );
-				}
-
-				// find the closest referring to a view
-				while ( !( view = getView( element ) ) ) {
-					// include the element's length in the final offset
-					if ( element.nodeType === Node.TEXT_NODE ) {
-						length += element.data.length;
-					}
-
-					element = searchPrecedingElem( element );
-				}
-
-				node = view.node;
-
-				// include the element's length or + 1 opening element if needed
-				length += hasAncestor( searchElem, element ) ? 1 : node.length;
-
-				// compute the final offset
-				offset = node.getOffset() + length;
-
-				return offset;
-			}
-
-			// finds the closest preceding element that has a view attached to it
-			function searchPrecedingElem( element ) {
-				// use the parent if there's no previous sibling
-				while ( !element.previousSibling ) {
-					element = element.parentElement;
-
-					if ( !element ) {
-						throw new Error( 'Element doesn\'t have a parent with a view attached to it.' );
-					}
-
-					// we may use the parent since it has a view
-					if ( getView( element ) ) {
-						return element;
-					}
-				}
-
-				element = element.previousSibling;
-
-				// we may use the sibling
-				if ( getView( element ) ) {
-					return element;
-				}
-
-				while ( element.lastChild ) {
-					element = element.lastChild;
-					// we may use the sibling's descendant
-					if ( getView( element ) ) {
-						return element;
-					}
-				}
-
-				return element;
-			}
-
-			// checks if the given element has the given ancestor
-			function hasAncestor( elem, ancestor ) {
-				var parent;
-
-				while ( ( parent = elem.parentElement ) ) {
-					if ( parent === ancestor ) {
-						return true;
-					}
-
-					elem = parent;
-				}
-
-				return false;
-			}
-
-			// get the element's view, if any
-			function getView( element ) {
-				return element.dataset && element.dataset.vid && that.editable.getView( element.dataset.vid );
-			}
+		disable: function() {
+			this.document.removeEventListener( 'selectionchange', this._changeHandler );
 		},
 
 		startWatching: function() {
 			// enable selectionchange event polyfill if needed
 			this._startSelectionChangePolyfill();
 
-			this.document.addEventListener( 'selectionchange', this._changeHandler );
+			this.enable();
 		},
 
 		stopWatching: function() {
 			// disable selectionchange event polyfill
 			this._stopSelectionChangePolyfill();
 
-			this.document.removeEventListener( 'selectionchange', this._changeHandler );
+			this.disable();
 		},
 
 		_startSelectionChangePolyfill: function() {

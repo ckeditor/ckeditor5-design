@@ -6,6 +6,8 @@ define( [
 	'nodemanager',
 	'store',
 	'view',
+	'viewmanager',
+	'tools/element',
 	'tools/emitter',
 	'tools/utils'
 ], function(
@@ -16,6 +18,8 @@ define( [
 	nodeManager,
 	Store,
 	View,
+	viewManager,
+	Element,
 	Emitter,
 	utils
 ) {
@@ -31,7 +35,7 @@ define( [
 		var dom = utils.createDocumentFromHTML( $el.html() ).body;
 
 		// TODO combine the data processing with data conversion loop
-		// normalize the dom
+		// normalize the DOM
 		dataProcessor.normalizeWhitespaces( dom );
 
 		// prepare the data array for the linear data
@@ -59,18 +63,63 @@ define( [
 			this.history.push( transaction );
 		},
 
+		// retrieve a branch node located at the given position
+		getBranchAtPosition: function( position ) {
+			var node = this.getNodeAtPosition( position );
+
+			while ( node && !( node.hasChildren ) ) {
+				node = node.parent;
+			}
+
+			return node;
+		},
+
 		// return an element and offset representing the given position in the linear data
 		getDomNodeAndOffset: function( position, attributes ) {
-			var node = this.getViewNodeAtPosition( position );
+			var item = this.data.get( position );
 
-			if ( !node ) {
+			if ( !item ) {
 				return null;
 			}
 
-			// TODO take the attributes into account
+			attributes = attributes || [];
 
+			var attrFix = 0;
+
+			// we have attributes, but the item does not, or has different ones
+			if ( !matchAttributes( item, attributes ) ) {
+				var itemBefore;
+
+				do {
+					attrFix++;
+					position--;
+
+					itemBefore = this.data.get( position );
+
+					if ( typeof itemBefore == 'undefined' ) {
+						throw new Error( 'Couldn\'t find a preceding item matching given attributes.' );
+					}
+				} while ( !matchAttributes( itemBefore, attributes ) );
+			}
+
+			var node = this.getBranchAtPosition( position );
 			var view = node.view;
-			var offset = node.getOffset() + ( node.isWrapped ? 1 : 0 );
+			var offset = node.getOffset();
+
+			var parent;
+
+			// position points to an element's opening, return its offset within its parent
+			if ( position === offset ) {
+				parent = view.getElement().parentNode;
+
+				return {
+					node: parent,
+					offset: getNodeOffset( parent, view.getElement() )
+				};
+			}
+
+			// add 1 for node's opening item if needed
+			offset += node.isWrapped ? 1 : 0;
 
 			var current = {
 				children: view.getElement().childNodes,
@@ -79,10 +128,7 @@ define( [
 
 			var stack = [ current ];
 
-			console.log( 'offset', offset );
-
 			while ( stack.length ) {
-				console.log( current.index, current.children.length );
 				// we went through all nodes in the current stack
 				if ( current.index >= current.children.length ) {
 					stack.pop();
@@ -94,10 +140,13 @@ define( [
 					// child  is a text node, check if the position sits within the child
 					if ( child.nodeType === Node.TEXT_NODE ) {
 						// position fits this node
-						if ( position >= offset && position < offset + child.data.length ) {
+						if ( position >= offset && ( position < offset + child.data.length ||
+								// position points to an element's opening / closing tag
+								( this.data.isElementAt( position ) && position === offset + child.data.length )
+							) ) {
 							return {
 								node: child,
-								offset: position - offset
+								offset: position - offset + attrFix
 							};
 						} else {
 							offset += child.data.length;
@@ -107,12 +156,23 @@ define( [
 						var vid;
 
 						// see if we have a view attached to this node
-						if ( child.dataset && ( vid = child.dataset.vid ) && ( view = this.editable.getView( vid ) ) ) {
+						if ( child.dataset && ( vid = child.dataset.vid ) && ( view = viewManager.get( vid ) ) ) {
 							node = view.node;
 
 							var nodeOffset = node.getOffset();
 
 							if ( position >= nodeOffset && position < nodeOffset + node.length ) {
+
+								if ( position === nodeOffset ) {
+									parent = child.parentNode;
+
+									return {
+										node: parent,
+										offset: getNodeOffset( parent, child )
+									};
+								}
+
+
 								current.index++;
 								current = {
 									children: child.childNodes,
@@ -147,6 +207,32 @@ define( [
 				}
 			}
 
+			// check if two arrays are equal (shallow)
+			function areEqualArrays( a, b ) {
+				return Array.isArray( a ) && Array.isArray( b ) && a.length === b.length &&
+					a.every( function( item, i ) {
+						return item === b[ i ];
+					} );
+			}
+
+			// check if the given item matches the attributes:
+			// - item attributes and the attributes are equal
+			// - item attributes length is 0 and the attributes length is 0
+			// - item is a string and the attributes length is 0
+			function matchAttributes( item, attributes ) {
+				return ( attributes.length && Array.isArray( item ) && areEqualArrays( item[ 1 ], attributes ) ) ||
+					( !attributes.length && !Array.isArray( item ) || areEqualArrays( item[ 1 ], attributes ) );
+			}
+
+			function getNodeOffset( parent, node ) {
+				for ( var i = 0, len = parent.childNodes.length; i < len; i++ ) {
+					if ( parent.childNodes[ i ] === node ) {
+						return i;
+					}
+				}
+
+				return -1;
+			}
 		},
 
 		// retrieve linear data for the given node
@@ -200,15 +286,142 @@ define( [
 			return findNode( this.root, 0 );
 		},
 
-		// retrieve a node with view attached to it located at the given position
-		getViewNodeAtPosition: function( position ) {
-			var node = this.getNodeAtPosition( position );
-
-			while ( !node.view ) {
-				node = node.parent;
+		// TODO exclude internal elements from the offset calculation
+		// calculates the offset in the linear data
+		getOffsetAndAttributes: function( element, offset ) {
+			var that = this;
+			// validate the offset first
+			if (
+				offset < 0 ||
+				offset > ( element.nodeType === Node.ELEMENT_NODE ? element.childNodes.length : element.data.length )
+			) {
+				throw new Error( 'Invalid offset.' );
 			}
 
-			return node;
+			var length = 0,
+				view, node, searchElem;
+
+			// get attributes for the given element
+			var attributes = converter.getAttributesForDomElement( element, this.store );
+
+			if ( element.nodeType === Node.ELEMENT_NODE ) {
+				// the selection is at the beginning or end of the element
+				if ( element.childNodes.length === 0 || element.childNodes.length === offset ) {
+					// the element has a view so we can easily get its offset in the linear data
+					if ( ( view = viewManager.getByElement( element ) ) ) {
+						node = view.node;
+
+						// node's offset +
+						// node's length if we're looking for the node's closing element
+						// or + 1 for the opening element
+						return {
+							attributes: attributes,
+							offset: node.getOffset() + ( offset ? node.length : 1 )
+						};
+					}
+
+					searchElem = element;
+
+					// we'll try to get the offset using the element last child's offset (or its descendant's offset)
+					if ( offset ) {
+						while ( searchElem.lastChild ) {
+							searchElem = searchElem.lastChild;
+
+							if ( ( view = viewManager.getByElement( searchElem ) ) ) {
+								node = view.node;
+
+								// node's offset + length to get the closing element's offset
+								return {
+									attributes: attributes,
+									offset: node.getOffset() + node.length
+								};
+							}
+						}
+					}
+				} else {
+					searchElem = element.childNodes[ offset ];
+					element = searchPrecedingElem( searchElem );
+				}
+			} else {
+				// include the offset within a text node
+				length += offset;
+
+				searchElem = element;
+				element = searchPrecedingElem( element );
+			}
+
+			// find the closest referring to a view
+			while ( !( view = viewManager.getByElement( element ) ) ) {
+				// include the element's length in the final offset
+				if ( element.nodeType === Node.TEXT_NODE ) {
+					length += element.data.length;
+				}
+
+				element = searchPrecedingElem( element );
+			}
+
+			node = view.node;
+
+			// include the element's length or + 1 opening element if needed
+			length += Element.hasAncestor( searchElem, element ) ? 1 : node.length;
+
+			// compute the final offset
+			offset = node.getOffset() + length;
+
+			// finds the closest preceding element that has a view attached to it
+			function searchPrecedingElem( element ) {
+				// use the parent if there's no previous sibling
+				while ( !element.previousSibling ) {
+					element = element.parentNode;
+
+					if ( !element ) {
+						throw new Error( 'Element doesn\'t have a parent with a view attached to it.' );
+					}
+
+					// we may use the parent since it has a view
+					if ( viewManager.getByElement( element ) ) {
+						return element;
+					}
+
+					if ( isAffected( element ) ) {
+						length += 1;
+					}
+				}
+
+				element = element.previousSibling;
+
+				// we may use the sibling
+				if ( viewManager.getByElement( element ) ) {
+					return element;
+				}
+
+				if ( isAffected( element ) ) {
+					length += 1;
+				}
+
+				while ( element.lastChild ) {
+					element = element.lastChild;
+					// we may use the sibling's descendant
+					if ( viewManager.getByElement( element ) ) {
+						return element;
+					}
+
+					if ( isAffected( element ) ) {
+						length += 1;
+					}
+				}
+
+				return element;
+			}
+
+			function isAffected( element ) {
+				return element.dataset && element.dataset.affected;
+			}
+
+			return {
+				attributes: attributes,
+				offset: offset
+			};
 		}
 	} );
 
