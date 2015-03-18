@@ -51,6 +51,9 @@ define( [
 		// start listening for DOM mutations
 		this.mutationObserver.enable();
 
+		this.listenTo( this.document, 'transactionStart', this.mutationObserver.disable, this.mutationObserver );
+		this.listenTo( this.document, 'transactionEnd', this.mutationObserver.enable, this.mutationObserver );
+
 		this.watcher = new EditableWatcher( this );
 		this.watcher.on( 'selectionChange', this.updateSelection, this );
 		this.watcher.enable();

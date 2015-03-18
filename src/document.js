@@ -25,11 +25,8 @@ define( [
 ) {
 	'use strict';
 
-	function Document( $el, editable ) {
+	function Document( $el ) {
 		this.store = new Store();
-
-		// reference to the parent editable object
-		this.editable = editable;
 
 		// create a detached copy of the source html
 		var dom = utils.createDocumentFromHTML( $el.html() ).body;

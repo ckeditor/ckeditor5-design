@@ -42,6 +42,8 @@ define( [
 				return;
 			}
 
+			document.trigger( 'transactionStart', this );
+
 			// a counter representing the current offset in the linear data
 			var offset = 0;
 			// a counter representing the number of inserted data items
@@ -85,9 +87,6 @@ define( [
 					removed++;
 				}
 			}
-
-			// disable the editable's mutation observer while applying changes in the dirty DOM
-			document.editable.mutationObserver.disable();
 
 			// calculate the ending offset to locate the last affected node
 			var rightOffset = offset - added + removed - ( removed > 0 ? 1 : 0 );
@@ -167,11 +166,10 @@ define( [
 				throw new Error( 'WAT?' );
 			}
 
-			// re-enable the editable's mutation observer
-			document.editable.mutationObserver.enable();
-
 			// mark the transaction as applied
 			this.applied = true;
+
+			document.trigger( 'transactionEnd', this );
 
 			// recursively compares arrays of nodes and applies necessary changes to the given parent
 			function updateTree( parent, oldChildren, newChildren ) {
