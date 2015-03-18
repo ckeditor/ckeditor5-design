@@ -392,7 +392,7 @@ define( [
 				}
 
 				if ( isAffected( element ) ) {
-					length += 1;
+					length += 2;
 				}
 
 				while ( element.lastChild ) {
@@ -403,7 +403,7 @@ define( [
 					}
 
 					if ( isAffected( element ) ) {
-						length += 1;
+						length += 2;
 					}
 				}
 

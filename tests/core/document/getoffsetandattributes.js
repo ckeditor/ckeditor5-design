@@ -26,6 +26,17 @@ bender.require( [
 			expect( doc.getOffsetAndAttributes.bind( doc, t, 4 ) ).to.throw( Error, 'Invalid offset.' );
 		} );
 
+		it( 'should throw an error when trying to get offset of an element outside of the document\'s root', function() {
+			var doc = makeDocument( 't1' );
+			// references to DOM elements
+			var p = document.getElementById( 't1' ).firstChild;
+
+			expect( doc.getOffsetAndAttributes.bind( doc, p, 0 ) ).to.throw(
+				Error,
+				'Element doesn\'t have a parent with a view attached to it.'
+			);
+		} );
+
 		it( 'should return a valid offset (t1) - <p>foo</p>', function() {
 			var doc = makeDocument( 't1' );
 			// references to DOM elements
@@ -243,7 +254,7 @@ bender.require( [
 			} );
 		} );
 
-		it( 'should return valid offsets and attributes for injected elements', function() {
+		it( 'should return valid offsets and attributes for injected elements 1', function() {
 			var doc = makeDocument( 't1' );
 
 			var root = doc.root.view.getElement();
@@ -260,13 +271,56 @@ bender.require( [
 
 			root.appendChild( p );
 
-			console.log( doc.data.data );
-
 			var testCases = [
 				// <p data-affected=true><b>^"bar"</b></p>
 				[ b, 0, 7, [ 0 ] ],
 				// <p data-affected=true><b>"bar"^</b></p>
 				[ b, 1, 10, [ 0 ] ]
+			];
+
+			testCases.forEach( function( tc ) {
+				expect( doc.getOffsetAndAttributes( tc[ 0 ], tc[ 1 ] ) ).to.deep.equal( {
+					attributes: tc[ 3 ] || [],
+					offset: tc[ 2 ]
+				} );
+			} );
+		} );
+
+		it( 'should return valid offsets and attributes for injected elements 2', function() {
+			var doc = makeDocument( 't1' );
+
+			var root = doc.root.view.getElement();
+
+			var p = document.createElement( 'p' );
+
+			var br = document.createElement( 'br' );
+			br.dataset.affected = true;
+			p.appendChild( br );
+
+			var i = document.createElement( 'i' );
+			i.textContent = 'bar';
+			p.appendChild( i );
+
+			var br2 = document.createElement( 'br' );
+			br2.dataset.affected = true;
+			p.appendChild( br2 );
+
+			var b = document.createElement( 'b' );
+			b.textContent = 'baz';
+			p.appendChild( b );
+
+			p.dataset.affected = true;
+			root.appendChild( p );
+
+			var testCases = [
+				// <p data-affected=true><br data-affected=true><i>^"bar"</i><br data-affected=true><b>"baz"</b></p>
+				[ i, 0, 9, [ 0 ] ],
+				// <p data-affected=true><br data-affected=true><i>"bar"^</i><br data-affected=true><b>"baz"</b></p>
+				[ i, 1, 12, [ 0 ] ],
+				// <p data-affected=true><br data-affected=true><i>"bar"</i><br data-affected=true><b>^"baz"</b></p>
+				[ b, 0, 14, [ 1 ] ],
+				// <p data-affected=true><br data-affected=true><i>"bar"</i><br data-affected=true><b>"baz"^</b></p>
+				[ b, 1, 17, [ 1 ] ]
 			];
 
 			testCases.forEach( function( tc ) {
