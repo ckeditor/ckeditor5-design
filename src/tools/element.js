@@ -15,12 +15,31 @@ define( [
 		}
 	}
 
-	Element.create = function( tag ) {
-		var el = document.createElement( tag );
+	// static methods
+	utils.extend( Element, {
+		create: function( tag ) {
+			var el = document.createElement( tag );
 
-		return new Element( el );
-	};
+			return new Element( el );
+		},
 
+		hasAncestor: function( element, ancestor ) {
+			var parent;
+
+			while ( ( parent = element.parentNode ) ) {
+				if ( parent === ancestor ) {
+					return true;
+				}
+
+				element = parent;
+			}
+
+			return false;
+		}
+	} );
+
+
+	// prototype properties
 	Object.defineProperty( Element.prototype, 'detached', {
 		get: function() {
 			return !this._el.parentNode;
@@ -51,6 +70,7 @@ define( [
 		}
 	} );
 
+	// prototype methods
 	utils.extend( Element.prototype, {
 		addClass: function( value ) {
 			this._el.classList.add( value.split( sepPattern ) );
@@ -106,6 +126,10 @@ define( [
 
 		getElement: function() {
 			return this._el;
+		},
+
+		hasAncestor: function( ancestor ) {
+			return this.constructor.hasAncestor( this._el, ancestor instanceof Element ? ancestor._el : ancestor );
 		},
 
 		hasClass: function( value ) {
