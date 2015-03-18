@@ -10,9 +10,13 @@ bender.require( [
 	'use strict';
 
 	describe( 'getOffsetAndAttributes', function() {
+		function makeDocument( id ) {
+			return new Document( new Element( document.getElementById( id ) ) );
+		}
+
 		it( 'should throw "Invalid offset" error', function() {
-			var element = document.getElementById( 't1' );
-			var doc = new Document( new Element( element ) );
+			var doc = makeDocument( 't1' );
+			// references to DOM elements
 			var p = doc.root.children[ 0 ].view.getElement();
 			var t = p.firstChild;
 
@@ -22,9 +26,9 @@ bender.require( [
 			expect( doc.getOffsetAndAttributes.bind( doc, t, 4 ) ).to.throw( Error, 'Invalid offset.' );
 		} );
 
-		it( 'should return a valid offset t/1 - <p>foo</p>', function() {
-			var element = document.getElementById( 't1' );
-			var doc = new Document( new Element( element ) );
+		it( 'should return a valid offset (t1) - <p>foo</p>', function() {
+			var doc = makeDocument( 't1' );
+			// references to DOM elements
 			var p = doc.root.children[ 0 ].view.getElement();
 			var t = p.firstChild;
 
@@ -51,11 +55,9 @@ bender.require( [
 			} );
 		} );
 
-		it( 'should return valid offsets and attributes t/2 - <p><u><b><i>foo</i></b></u></p>', function() {
-			var element = document.getElementById( 't2' );
-
-			var doc = new Document( new Element( element ) );
-
+		it( 'should return valid offsets and attributes (t2) - <p><u><b><i>foo</i></b></u></p>', function() {
+			var doc = makeDocument( 't2' );
+			// references to DOM elements
 			var p = doc.root.children[ 0 ].view.getElement();
 			var u = p.firstChild;
 			var b = u.firstChild;
@@ -97,11 +99,9 @@ bender.require( [
 			} );
 		} );
 
-		it( 'should return valid offsets and attributes t/3 - <p><b><i>foo</i></b><i><b>bar</b></i></p>', function() {
-			var element = document.getElementById( 't3' );
-
-			var doc = new Document( new Element( element ) );
-
+		it( 'should return valid offsets and attributes (t3) - <p><b><i>foo</i></b><i><b>bar</b></i></p>', function() {
+			var doc = makeDocument( 't3' );
+			// references to DOM elements
 			var p = doc.root.children[ 0 ].view.getElement();
 			var b1 = p.firstChild;
 			var i1 = b1.firstChild;
@@ -159,11 +159,9 @@ bender.require( [
 			} );
 		} );
 
-		it( 'should return valid offsets and attributes t/4 - <p><b>foo</b><br><i>bar</i></p>', function() {
-			var element = document.getElementById( 't4' );
-
-			var doc = new Document( new Element( element ) );
-
+		it( 'should return valid offsets and attributes (t4) - <p><b>foo</b><br><i>bar</i></p>', function() {
+			var doc = makeDocument( 't4' );
+			// references to DOM elements
 			var p = doc.root.children[ 0 ].view.getElement();
 			var b = p.firstChild;
 			var t1 = b.firstChild;
@@ -214,16 +212,34 @@ bender.require( [
 			} );
 		} );
 
-		it( 'should return a valid offset using preceding element with view - <p><b>foo</b><br>^</p>', function() {
-			var element = document.getElementById( 't5' );
-
-			var doc = new Document( new Element( element ) );
-
+		it( 'should return a valid offset using preceding element with view (t5) - <p><b>foo</b><br>^</p>', function() {
+			var doc = makeDocument( 't5' );
+			// references to DOM elements
 			var p = doc.root.children[ 0 ].view.getElement();
 
 			expect( doc.getOffsetAndAttributes( p, 2 ) ).to.deep.equal( {
 				attributes: [],
 				offset: 7
+			} );
+		} );
+
+		it( 'should return a valid offset (t6) - <p><img /></p>', function() {
+			var doc = makeDocument( 't6' );
+			// references to DOM elements
+			var root = doc.root.view.getElement();
+
+			var testCases = [
+				// ^<img>
+				[ root, 0, 1 ],
+				// <img>^
+				[ root, 1, 3 ]
+			];
+
+			testCases.forEach( function( tc ) {
+				expect( doc.getOffsetAndAttributes( tc[ 0 ], tc[ 1 ] ) ).to.deep.equal( {
+					attributes: tc[ 3 ] || [],
+					offset: tc[ 2 ]
+				} );
 			} );
 		} );
 
