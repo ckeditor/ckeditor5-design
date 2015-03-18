@@ -223,7 +223,7 @@ bender.require( [
 			} );
 		} );
 
-		it( 'should return a valid offset (t6) - <p><img /></p>', function() {
+		it( 'should return valid offsets (t6) - <p><img /></p>', function() {
 			var doc = makeDocument( 't6' );
 			// references to DOM elements
 			var root = doc.root.view.getElement();
@@ -243,5 +243,38 @@ bender.require( [
 			} );
 		} );
 
+		it( 'should return valid offsets and attributes for injected elements', function() {
+			var doc = makeDocument( 't1' );
+
+			var root = doc.root.view.getElement();
+
+			var p = document.createElement( 'p' );
+
+			p.dataset.affected = true;
+
+			var b = document.createElement( 'b' );
+
+			b.textContent = 'bar';
+
+			p.appendChild( b );
+
+			root.appendChild( p );
+
+			console.log( doc.data.data );
+
+			var testCases = [
+				// <p data-affected=true><b>^"bar"</b></p>
+				[ b, 0, 7, [ 0 ] ],
+				// <p data-affected=true><b>"bar"^</b></p>
+				[ b, 1, 10, [ 0 ] ]
+			];
+
+			testCases.forEach( function( tc ) {
+				expect( doc.getOffsetAndAttributes( tc[ 0 ], tc[ 1 ] ) ).to.deep.equal( {
+					attributes: tc[ 3 ] || [],
+					offset: tc[ 2 ]
+				} );
+			} );
+		} );
 	} );
 } );
