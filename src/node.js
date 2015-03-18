@@ -210,8 +210,6 @@ define( [
 
 			this.view = new View( this, elem );
 
-			this.document.editable.addView( this.view );
-
 			this.isRendered = true;
 		},
 

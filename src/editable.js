@@ -5,6 +5,7 @@ define( [
 	'mutationobserver',
 	'selection',
 	'transaction',
+	'viewmanager',
 	'tools/element',
 	'tools/emitter',
 	'tools/utils'
@@ -15,6 +16,7 @@ define( [
 	MutationObserver,
 	Selection,
 	Transaction,
+	viewManager,
 	Element,
 	Emitter,
 	utils
@@ -29,8 +31,6 @@ define( [
 
 		this.$document = $el.getElement().ownerDocument;
 
-		this._views = {};
-
 		// create a document for this editable area
 		this.document = new Document( $el, this );
 
@@ -40,7 +40,11 @@ define( [
 		// a store for applied transactions
 		this.history = [];
 
-		this.selection = new Selection( this.document );
+		// linear data selection
+		this.dataSelection = new Selection( this.document );
+
+		// native selection
+		this.selection = window.getSelection();
 
 		this.mutationObserver = new MutationObserver( this.$documentView.getElement(), this.handleMutations.bind( this ) );
 
@@ -49,17 +53,10 @@ define( [
 
 		this.watcher = new EditableWatcher( this );
 		this.watcher.on( 'selectionChange', this.updateSelection, this );
+		this.watcher.enable();
 	}
 
 	utils.extend( Editable.prototype, Emitter, {
-		addView: function( view ) {
-			this._views[ view.vid ] = view;
-		},
-
-		getView: function( vid ) {
-			return this._views[ vid ] || null;
-		},
-
 		handleMutations: function( mutations ) {
 			var that = this;
 
@@ -72,6 +69,8 @@ define( [
 
 			// disable the mutation observer while manipulating "dirty" DOM elements
 			this.mutationObserver.disable();
+			// pattern used to recognized ignored attribute changes
+			var attrIgnorePattern = /^_moz_/i;
 
 			// get the top-most affected node
 			for ( i = 0, len = mutations.length; i < len; i++ ) {
@@ -80,15 +79,21 @@ define( [
 				var target = mutation.target,
 					view;
 
+				// ignore mutations caused by Firefox adding some attributes
+				if ( mutation.type === 'attributes' && attrIgnorePattern.test( mutation.attributeName ) ) {
+					continue;
+				}
+
 				// try identifying a node in the document tree using a view
 				if ( target.dataset && target.dataset.vid ) {
-					view = this.getView( target.dataset.vid );
+					view = viewManager.get( target.dataset.vid );
 
 					if ( view ) {
 						node = view.node;
 					}
 
 					if ( !node || node.type !== 'root' ) {
+						target.dataset.affected = node.type;
 						delete target.dataset.vid;
 					}
 
@@ -132,6 +137,7 @@ define( [
 
 			// force selection change check
 			this.watcher.checkSelectionChange();
+			this.watcher.disable();
 
 			// TODO merge transactions (?)
 			// create and apply transactions to the document
@@ -155,8 +161,8 @@ define( [
 			for ( i = 0, len = toRemove.length; i < len; i++ ) {
 				node = toRemove[ i ];
 
-				if ( node.parentElement ) {
-					node.parentElement.removeChild( node );
+				if ( node.parentNode ) {
+					node.parentNode.removeChild( node );
 				}
 			}
 
@@ -164,6 +170,12 @@ define( [
 			this.mutationObserver.enable();
 
 			// TODO restore the selection
+
+			// re-enable the watcher in another tick - we don't want to trigger current changes
+			setTimeout( function() {
+				that.watcher.enable();
+				// that.watcher.checkSelectionChange();
+			}, 0 );
 
 			// TODO this is just a temporary solution for development purposes
 			this.trigger( 'change' );
@@ -196,24 +208,67 @@ define( [
 				while ( element ) {
 					// we've found a parent view
 					if ( element.dataset && element.dataset.vid ) {
-						return that.getView( element.dataset.vid );
+						return viewManager.get( element.dataset.vid );
 						// we reached the editable element
 					} else if ( element === topEl ) {
 						return null;
 					}
 
-					element = element.parentElement;
+					element = element.parentNode;
 				}
 			}
 		},
 
-		removeView: function( vid ) {
-			delete this._views[ vid ];
-		},
-
 		updateSelection: function( range ) {
-			this.selection.update( range );
-			console.log( this.selection.range );
+			this.dataSelection.update( range );
+
+			console.log( this.dataSelection.range );
+
+			// this.selection.removeAllRanges();
+
+			if ( this.dataSelection.type === Selection.EMPTY ) {
+				return;
+			}
+
+			var nativeRange = this.selection.getRangeAt( 0 );
+
+
+			var newRange = this.$document.createRange();
+
+			var start = this.document.getDomNodeAndOffset(
+				this.dataSelection.range.start,
+				this.dataSelection.range.startAttributes
+			);
+
+			if ( start ) {
+				console.log( 'start', start.node, start.offset );
+			}
+
+			if ( !start || nativeRange.startContainer !== start.node || nativeRange.startOffset !== start.offset ) {
+				console.warn( 'wrong - native start', nativeRange.startContainer, nativeRange.startOffset );
+			}
+
+			// newRange.setStart( start.node, start.offset );
+
+			if ( this.dataSelection.type === Selection.RANGE ) {
+				var end = this.document.getDomNodeAndOffset(
+					this.dataSelection.range.end,
+					this.dataSelection.range.endAttributes
+				);
+
+				if ( end ) {
+					console.log( 'end', end.node, end.offset );
+				}
+
+				if ( !end || nativeRange.endContainer !== end.node || nativeRange.endOffset !== end.offset ) {
+					console.warn( 'wrong - native end', nativeRange.endContainer, nativeRange.endOffset );
+				}
+
+				// newRange.setEnd( end.node, end.offset );
+			}
+
+			// this.selection.addRange( newRange );
+
 		}
 	} );
 

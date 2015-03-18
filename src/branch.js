@@ -57,9 +57,8 @@ define( [
 				var child = removed[ i ];
 
 				if ( child.view ) {
-					child.view.remove();
 					// TODO remove child views
-					doc.editable.removeView( child.view.vid );
+					child.view.destroy();
 				}
 			}
 
