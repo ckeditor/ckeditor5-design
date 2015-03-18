@@ -43,7 +43,7 @@ define( [
 			return result;
 		},
 		// prepare linear data for the given DOM
-		getDataForDom: function( elem, store, parentAttributes, root ) {
+		getDataForDom: function( elem, store, parentAttributes, isRoot ) {
 			var data = [],
 				attributes,
 				current;
@@ -51,7 +51,7 @@ define( [
 			// element
 			if ( elem.nodeType === Node.ELEMENT_NODE ) {
 				// we want to treat the topmost element as a root node
-				var nodeConstructor = root ?
+				var nodeConstructor = isRoot ?
 					nodeManager.get( 'root' ) :
 					nodeManager.matchForDom( elem ) || nodeManager.get( 'unknown' );
 

@@ -56,6 +56,10 @@ define( [
 
 		splice: function() {
 			return [].splice.apply( this.data, arguments );
+		},
+
+		spliceArray: function( index, remove, items ) {
+			return this.splice.apply( this, [ index, remove ].concat( items ) );
 		}
 	} );
 
