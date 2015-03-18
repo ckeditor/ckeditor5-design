@@ -305,11 +305,11 @@ define( [
 						node = view.node;
 
 						// node's offset +
-						// node's length if we're looking for the node's closing element
+						// node's length - 1 if we're looking for the node's closing element
 						// or + 1 for the opening element
 						return {
 							attributes: attributes,
-							offset: node.getOffset() + ( offset ? node.length : 1 )
+							offset: node.getOffset() + ( offset ? node.length - 1 : 1 )
 						};
 					}
 
@@ -328,6 +328,9 @@ define( [
 									attributes: attributes,
 									offset: node.getOffset() + node.length
 								};
+								// take child elem's text length into consideration
+							} else if ( searchElem.nodeType === Node.TEXT_NODE ) {
+								length += searchElem.data.length;
 							}
 						}
 					}
