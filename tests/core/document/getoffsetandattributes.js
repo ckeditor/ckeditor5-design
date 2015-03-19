@@ -37,36 +37,32 @@ bender.require( [
 			);
 		} );
 
-		it( 'should return a valid offset (t1) - <p>foo</p>', function() {
+		describe( 't1', function() {
 			var doc = makeDocument( 't1' );
 			// references to DOM elements
 			var p = doc.root.children[ 0 ].view.getElement();
 			var t = p.firstChild;
 
 			var testCases = [
-				// <p>^"foo"</p>
-				[ p, 0, 2 ],
-				// <p>"^foo"</p>
-				[ t, 0, 2 ],
-				// <p>"f^oo"</p>
-				[ t, 1, 3 ],
-				// <p>"fo^o"</p>
-				[ t, 2, 4 ],
-				// <p>"foo^"</p>
-				[ t, 3, 5 ],
-				// <p>"foo"^</p>
-				[ p, 1, 5 ]
+				[ '<p>^"foo"</p>', p, 0, 2 ],
+				[ '<p>"^foo"</p>', t, 0, 2 ],
+				[ '<p>"f^oo"</p>', t, 1, 3 ],
+				[ '<p>"fo^o"</p>', t, 2, 4 ],
+				[ '<p>"foo^"</p>', t, 3, 5 ],
+				[ '<p>"foo"^</p>', p, 1, 5 ]
 			];
 
 			testCases.forEach( function( tc ) {
-				expect( doc.getOffsetAndAttributes( tc[ 0 ], tc[ 1 ] ) ).to.deep.equal( {
-					attributes: [],
-					offset: tc[ 2 ]
+				it( 'should return a valid offset for ' + tc[ 0 ], function() {
+					expect( doc.getOffsetAndAttributes( tc[ 1 ], tc[ 2 ] ) ).to.deep.equal( {
+						attributes: [],
+						offset: tc[ 3 ]
+					} );
 				} );
 			} );
 		} );
 
-		it( 'should return valid offsets and attributes (t2) - <p><u><b><i>foo</i></b></u></p>', function() {
+		describe( 't2', function() {
 			var doc = makeDocument( 't2' );
 			// references to DOM elements
 			var p = doc.root.children[ 0 ].view.getElement();
@@ -76,41 +72,31 @@ bender.require( [
 			var t = i.firstChild;
 
 			var testCases = [
-				// <p>^<u><b><i>"foo"</i></b></u></p>
-				[ p, 0, 2 ],
-				// <p><u>^<b><i>"foo"</i></b></u></p>
-				[ u, 0, 2, [ 0 ] ],
-				// <p><u><b>^<i>"foo"</i></b></u></p>
-				[ b, 0, 2, [ 0, 1 ] ],
-				// <p><u><b><i>^"foo"</i></b></u></p>
-				[ i, 0, 2, [ 0, 1, 2 ] ],
-				// <p><u><b><i>"^foo"</i></b></u></p>
-				[ t, 0, 2, [ 0, 1, 2 ] ],
-				// <p><u><b><i>"f^oo"</i></b></u></p>
-				[ t, 1, 3, [ 0, 1, 2 ] ],
-				// <p><u><b><i>"fo^o"</i></b></u></p>
-				[ t, 2, 4, [ 0, 1, 2 ] ],
-				// <p><u><b><i>"foo^"</i></b></u></p>
-				[ t, 3, 5, [ 0, 1, 2 ] ],
-				// <p><u><b><i>"foo"^</i></b></u></p>
-				[ i, 1, 5, [ 0, 1, 2 ] ],
-				// <p><u><b><i>"foo"</i>^</b></u></p>
-				[ b, 1, 5, [ 0, 1 ] ],
-				// <p><u><b><i>"foo"</i></b>^</u></p>
-				[ u, 1, 5, [ 0 ] ],
-				// <p><u><b><i>"foo"</i></b></u>^</p>
-				[ p, 1, 5 ]
+				[ '<p>^<u><b><i>"foo"</i></b></u></p>', p, 0, 2 ],
+				[ '<p><u>^<b><i>"foo"</i></b></u></p>', u, 0, 2, [ 0 ] ],
+				[ '<p><u><b>^<i>"foo"</i></b></u></p>', b, 0, 2, [ 0, 1 ] ],
+				[ '<p><u><b><i>^"foo"</i></b></u></p>', i, 0, 2, [ 0, 1, 2 ] ],
+				[ '<p><u><b><i>"^foo"</i></b></u></p>', t, 0, 2, [ 0, 1, 2 ] ],
+				[ '<p><u><b><i>"f^oo"</i></b></u></p>', t, 1, 3, [ 0, 1, 2 ] ],
+				[ '<p><u><b><i>"fo^o"</i></b></u></p>', t, 2, 4, [ 0, 1, 2 ] ],
+				[ '<p><u><b><i>"foo^"</i></b></u></p>', t, 3, 5, [ 0, 1, 2 ] ],
+				[ '<p><u><b><i>"foo"^</i></b></u></p>', i, 1, 5, [ 0, 1, 2 ] ],
+				[ '<p><u><b><i>"foo"</i>^</b></u></p>', b, 1, 5, [ 0, 1 ] ],
+				[ '<p><u><b><i>"foo"</i></b>^</u></p>', u, 1, 5, [ 0 ] ],
+				[ '<p><u><b><i>"foo"</i></b></u>^</p>', p, 1, 5 ]
 			];
 
 			testCases.forEach( function( tc ) {
-				expect( doc.getOffsetAndAttributes( tc[ 0 ], tc[ 1 ] ) ).to.deep.equal( {
-					attributes: tc[ 3 ] || [],
-					offset: tc[ 2 ]
+				it( 'should return a valid offset and attributes for ' + tc[ 0 ], function() {
+					expect( doc.getOffsetAndAttributes( tc[ 1 ], tc[ 2 ] ) ).to.deep.equal( {
+						attributes: tc[ 4 ] || [],
+						offset: tc[ 3 ]
+					} );
 				} );
 			} );
 		} );
 
-		it( 'should return valid offsets and attributes (t3) - <p><b><i>foo</i></b><i><b>bar</b></i></p>', function() {
+		describe( 't3', function() {
 			var doc = makeDocument( 't3' );
 			// references to DOM elements
 			var p = doc.root.children[ 0 ].view.getElement();
@@ -122,55 +108,38 @@ bender.require( [
 			var t2 = b2.firstChild;
 
 			var testCases = [
-				// <p>^<b><i>"foo"</i></b><i><b>"bar"</b></i></p>
-				[ p, 0, 2 ],
-				// <p><b>^<i>"foo"</i></b><i><b>"bar"</b></i></p>
-				[ b1, 0, 2, [ 0 ] ],
-				// <p><b><i>^"foo"</i></b><i><b>"bar"</b></i></p>
-				[ i1, 0, 2, [ 0, 1 ] ],
-				// <p><b><i>"^foo"</i></b><i><b>"bar"</b></i></p>
-				[ t1, 0, 2, [ 0, 1 ] ],
-				// <p><b><i>"f^oo"</i></b><i><b>"bar"</b></i></p>
-				[ t1, 1, 3, [ 0, 1 ] ],
-				// <p><b><i>"fo^o"</i></b><i><b>"bar"</b></i></p>
-				[ t1, 2, 4, [ 0, 1 ] ],
-				// <p><b><i>"foo^"</i></b><i><b>"bar"</b></i></p>
-				[ t1, 3, 5, [ 0, 1 ] ],
-				// <p><b><i>"foo"^</i></b><i><b>"bar"</b></i></p>
-				[ i1, 1, 5, [ 0, 1 ] ],
-				// <p><b><i>"foo"</i>^</b><i><b>"bar"</b></i></p>
-				[ b1, 1, 5, [ 0 ] ],
-				// <p><b><i>"foo"</i></b>^<i><b>"bar"</b></i></p>
-				[ p, 1, 5 ],
-				// <p><b><i>"foo"</i></b><i>^<b>"bar"</b></i></p>
-				[ i2, 0, 5, [ 1 ] ],
-				// <p><b><i>"foo"</i></b><i><b>^"bar"</b></i></p>
-				[ b2, 0, 5, [ 1, 0 ] ],
-				// <p><b><i>"foo"</i></b><i><b>"^bar"</b></i></p>
-				[ t2, 0, 5, [ 1, 0 ] ],
-				// <p><b><i>"foo"</i></b><i><b>"b^ar"</b></i></p>
-				[ t2, 1, 6, [ 1, 0 ] ],
-				// <p><b><i>"foo"</i></b><i><b>"ba^r"</b></i></p>
-				[ t2, 2, 7, [ 1, 0 ] ],
-				// <p><b><i>"foo"</i></b><i><b>"bar^"</b></i></p>
-				[ t2, 3, 8, [ 1, 0 ] ],
-				// <p><b><i>"foo"</i></b><i><b>"bar"^</b></i></p>
-				[ b2, 1, 8, [ 1, 0 ] ],
-				// <p><b><i>"foo"</i></b><i><b>"bar"</b>^</i></p>
-				[ i2, 1, 8, [ 1 ] ],
-				// <p><b><i>"foo"</i></b><i><b>"bar"</b></i>^</p>
-				[ p, 2, 8 ]
+				[ '<p>^<b><i>"foo"</i></b><i><b>"bar"</b></i></p>', p, 0, 2 ],
+				[ '<p><b>^<i>"foo"</i></b><i><b>"bar"</b></i></p>', b1, 0, 2, [ 0 ] ],
+				[ '<p><b><i>^"foo"</i></b><i><b>"bar"</b></i></p>', i1, 0, 2, [ 0, 1 ] ],
+				[ '<p><b><i>"^foo"</i></b><i><b>"bar"</b></i></p>', t1, 0, 2, [ 0, 1 ] ],
+				[ '<p><b><i>"f^oo"</i></b><i><b>"bar"</b></i></p>', t1, 1, 3, [ 0, 1 ] ],
+				[ '<p><b><i>"fo^o"</i></b><i><b>"bar"</b></i></p>', t1, 2, 4, [ 0, 1 ] ],
+				[ '<p><b><i>"foo^"</i></b><i><b>"bar"</b></i></p>', t1, 3, 5, [ 0, 1 ] ],
+				[ '<p><b><i>"foo"^</i></b><i><b>"bar"</b></i></p>', i1, 1, 5, [ 0, 1 ] ],
+				[ '<p><b><i>"foo"</i>^</b><i><b>"bar"</b></i></p>', b1, 1, 5, [ 0 ] ],
+				[ '<p><b><i>"foo"</i></b>^<i><b>"bar"</b></i></p>', p, 1, 5 ],
+				[ '<p><b><i>"foo"</i></b><i>^<b>"bar"</b></i></p>', i2, 0, 5, [ 1 ] ],
+				[ '<p><b><i>"foo"</i></b><i><b>^"bar"</b></i></p>', b2, 0, 5, [ 1, 0 ] ],
+				[ '<p><b><i>"foo"</i></b><i><b>"^bar"</b></i></p>', t2, 0, 5, [ 1, 0 ] ],
+				[ '<p><b><i>"foo"</i></b><i><b>"b^ar"</b></i></p>', t2, 1, 6, [ 1, 0 ] ],
+				[ '<p><b><i>"foo"</i></b><i><b>"ba^r"</b></i></p>', t2, 2, 7, [ 1, 0 ] ],
+				[ '<p><b><i>"foo"</i></b><i><b>"bar^"</b></i></p>', t2, 3, 8, [ 1, 0 ] ],
+				[ '<p><b><i>"foo"</i></b><i><b>"bar"^</b></i></p>', b2, 1, 8, [ 1, 0 ] ],
+				[ '<p><b><i>"foo"</i></b><i><b>"bar"</b>^</i></p>', i2, 1, 8, [ 1 ] ],
+				[ '<p><b><i>"foo"</i></b><i><b>"bar"</b></i>^</p>', p, 2, 8 ]
 			];
 
 			testCases.forEach( function( tc ) {
-				expect( doc.getOffsetAndAttributes( tc[ 0 ], tc[ 1 ] ) ).to.deep.equal( {
-					attributes: tc[ 3 ] || [],
-					offset: tc[ 2 ]
+				it( 'should return a valid offset and attributes for ' + tc[ 0 ], function() {
+					expect( doc.getOffsetAndAttributes( tc[ 1 ], tc[ 2 ] ) ).to.deep.equal( {
+						attributes: tc[ 4 ] || [],
+						offset: tc[ 3 ]
+					} );
 				} );
 			} );
 		} );
 
-		it( 'should return valid offsets and attributes (t4) - <p><b>foo</b><br><i>bar</i></p>', function() {
+		describe( 't4', function() {
 			var doc = makeDocument( 't4' );
 			// references to DOM elements
 			var p = doc.root.children[ 0 ].view.getElement();
@@ -181,49 +150,35 @@ bender.require( [
 			var t2 = i.firstChild;
 
 			var testCases = [
-				// <p>^<b>"foo"</b><br><i>"bar"</i></p>
-				[ p, 0, 2 ],
-				// <p><b>^"foo"</b><br><i>"bar"</i></p>
-				[ b, 0, 2, [ 0 ] ],
-				// <p><b>"^foo"</b><br><i>"bar"</i></p>
-				[ t1, 0, 2, [ 0 ] ],
-				// <p><b>"f^oo"</b><br><i>"bar"</i></p>
-				[ t1, 1, 3, [ 0 ] ],
-				// <p><b>"fo^o"</b><br><i>"bar"</i></p>
-				[ t1, 2, 4, [ 0 ] ],
-				// <p><b>"foo^"</b><br><i>"bar"</i></p>
-				[ t1, 3, 5, [ 0 ] ],
-				// <p><b>"foo"^</b><br><i>"bar"</i></p>
-				[ b, 1, 5, [ 0 ] ],
-				// <p><b>"foo"</b>^<br><i>"bar"</i></p>
-				[ p, 1, 5 ],
-				// <p><b>"foo"</b><br>^<i>"bar"</i></p>
-				[ p, 2, 7 ],
-				// <p><b>"foo"</b><br><i>^"bar"</i></p>
-				[ i, 0, 7, [ 1 ] ],
-				// <p><b>"foo"</b><br><i>"^bar"</i></p>
-				[ t2, 0, 7, [ 1 ] ],
-				// <p><b>"foo"</b><br><i>"b^ar"</i></p>
-				[ t2, 1, 8, [ 1 ] ],
-				// <p><b>"foo"</b><br><i>"ba^r"</i></p>
-				[ t2, 2, 9, [ 1 ] ],
-				// <p><b>"foo"</b><br><i>"bar^"</i></p>
-				[ t2, 3, 10, [ 1 ] ],
-				// <p><b>"foo"</b><br><i>"bar"^</i></p>
-				[ i, 1, 10, [ 1 ] ],
-				// <p><b>"foo"</b><br><i>"bar"</i>^</p>
-				[ p, 3, 10 ]
+				[ '<p>^<b>"foo"</b><br><i>"bar"</i></p>', p, 0, 2 ],
+				[ '<p><b>^"foo"</b><br><i>"bar"</i></p>', b, 0, 2, [ 0 ] ],
+				[ '<p><b>"^foo"</b><br><i>"bar"</i></p>', t1, 0, 2, [ 0 ] ],
+				[ '<p><b>"f^oo"</b><br><i>"bar"</i></p>', t1, 1, 3, [ 0 ] ],
+				[ '<p><b>"fo^o"</b><br><i>"bar"</i></p>', t1, 2, 4, [ 0 ] ],
+				[ '<p><b>"foo^"</b><br><i>"bar"</i></p>', t1, 3, 5, [ 0 ] ],
+				[ '<p><b>"foo"^</b><br><i>"bar"</i></p>', b, 1, 5, [ 0 ] ],
+				[ '<p><b>"foo"</b>^<br><i>"bar"</i></p>', p, 1, 5 ],
+				[ '<p><b>"foo"</b><br>^<i>"bar"</i></p>', p, 2, 7 ],
+				[ '<p><b>"foo"</b><br><i>^"bar"</i></p>', i, 0, 7, [ 1 ] ],
+				[ '<p><b>"foo"</b><br><i>"^bar"</i></p>', t2, 0, 7, [ 1 ] ],
+				[ '<p><b>"foo"</b><br><i>"b^ar"</i></p>', t2, 1, 8, [ 1 ] ],
+				[ '<p><b>"foo"</b><br><i>"ba^r"</i></p>', t2, 2, 9, [ 1 ] ],
+				[ '<p><b>"foo"</b><br><i>"bar^"</i></p>', t2, 3, 10, [ 1 ] ],
+				[ '<p><b>"foo"</b><br><i>"bar"^</i></p>', i, 1, 10, [ 1 ] ],
+				[ '<p><b>"foo"</b><br><i>"bar"</i>^</p>', p, 3, 10 ]
 			];
 
 			testCases.forEach( function( tc ) {
-				expect( doc.getOffsetAndAttributes( tc[ 0 ], tc[ 1 ] ) ).to.deep.equal( {
-					attributes: tc[ 3 ] || [],
-					offset: tc[ 2 ]
+				it( 'should return a valid offset and attributes for ' + tc[ 0 ], function() {
+					expect( doc.getOffsetAndAttributes( tc[ 1 ], tc[ 2 ] ) ).to.deep.equal( {
+						attributes: tc[ 4 ] || [],
+						offset: tc[ 3 ]
+					} );
 				} );
 			} );
 		} );
 
-		it( 'should return a valid offset using preceding element with view (t5) - <p><b>foo</b><br>^</p>', function() {
+		it( 'should return a valid offset using preceding element\'s view - <p><b>foo</b><br>^</p>', function() {
 			var doc = makeDocument( 't5' );
 			// references to DOM elements
 			var p = doc.root.children[ 0 ].view.getElement();
@@ -234,7 +189,7 @@ bender.require( [
 			} );
 		} );
 
-		it( 'should return valid offsets (t6) - <p><img /></p>', function() {
+		it( 'should return valid offsets for block elements <p><img /></p>', function() {
 			var doc = makeDocument( 't6' );
 			// references to DOM elements
 			var root = doc.root.view.getElement();
