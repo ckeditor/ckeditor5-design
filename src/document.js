@@ -69,55 +69,23 @@ define( [
 
 		// return an element and offset representing the given position in the linear data
 		getDomNodeAndOffset: function( position, attributes ) {
-			var item = this.data.get( position );
+			var node = this.getBranchAtPosition( position );
 
-			if ( !item ) {
+			if ( !node ) {
 				return null;
 			}
 
-			attributes = attributes || [];
-
-			var attrFix = 0;
-
-			// we have attributes, but the item does not, or has different ones
-			if ( !matchAttributes( item, attributes ) ) {
-				var itemBefore;
-
-				do {
-					attrFix++;
-					position--;
-
-					itemBefore = this.data.get( position );
-
-					if ( typeof itemBefore == 'undefined' ) {
-						throw new Error( 'Couldn\'t find a preceding item matching given attributes.' );
-					}
-				} while ( !matchAttributes( itemBefore, attributes ) );
-			}
-
-			var node = this.getBranchAtPosition( position );
-			var view = node.view;
 			var offset = node.getOffset();
-
-			var parent;
-
-			// position points to an element's opening, return its offset within its parent
-			if ( position === offset ) {
-				parent = view.getElement().parentNode;
-
-				return {
-					node: parent,
-					offset: getNodeOffset( parent, view.getElement() )
-				};
-			}
-
-			// add 1 for node's opening item if needed
-			offset += node.isWrapped ? 1 : 0;
-
+			var parent = node.view.getElement();
 			var current = {
-				children: view.getElement().childNodes,
+				children: parent.childNodes,
 				index: 0
 			};
+
+			// include a branch opening tag
+			if ( node.isWrapped ) {
+				offset++;
+			}
 
 			var stack = [ current ];
 
@@ -132,30 +100,60 @@ define( [
 
 					// child  is a text node, check if the position sits within the child
 					if ( child.nodeType === Node.TEXT_NODE ) {
-						// position fits this node
-						if ( position >= offset && ( position < offset + child.data.length ||
-								// position points to an element's opening / closing tag
-								( this.data.isElementAt( position ) && position === offset + child.data.length )
-							) ) {
-							return {
-								node: child,
-								offset: position - offset + attrFix
-							};
-						} else {
-							offset += child.data.length;
+						// position fits in this text node
+						if ( position >= offset && position <= offset + child.data.length ) {
+							var childAttributes = converter.getAttributesForDomElement( child, this.store );
+
+							// child attributes match the attributes so we return the text node and offset
+							if ( areEqualArrays( childAttributes, attributes ) ) {
+								return {
+									node: child,
+									offset: position - offset
+								};
+								// text node doesn't meet the criteria, let's check its ancestors
+							}
+
+							var ancestor = child.parentNode;
+
+							// traverse ancestors up to the parent node
+							while ( ancestor !== parent ) {
+								var ancestorAttributes = converter.getAttributesForDomElement( ancestor.parentNode, this.store );
+
+								// ancestor's attributes match the attributes
+								if ( areEqualArrays( ancestorAttributes, attributes ) ) {
+									var finalOffset = getNodeOffset( ancestor.parentNode, ancestor );
+
+									// position after the text node, so include it in the final offset
+									if ( position === offset + child.data.length ) {
+										finalOffset++;
+									}
+
+									return {
+										node: ancestor.parentNode,
+										offset: finalOffset
+									};
+								}
+
+								ancestor = ancestor.parentNode;
+							}
 						}
+
+						// include the text node's length in the offset and proceed
+						offset += child.data.length;
 						// child  is an element
 					} else if ( child.nodeType === Node.ELEMENT_NODE ) {
-						var vid;
+						var view;
 
-						// see if we have a view attached to this node
-						if ( child.dataset && ( vid = child.dataset.vid ) && ( view = viewManager.get( vid ) ) ) {
+						// we have a view attached to this node
+						if ( ( view = viewManager.getByElement( child ) ) ) {
 							node = view.node;
 
 							var nodeOffset = node.getOffset();
 
+							// position fits in this node
 							if ( position >= nodeOffset && position < nodeOffset + node.length ) {
-
+								// position points to the node's opening so we can just return it
+								// and its offset inside the parent node
 								if ( position === nodeOffset ) {
 									parent = child.parentNode;
 
@@ -165,8 +163,9 @@ define( [
 									};
 								}
 
-
 								current.index++;
+
+								// add current node to the stack to be processed in the next loop
 								current = {
 									children: child.childNodes,
 									index: 0
@@ -174,17 +173,20 @@ define( [
 
 								stack.push( current );
 
+								// include a node opening tag
 								if ( node.isWrapped ) {
 									offset += 1;
 								}
 
 								continue;
-							} else {
-								offset += node.length;
 							}
+
+							// include the node's length in the offset and proceed
+							offset += node.length;
 						} else {
 							current.index++;
 
+							// add current node to the stack to be processed in the next loop
 							current = {
 								children: child.childNodes,
 								index: 0
@@ -208,15 +210,7 @@ define( [
 					} );
 			}
 
-			// check if the given item matches the attributes:
-			// - item attributes and the attributes are equal
-			// - item attributes length is 0 and the attributes length is 0
-			// - item is a string and the attributes length is 0
-			function matchAttributes( item, attributes ) {
-				return ( attributes.length && Array.isArray( item ) && areEqualArrays( item[ 1 ], attributes ) ) ||
-					( !attributes.length && !Array.isArray( item ) || areEqualArrays( item[ 1 ], attributes ) );
-			}
-
+			// find a node's offset in a parent element
 			function getNodeOffset( parent, node ) {
 				for ( var i = 0, len = parent.childNodes.length; i < len; i++ ) {
 					if ( parent.childNodes[ i ] === node ) {
@@ -334,6 +328,8 @@ define( [
 							}
 						}
 					}
+
+					element = searchPrecedingElem( searchElem );
 				} else {
 					searchElem = element.childNodes[ offset ];
 					element = searchPrecedingElem( searchElem );
