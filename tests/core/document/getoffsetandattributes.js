@@ -209,6 +209,43 @@ bender.require( [
 			} );
 		} );
 
+		describe( 't7', function() {
+			var doc = makeDocument( 't7' );
+			// references to DOM elements
+			var p = doc.root.children[ 0 ].view.getElement();
+			var b = p.firstChild;
+			var i1 = b.firstChild;
+			var t1 = i1.firstChild;
+			var u = b.lastChild;
+			var i2 = u.firstChild;
+			var t2 = i2.firstChild;
+
+			var testCases = [
+				[ '<p>^<b><i>ab</i><u><i>cd</i></u></b></p>', p, 0, 2 ],
+				[ '<p><b>^<i>ab</i><u><i>cd</i></u></b></p>', b, 0, 2, [ 0 ] ],
+				[ '<p><b><i>^ab</i><u><i>cd</i></u></b></p>', t1, 0, 2, [ 0, 1 ] ],
+				[ '<p><b><i>a^b</i><u><i>cd</i></u></b></p>', t1, 1, 3, [ 0, 1 ] ],
+				[ '<p><b><i>ab^</i><u><i>cd</i></u></b></p>', t1, 2, 4, [ 0, 1 ] ],
+				[ '<p><b><i>ab</i>^<u><i>cd</i></u></b></p>', b, 1, 4, [ 0 ] ],
+				[ '<p><b><i>ab</i><u>^<i>cd</i></u></b></p>', u, 0, 4, [ 0, 2 ] ],
+				[ '<p><b><i>ab</i><u><i>^cd</i></u></b></p>', t2, 0, 4, [ 0, 2, 1 ] ],
+				[ '<p><b><i>ab</i><u><i>c^d</i></u></b></p>', t2, 1, 5, [ 0, 2, 1 ] ],
+				[ '<p><b><i>ab</i><u><i>cd^</i></u></b></p>', t2, 2, 6, [ 0, 2, 1 ] ],
+				[ '<p><b><i>ab</i><u><i>cd</i>^</u></b></p>', u, 1, 6, [ 0, 2 ] ],
+				[ '<p><b><i>ab</i><u><i>cd</i></u>^</b></p>', b, 2, 6, [ 0 ] ],
+				[ '<p><b><i>ab</i><u><i>cd</i></u></b>^</p>', p, 1, 6 ]
+			];
+
+			testCases.forEach( function( tc ) {
+				it( 'should return a valid offset and attributes for ' + tc[ 0 ], function() {
+					expect( doc.getOffsetAndAttributes( tc[ 1 ], tc[ 2 ] ) ).to.deep.equal( {
+						attributes: tc[ 4 ] || [],
+						offset: tc[ 3 ]
+					} );
+				} );
+			} );
+		} );
+
 		it( 'should return valid offsets and attributes for injected elements 1', function() {
 			var doc = makeDocument( 't1' );
 
