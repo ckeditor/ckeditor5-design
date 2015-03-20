@@ -72,22 +72,31 @@ define( [
 			var node = this.getBranchAtPosition( position );
 
 			if ( !node ) {
-				return null;
+				throw new Error( 'No branch at the given position.' );
 			}
 
 			var offset = node.getOffset();
 			var parent = node.view.getElement();
+
+			// position points to the parent node
+			if ( position === offset ) {
+				return {
+					node: parent.parentNode,
+					offset: getNodeOffset( parent.parentNode, parent )
+				};
+			}
+
+			// +1 for the branch opening tag
+			offset++;
+
 			var current = {
 				children: parent.childNodes,
 				index: 0
 			};
 
-			// include a branch opening tag
-			if ( node.isWrapped ) {
-				offset++;
-			}
-
 			var stack = [ current ];
+
+			var child;
 
 			while ( stack.length ) {
 				// we went through all nodes in the current stack
@@ -96,7 +105,7 @@ define( [
 					current = stack[ stack.length - 1 ];
 					// process current stack
 				} else {
-					var child = current.children[ current.index ];
+					child = current.children[ current.index ];
 
 					// child  is a text node, check if the position sits within the child
 					if ( child.nodeType === Node.TEXT_NODE ) {
@@ -141,7 +150,9 @@ define( [
 						// include the text node's length in the offset and proceed
 						offset += child.data.length;
 						// child  is an element
-					} else if ( child.nodeType === Node.ELEMENT_NODE ) {
+					}
+
+					if ( child.nodeType === Node.ELEMENT_NODE ) {
 						var view;
 
 						// we have a view attached to this node
@@ -200,6 +211,14 @@ define( [
 
 					current.index++;
 				}
+			}
+
+			// we went through all the children
+			if ( offset === position ) {
+				return {
+					node: child.parentNode,
+					offset: getNodeOffset( child.parentNode, child ) + 1
+				};
 			}
 
 			// check if two arrays are equal (shallow)
