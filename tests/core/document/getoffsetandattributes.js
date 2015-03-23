@@ -193,12 +193,13 @@ bender.require( [
 			var doc = makeDocument( 't6' );
 			// references to DOM elements
 			var root = doc.root.view.getElement();
+			var p = doc.root.children[ 0 ].view.getElement();
 
 			var testCases = [
-				// ^<img>
-				[ root, 0, 1 ],
-				// <img>^
-				[ root, 1, 3 ]
+				// <p>^<img></p>
+				[ p, 0, 2 ],
+				// <p><img>^</p>
+				[ p, 1, 4 ]
 			];
 
 			testCases.forEach( function( tc ) {
