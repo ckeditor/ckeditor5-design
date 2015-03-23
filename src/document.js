@@ -69,24 +69,38 @@ define( [
 
 		// return an element and offset representing the given position in the linear data
 		getDomNodeAndOffset: function( position, attributes ) {
-			var node = this.getBranchAtPosition( position );
+			var child, sibling, ancestor, ancestorAttributes;
 
-			if ( !node ) {
+			var parent = this.getBranchAtPosition( position );
+
+			if ( !parent ) {
 				throw new Error( 'No branch at the given position.' );
 			}
 
-			var offset = node.getOffset();
-			var parent = node.view.getElement();
+			var offset = parent.getOffset();
+
+			// now work with the actual DOM element
+			parent = parent.view.getElement();
 
 			// position points to the parent node
-			if ( position === offset ) {
+			if ( position === offset && !attributes.length ) {
+				sibling = parent.previousSibling;
+
+				// there's a text node right before the parent, let's use it
+				if ( sibling && sibling.nodeType === Node.TEXT_NODE ) {
+					return {
+						node: sibling,
+						offset: sibling.data.length
+					};
+				}
+
 				return {
 					node: parent.parentNode,
-					offset: getNodeOffset( parent.parentNode, parent )
+					offset: getNodeOffset( parent )
 				};
 			}
 
-			// +1 for the branch opening tag
+			// +1 for the parent's opening tag
 			offset++;
 
 			var current = {
@@ -96,128 +110,115 @@ define( [
 
 			var stack = [ current ];
 
-			var child;
-
 			while ( stack.length ) {
 				// we went through all nodes in the current stack
 				if ( current.index >= current.children.length ) {
 					stack.pop();
 					current = stack[ stack.length - 1 ];
-					// process current stack
-				} else {
-					child = current.children[ current.index ];
+					continue;
+				}
 
-					// child  is a text node, check if the position sits within the child
-					if ( child.nodeType === Node.TEXT_NODE ) {
-						// position fits in this text node
-						if ( position >= offset && position <= offset + child.data.length ) {
-							var childAttributes = converter.getAttributesForDomElement( child, this.store );
+				child = current.children[ current.index ];
 
-							// child attributes match the attributes so we return the text node and offset
-							if ( areEqualArrays( childAttributes, attributes ) ) {
-								return {
-									node: child,
-									offset: position - offset
-								};
-								// text node doesn't meet the criteria, let's check its ancestors
-							}
+				// move to another node in the next loop
+				current.index++;
 
-							var ancestor = child.parentNode;
+				// child  is a text node, check if the position sits within the child
+				if ( child.nodeType === Node.TEXT_NODE ) {
+					// position fits in this text node
+					if ( position >= offset && position < offset + child.data.length ) {
+						var childAttributes = converter.getAttributesForDomElement( child, this.store );
 
-							// traverse ancestors up to the parent node
-							while ( ancestor !== parent ) {
-								var ancestorAttributes = converter.getAttributesForDomElement( ancestor.parentNode, this.store );
-
-								// ancestor's attributes match the attributes
-								if ( areEqualArrays( ancestorAttributes, attributes ) ) {
-									var finalOffset = getNodeOffset( ancestor.parentNode, ancestor );
-
-									// position after the text node, so include it in the final offset
-									if ( position === offset + child.data.length ) {
-										finalOffset++;
-									}
-
-									return {
-										node: ancestor.parentNode,
-										offset: finalOffset
-									};
-								}
-
-								ancestor = ancestor.parentNode;
-							}
-						}
-
-						// include the text node's length in the offset and proceed
-						offset += child.data.length;
-						// child  is an element
-					}
-
-					if ( child.nodeType === Node.ELEMENT_NODE ) {
-						var view;
-
-						// we have a view attached to this node
-						if ( ( view = viewManager.getByElement( child ) ) ) {
-							node = view.node;
-
-							var nodeOffset = node.getOffset();
-
-							// position fits in this node
-							if ( position >= nodeOffset && position < nodeOffset + node.length ) {
-								// position points to the node's opening so we can just return it
-								// and its offset inside the parent node
-								if ( position === nodeOffset ) {
-									parent = child.parentNode;
-
-									return {
-										node: parent,
-										offset: getNodeOffset( parent, child )
-									};
-								}
-
-								current.index++;
-
-								// add current node to the stack to be processed in the next loop
-								current = {
-									children: child.childNodes,
-									index: 0
-								};
-
-								stack.push( current );
-
-								// include a node opening tag
-								if ( node.isWrapped ) {
-									offset += 1;
-								}
-
-								continue;
-							}
-
-							// include the node's length in the offset and proceed
-							offset += node.length;
-						} else {
-							current.index++;
-
-							// add current node to the stack to be processed in the next loop
-							current = {
-								children: child.childNodes,
-								index: 0
+						// child attributes match the attributes so we return the text node and offset
+						if ( areEqualArrays( childAttributes, attributes ) ) {
+							return {
+								node: child,
+								offset: position - offset
 							};
-
-							stack.push( current );
-
-							continue;
 						}
+
+						// text node doesn't meet the criteria, let's check its ancestors
+						ancestor = child;
+						// traverse ancestors up to the parent node
+						while ( ( ancestor = ancestor.parentNode ) !== parent ) {
+							ancestorAttributes = converter.getAttributesForDomElement( ancestor.parentNode, this.store );
+
+							// ancestor's attributes match the attributes
+							if ( areEqualArrays( ancestorAttributes, attributes ) ) {
+								return {
+									node: ancestor.parentNode,
+									offset: getNodeOffset( ancestor )
+								};
+							}
+						}
+						// we're at the end of a text node and child attributes match the attributes
+						// so we can return the text node and offset
+					} else if ( position === offset + child.data.length &&
+						areEqualArrays( converter.getAttributesForDomElement( child, this.store ), attributes ) ) {
+
+						return {
+							node: child,
+							offset: position - offset
+						};
 					}
 
-					current.index++;
+					// include the text node's length in the offset and proceed
+					offset += child.data.length;
+				}
+
+				// child is an element
+				if ( child.nodeType === Node.ELEMENT_NODE ) {
+					var view;
+
+					// we have a view attached to this node
+					if ( ( view = viewManager.getByElement( child ) ) ) {
+						var node = view.node;
+
+						if ( position === node.getOffset() ) {
+							return {
+								node: child.parentNode,
+								offset: getNodeOffset( child )
+							};
+						}
+
+						// include the node's length in the offset and proceed
+						offset += node.length;
+						// there's no view, let's process child's children
+					} else {
+						// add current node's children to the stack to be processed in the next loop
+						current = {
+							children: child.childNodes,
+							index: 0
+						};
+
+						stack.push( current );
+					}
 				}
 			}
 
-			// we went through all the children
-			if ( offset === position ) {
+			// we went through all the children, check last child's ancestors if they match the offset and attributes
+			if ( position === offset ) {
+				ancestor = child.parentNode;
+
+				// traverse ancestors up to the parent node
+				while ( ancestor !== parent ) {
+					ancestorAttributes = converter.getAttributesForDomElement( ancestor.parentNode, this.store );
+
+					// ancestor's attributes match the attributes
+					if ( areEqualArrays( ancestorAttributes, attributes ) ) {
+						return {
+							node: ancestor.parentNode,
+							// + include the node in the final offset
+							offset: getNodeOffset( ancestor ) + 1
+						};
+					}
+
+					ancestor = ancestor.parentNode;
+				}
+
 				return {
 					node: child.parentNode,
-					offset: getNodeOffset( child.parentNode, child ) + 1
+					offset: getNodeOffset( child ) + 1
 				};
 			}
 
@@ -230,14 +231,8 @@ define( [
 			}
 
 			// find a node's offset in a parent element
-			function getNodeOffset( parent, node ) {
-				for ( var i = 0, len = parent.childNodes.length; i < len; i++ ) {
-					if ( parent.childNodes[ i ] === node ) {
-						return i;
-					}
-				}
-
-				return -1;
+			function getNodeOffset( node ) {
+				return [].indexOf.call( node.parentNode.childNodes, node );
 			}
 		},
 
