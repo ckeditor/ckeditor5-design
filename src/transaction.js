@@ -40,7 +40,7 @@ define( [
 				return;
 			}
 
-			document.trigger( 'transactionStart', this );
+			document.trigger( 'transaction:start', this );
 
 			// a counter representing the current offset in the linear data
 			var offset = 0;
@@ -167,7 +167,7 @@ define( [
 			// mark the transaction as applied
 			this.applied = true;
 
-			document.trigger( 'transactionEnd', this );
+			document.trigger( 'transaction:end', this );
 
 			// recursively compares arrays of nodes and applies necessary changes to the given parent
 			function updateTree( parent, oldChildren, newChildren ) {
