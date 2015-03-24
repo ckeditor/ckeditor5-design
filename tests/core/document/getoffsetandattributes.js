@@ -54,10 +54,10 @@ bender.require( [
 
 			testCases.forEach( function( tc ) {
 				it( 'should return a valid offset for ' + tc[ 0 ], function() {
-					expect( doc.getOffsetAndAttributes( tc[ 1 ], tc[ 2 ] ) ).to.deep.equal( {
-						attributes: [],
-						offset: tc[ 3 ]
-					} );
+					var result = doc.getOffsetAndAttributes( tc[ 1 ], tc[ 2 ] );
+
+					expect( result.offset ).to.equal( tc[ 3 ] );
+					expect( result.attributes ).to.have.length( 0 );
 				} );
 			} );
 		} );
@@ -88,10 +88,10 @@ bender.require( [
 
 			testCases.forEach( function( tc ) {
 				it( 'should return a valid offset and attributes for ' + tc[ 0 ], function() {
-					expect( doc.getOffsetAndAttributes( tc[ 1 ], tc[ 2 ] ) ).to.deep.equal( {
-						attributes: tc[ 4 ] || [],
-						offset: tc[ 3 ]
-					} );
+					var result = doc.getOffsetAndAttributes( tc[ 1 ], tc[ 2 ] );
+
+					expect( result.offset ).to.equal( tc[ 3 ] );
+					expect( result.attributes ).to.deep.equal( tc[ 4 ] || [] );
 				} );
 			} );
 		} );
@@ -131,10 +131,10 @@ bender.require( [
 
 			testCases.forEach( function( tc ) {
 				it( 'should return a valid offset and attributes for ' + tc[ 0 ], function() {
-					expect( doc.getOffsetAndAttributes( tc[ 1 ], tc[ 2 ] ) ).to.deep.equal( {
-						attributes: tc[ 4 ] || [],
-						offset: tc[ 3 ]
-					} );
+					var result = doc.getOffsetAndAttributes( tc[ 1 ], tc[ 2 ] );
+
+					expect( result.offset ).to.equal( tc[ 3 ] );
+					expect( result.attributes ).to.deep.equal( tc[ 4 ] || [] );
 				} );
 			} );
 		} );
@@ -170,10 +170,10 @@ bender.require( [
 
 			testCases.forEach( function( tc ) {
 				it( 'should return a valid offset and attributes for ' + tc[ 0 ], function() {
-					expect( doc.getOffsetAndAttributes( tc[ 1 ], tc[ 2 ] ) ).to.deep.equal( {
-						attributes: tc[ 4 ] || [],
-						offset: tc[ 3 ]
-					} );
+					var result = doc.getOffsetAndAttributes( tc[ 1 ], tc[ 2 ] );
+
+					expect( result.offset ).to.equal( tc[ 3 ] );
+					expect( result.attributes ).to.deep.equal( tc[ 4 ] || [] );
 				} );
 			} );
 		} );
@@ -183,10 +183,10 @@ bender.require( [
 			// references to DOM elements
 			var p = doc.root.children[ 0 ].view.getElement();
 
-			expect( doc.getOffsetAndAttributes( p, 2 ) ).to.deep.equal( {
-				attributes: [],
-				offset: 7
-			} );
+			var result = doc.getOffsetAndAttributes( p, 2 );
+
+			expect( result.offset ).to.equal( 7 );
+			expect( result.attributes ).to.have.length( 0 );
 		} );
 
 		it( 'should return valid offsets for block elements <p><img /></p>', function() {
@@ -203,10 +203,10 @@ bender.require( [
 			];
 
 			testCases.forEach( function( tc ) {
-				expect( doc.getOffsetAndAttributes( tc[ 0 ], tc[ 1 ] ) ).to.deep.equal( {
-					attributes: tc[ 3 ] || [],
-					offset: tc[ 2 ]
-				} );
+				var result = doc.getOffsetAndAttributes( tc[ 0 ], tc[ 1 ] );
+
+				expect( result.offset ).to.equal( tc[ 2 ] );
+				expect( result.attributes ).to.have.length( 0 );
 			} );
 		} );
 
@@ -239,10 +239,10 @@ bender.require( [
 
 			testCases.forEach( function( tc ) {
 				it( 'should return a valid offset and attributes for ' + tc[ 0 ], function() {
-					expect( doc.getOffsetAndAttributes( tc[ 1 ], tc[ 2 ] ) ).to.deep.equal( {
-						attributes: tc[ 4 ] || [],
-						offset: tc[ 3 ]
-					} );
+					var result = doc.getOffsetAndAttributes( tc[ 1 ], tc[ 2 ] );
+
+					expect( result.offset ).to.equal( tc[ 3 ] );
+					expect( result.attributes ).to.deep.equal( tc[ 4 ] || [] );
 				} );
 			} );
 		} );
