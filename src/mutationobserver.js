@@ -1,4 +1,10 @@
-define( [ 'tools/utils' ], function( utils ) {
+define( [
+	'tools/emitter',
+	'tools/utils'
+], function(
+	Emitter,
+	utils
+) {
 	'use strict';
 
 	var defaultConfig = {
@@ -8,20 +14,23 @@ define( [ 'tools/utils' ], function( utils ) {
 		subtree: true
 	};
 
-	function MutationObserver( target, handler, config ) {
+	function MutationObserver( target, config ) {
 		this.target = target;
-		this.handler = handler;
 		this.config = config || defaultConfig;
-		this.mutationObserver = new window.MutationObserver( this.handler );
+		this.mutationObserver = new window.MutationObserver( this.handleMutations.bind( this ) );
 	}
 
-	utils.extend( MutationObserver.prototype, {
+	utils.extend( MutationObserver.prototype, Emitter, {
 		enable: function() {
 			this.mutationObserver.observe( this.target, this.config );
 		},
 
 		disable: function() {
 			this.mutationObserver.disconnect();
+		},
+
+		handleMutations: function( mutations ) {
+			this.trigger( 'mutation', mutations );
 		}
 	} );
 
