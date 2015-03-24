@@ -1,6 +1,5 @@
 define( [
 	'document',
-	'editablewatcher',
 	'mutationobserver',
 	'selection',
 	'transaction',
@@ -10,7 +9,6 @@ define( [
 	'tools/utils'
 ], function(
 	Document,
-	EditableWatcher,
 	MutationObserver,
 	Selection,
 	Transaction,
@@ -27,6 +25,7 @@ define( [
 		this.$el.addClass( 'cke-editable' );
 		this.$el.attr( 'contenteditable', true );
 
+		// a reference to the owner document
 		this.$document = $el.getElement().ownerDocument;
 
 		// create a document for this editable area
@@ -38,23 +37,15 @@ define( [
 		// a store for applied transactions
 		this.history = [];
 
-		// linear data selection
-		this.dataSelection = new Selection( this.document );
-
-		// native selection
-		this.selection = window.getSelection();
-
-		this.mutationObserver = new MutationObserver( this.$documentView.getElement(), this.handleMutations.bind( this ) );
+		this.mutationObserver = new MutationObserver( this.$documentView.getElement() );
+		this.mutationObserver.on( 'mutation', this.handleMutations, this );
+		this.document.on( 'transaction:start', this.mutationObserver.disable, this.mutationObserver );
+		this.document.on( 'transaction:end', this.mutationObserver.enable, this.mutationObserver );
 
 		// start listening for DOM mutations
 		this.mutationObserver.enable();
 
-		this.listenTo( this.document, 'transactionStart', this.mutationObserver.disable, this.mutationObserver );
-		this.listenTo( this.document, 'transactionEnd', this.mutationObserver.enable, this.mutationObserver );
-
-		this.watcher = new EditableWatcher( this );
-		this.watcher.on( 'selectionChange', this.updateSelection, this );
-		this.watcher.enable();
+		this.selection = new Selection( this );
 	}
 
 	utils.extend( Editable.prototype, Emitter, {
@@ -65,11 +56,11 @@ define( [
 
 			var nodes = [];
 			var elements = [];
-			// nodes to be removed after applying the mutation's outcome
-			var toRemove = [];
+			var nodesToRemove = [];
 
 			// disable the mutation observer while manipulating "dirty" DOM elements
 			this.mutationObserver.disable();
+
 			// pattern used to recognized ignored attribute changes
 			var attrIgnorePattern = /^_moz_/i;
 
@@ -94,7 +85,6 @@ define( [
 					}
 
 					if ( !node || node.type !== 'root' ) {
-						target.dataset.affected = node.type;
 						delete target.dataset.vid;
 					}
 
@@ -136,9 +126,8 @@ define( [
 				}
 			}
 
-			// force selection change check
-			this.watcher.checkSelectionChange();
-			this.watcher.disable();
+			// stop watching for selection changes
+			this.selection.stopWatching();
 
 			// TODO merge transactions (?)
 			// create and apply transactions to the document
@@ -155,27 +144,26 @@ define( [
 				}
 			}
 
-			// disable the mutation observer again before removing unneeded DOM elements
+			// re-disable the mutation observer before removing unneeded DOM elements
 			this.mutationObserver.disable();
 
 			// clean up all unneeded nodes
-			for ( i = 0, len = toRemove.length; i < len; i++ ) {
-				node = toRemove[ i ];
+			for ( i = 0, len = nodesToRemove.length; i < len; i++ ) {
+				node = nodesToRemove[ i ];
 
 				if ( node.parentNode ) {
 					node.parentNode.removeChild( node );
 				}
 			}
 
-			// re-enable the mutation observer
+			// enable the mutation observer
 			this.mutationObserver.enable();
 
 			// TODO restore the selection
 
-			// re-enable the watcher in another tick - we don't want to trigger current changes
+			// re-enable the selection watcher in another tick - we don't want to trigger current changes
 			setTimeout( function() {
-				that.watcher.enable();
-				// that.watcher.checkSelectionChange();
+				that.selection.startWatching();
 			}, 0 );
 
 			// TODO this is just a temporary solution for development purposes
@@ -185,8 +173,8 @@ define( [
 				for ( var i = 0, len = addedNodes.length; i < len; i++ ) {
 					var addedNode = addedNodes[ i ];
 
-					if ( toRemove.indexOf( addedNode ) === -1 ) {
-						toRemove.push( addedNode );
+					if ( nodesToRemove.indexOf( addedNode ) === -1 ) {
+						nodesToRemove.push( addedNode );
 					}
 				}
 			}
@@ -197,8 +185,8 @@ define( [
 				for ( var i = 0, len = removedNodes.length; i < len; i++ ) {
 					var removedNode = removedNodes[ i ];
 
-					if ( ( idx = toRemove.indexOf( removedNode ) ) !== -1 ) {
-						toRemove.splice( idx, 1 );
+					if ( ( idx = nodesToRemove.indexOf( removedNode ) ) !== -1 ) {
+						nodesToRemove.splice( idx, 1 );
 					}
 				}
 			}
@@ -218,58 +206,6 @@ define( [
 					element = element.parentNode;
 				}
 			}
-		},
-
-		updateSelection: function( range ) {
-			this.dataSelection.update( range );
-
-			console.log( this.dataSelection.range );
-
-			// this.selection.removeAllRanges();
-
-			if ( this.dataSelection.type === Selection.EMPTY ) {
-				return;
-			}
-
-			var nativeRange = this.selection.getRangeAt( 0 );
-
-
-			var newRange = this.$document.createRange();
-
-			var start = this.document.getDomNodeAndOffset(
-				this.dataSelection.range.start,
-				this.dataSelection.range.startAttributes
-			);
-
-			if ( start ) {
-				console.log( 'start', start.node, start.offset );
-			}
-
-			if ( !start || nativeRange.startContainer !== start.node || nativeRange.startOffset !== start.offset ) {
-				console.warn( 'wrong - native start', nativeRange.startContainer, nativeRange.startOffset );
-			}
-
-			// newRange.setStart( start.node, start.offset );
-
-			if ( this.dataSelection.type === Selection.RANGE ) {
-				var end = this.document.getDomNodeAndOffset(
-					this.dataSelection.range.end,
-					this.dataSelection.range.endAttributes
-				);
-
-				if ( end ) {
-					console.log( 'end', end.node, end.offset );
-				}
-
-				if ( !end || nativeRange.endContainer !== end.node || nativeRange.endOffset !== end.offset ) {
-					console.warn( 'wrong - native end', nativeRange.endContainer, nativeRange.endOffset );
-				}
-
-				// newRange.setEnd( end.node, end.offset );
-			}
-
-			// this.selection.addRange( newRange );
-
 		}
 	} );
 

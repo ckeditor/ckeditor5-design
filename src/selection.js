@@ -1,17 +1,23 @@
 define( [
+	'selectionwatcher',
+	'range',
+	'tools/element',
 	'tools/utils'
 ], function(
+	SelectionWatcher,
+	Range,
+	Element,
 	utils
 ) {
 	'use strict';
 
-	function Selection( document, range ) {
-		this.document = document;
-		// TODO what about multiple ranges (in ff)?
-		this.range = null;
-		this.node = null;
-
-		this.update( range );
+	function Selection( editable ) {
+		this.editable = editable;
+		this.document = editable.document;
+		this.nativeSelection = editable.$document.getSelection();
+		this.watcher = new SelectionWatcher( editable.$el );
+		this.watcher.on( 'selection:change', this.update, this );
+		this.startWatching();
 	}
 
 	utils.extend( Selection, {
@@ -27,17 +33,73 @@ define( [
 	} );
 
 	utils.extend( Selection.prototype, {
-		update: function( range ) {
-			this.range = range;
+		clear: function() {
+			this.nativeSelection.clearAllRanges();
+		},
 
-			// set current node
-			if ( this.range ) {
-				this.node = this.document.getNodeAtPosition( this.range.from );
+		getDataRange: function() {
+
+		},
+
+		getSelectedNode: function() {
+
+		},
+
+		getSelectedData: function() {
+
+		},
+
+		getSelectedDataRange: function() {
+			var nativeRange, start, end;
+
+			if ( !this.nativeSelection.rangeCount ) {
+				return null;
 			}
 
-			this.type = range ? range.collapsed ? Selection.CARRET : Selection.RANGE : Selection.EMPTY;
+			nativeRange = this.nativeSelection.getRangeAt( 0 );
 
-			// TODO get attributes
+			start = this.document.getOffsetAndAttributes(
+				nativeRange.startContainer,
+				nativeRange.startOffset
+			);
+
+			if ( !nativeRange.collapsed ) {
+				end = this.document.getOffsetAndAttributes(
+					nativeRange.endContainer,
+					nativeRange.endOffset
+				);
+			}
+
+			return new Range( start, end );
+		},
+
+		selectDataRange: function( range ) {
+			console.log( 'select data range', range );
+		},
+
+		selectDomRange: function( ranges ) {
+
+		},
+
+		selectElement: function( element ) {
+
+		},
+
+		selectNode: function( node ) {
+
+		},
+
+		startWatching: function() {
+			this.watcher.start();
+		},
+
+		stopWatching: function() {
+			this.watcher.stop();
+		},
+
+		update: function( selection ) {
+			console.log( 'update', selection );
+
 		}
 	} );
 

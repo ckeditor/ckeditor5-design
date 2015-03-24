@@ -371,11 +371,6 @@ define( [
 					if ( viewManager.getByElement( element ) ) {
 						return element;
 					}
-
-					// element was affected by a mutation, count it in
-					if ( isAffected( element ) ) {
-						length += 1;
-					}
 				}
 
 				// check the previous sibling
@@ -386,20 +381,11 @@ define( [
 					return element;
 				}
 
-				// element was affected by a mutation, count it in
-				if ( isAffected( element ) ) {
-					length += 2;
-				}
-
 				while ( element.lastChild ) {
 					element = element.lastChild;
 				}
 
 				return element;
-			}
-
-			function isAffected( element ) {
-				return element.dataset && element.dataset.affected;
 			}
 
 			return {
