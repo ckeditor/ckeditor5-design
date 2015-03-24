@@ -53,10 +53,10 @@ define( [
 				// we want to treat the topmost element as a root node
 				var nodeConstructor = isRoot ?
 					nodeManager.get( 'root' ) :
-					nodeManager.matchForDom( elem ) || nodeManager.get( 'unknown' );
+					nodeManager.matchForDom( elem );
 
 				// inline text
-				if ( nodeConstructor.prototype instanceof InlineNode ) {
+				if ( nodeConstructor && nodeConstructor.prototype instanceof InlineNode ) {
 					// inline node's data contains attributes only
 					attributes = nodeConstructor.toData( elem );
 
@@ -72,7 +72,7 @@ define( [
 					}
 
 					// regular element
-				} else {
+				} else if ( nodeConstructor ) {
 					// create an opening data for current element
 					current = nodeConstructor.toData( elem );
 
@@ -90,8 +90,8 @@ define( [
 				var text = elem.data;
 
 				// TODO IMPROOOOOOVE
-				// don't add empty text nodes
-				if ( text === '' || text.match( /^\s+$/ ) ) {
+				// don't add empty text nodes, except non-breaking white space
+				if ( text === '' || text.match( /^\s+$/ ) && text !== String.fromCharCode( 160 ) ) {
 					return data;
 				}
 
