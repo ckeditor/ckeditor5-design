@@ -3,6 +3,7 @@ define( [
 	'dataprocessor',
 	'lineardocumentdata',
 	'linearmetadata',
+	'position',
 	'store',
 	'viewmanager',
 	'tools/element',
@@ -13,6 +14,7 @@ define( [
 	dataProcessor,
 	LinearDocumentData,
 	LinearMetaData,
+	Position,
 	Store,
 	viewManager,
 	Element,
@@ -131,7 +133,7 @@ define( [
 						var childAttributes = converter.getAttributesForDomElement( child, this.store );
 
 						// child attributes match the attributes so we return the text node and offset
-						if ( areEqualArrays( childAttributes, attributes ) ) {
+						if ( utils.areEqual( childAttributes, attributes ) ) {
 							return {
 								node: child,
 								offset: position - offset
@@ -145,7 +147,7 @@ define( [
 							ancestorAttributes = converter.getAttributesForDomElement( ancestor.parentNode, this.store );
 
 							// ancestor's attributes match the attributes
-							if ( areEqualArrays( ancestorAttributes, attributes ) ) {
+							if ( utils.areEqual( ancestorAttributes, attributes ) ) {
 								return {
 									node: ancestor.parentNode,
 									offset: getNodeOffset( ancestor )
@@ -155,7 +157,7 @@ define( [
 						// we're at the end of a text node and child attributes match the attributes
 						// so we can return the text node and offset
 					} else if ( position === offset + child.data.length &&
-						areEqualArrays( converter.getAttributesForDomElement( child, this.store ), attributes ) ) {
+						utils.areEqual( converter.getAttributesForDomElement( child, this.store ), attributes ) ) {
 
 						return {
 							node: child,
@@ -206,7 +208,7 @@ define( [
 					ancestorAttributes = converter.getAttributesForDomElement( ancestor.parentNode, this.store );
 
 					// ancestor's attributes match the attributes
-					if ( areEqualArrays( ancestorAttributes, attributes ) ) {
+					if ( utils.areEqual( ancestorAttributes, attributes ) ) {
 						return {
 							node: ancestor.parentNode,
 							// + include the node in the final offset
@@ -223,14 +225,6 @@ define( [
 				};
 			} else {
 				throw new Error( 'Couldn\'t find a node and offset' );
-			}
-
-			// check if two arrays are equal (shallow)
-			function areEqualArrays( a, b ) {
-				return Array.isArray( a ) && Array.isArray( b ) && a.length === b.length &&
-					a.every( function( item, i ) {
-						return item === b[ i ];
-					} );
 			}
 
 			// find a node's offset in a parent element
@@ -287,7 +281,8 @@ define( [
 		},
 
 		// TODO exclude internal elements from the offset calculation
-		// calculates the offset in the linear data
+		// calculates the offset and attributes in the linear data
+		// and returns a Position object
 		getOffsetAndAttributes: function( element, offset ) {
 			// validate the offset first
 			if (
@@ -311,11 +306,8 @@ define( [
 					if ( ( view = viewManager.getByElement( element ) ) ) {
 						node = view.node;
 
-						return {
-							attributes: attributes,
-							// node's offset + node's length - 1 for the node's closing element
-							offset: node.getOffset() + node.length - 1
-						};
+						// node's offset + node's length - 1 for the node's closing element
+						return new Position( node.getOffset() + node.length - 1, attributes );
 					}
 
 					searchElem = element;
@@ -388,10 +380,7 @@ define( [
 				return element;
 			}
 
-			return {
-				attributes: attributes,
-				offset: offset
-			};
+			return new Position( offset, attributes );
 		}
 	} );
 
