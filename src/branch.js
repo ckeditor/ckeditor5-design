@@ -49,7 +49,6 @@ define( [
 				return;
 			}
 
-			// console.log( 'update branch view', this, index, removed, added );
 			var len, i;
 
 			// get rid of views for removed children
@@ -71,12 +70,9 @@ define( [
 
 			rightAnchor = findAnchor( index, 1 );
 
-			// console.log( 'la', leftAnchor );
-			// console.log( 'ra', rightAnchor );
 			if ( removed.length ) {
 				// remove all elements between the left and right anchors
 				if ( leftAnchor && rightAnchor ) {
-					console.log( 'remove elements between left and right anchors' );
 					var rightElem = rightAnchor.view.getElement();
 
 					while (
@@ -87,19 +83,16 @@ define( [
 					}
 					// remove all elements after the left anchor
 				} else if ( leftAnchor ) {
-					console.log( 'remove elements after the left anchor' );
 					while ( ( sibling = leftAnchor.view.nextSibling ) ) {
 						sibling.parentElement.removeChild( sibling );
 					}
 					// remove all elements before the right anchor
 				} else if ( rightAnchor ) {
-					console.log( 'remove elements before the right anchor' );
 					while ( ( sibling = rightAnchor.view.previousSibling ) ) {
 						sibling.parentElement.removeChild( sibling );
 					}
 					// remove all children
 				} else {
-					console.log( 'remove all child elements' );
 					this.view.html( '' );
 				}
 			}
