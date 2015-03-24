@@ -67,11 +67,10 @@ define( [
 			// get the top-most affected node
 			for ( i = 0, len = mutations.length; i < len; i++ ) {
 				var mutation = mutations[ i ];
-				// try to find the node using the sibling first
 				var target = mutation.target,
 					view;
 
-				// ignore mutations caused by Firefox adding some attributes
+				// ignore mutations caused by Firefox adding some attributes to elements
 				if ( mutation.type === 'attributes' && attrIgnorePattern.test( mutation.attributeName ) ) {
 					continue;
 				}
@@ -129,7 +128,12 @@ define( [
 			// stop watching for selection changes
 			this.selection.stopWatching();
 
-			// TODO merge transactions (?)
+			var historyItem = {
+				previousSelection: this.selection.previousSelection,
+				selection: this.selection.currentSelection,
+				transactions: []
+			};
+
 			// create and apply transactions to the document
 			for ( i = 0, len = nodes.length; i < len; i++ ) {
 				node = nodes[ i ];
@@ -140,9 +144,11 @@ define( [
 
 				// store applied transactions only
 				if ( transaction.applied ) {
-					this.history.push( transaction );
+					historyItem.transactions.push( transaction );
 				}
 			}
+
+			this.history.push( historyItem );
 
 			// re-disable the mutation observer before removing unneeded DOM elements
 			this.mutationObserver.disable();
