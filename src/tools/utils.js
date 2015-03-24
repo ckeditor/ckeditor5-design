@@ -10,6 +10,53 @@ define( function() {
 	var uids = {};
 
 	var utils = {
+		areEqual: function( a, b ) {
+			if ( utils.isArray( a ) && utils.isArray( b ) ) {
+				// different lengths, so nope
+				if ( a.length !== b.length ) {
+					return false;
+				}
+
+				return a.every( function( value, i ) {
+					return utils.areEqual( value, b[ i ] );
+				} );
+
+			} else if ( utils.isObject( a ) && utils.isObject( b ) ) {
+				var aKeys = Object.keys( a ),
+					bKeys = Object.keys( b );
+
+				// different keys, so nope
+				if ( !utils.areEqual( aKeys, bKeys ) ) {
+					return false;
+				}
+
+				return aKeys.every( function( name ) {
+					return utils.areEqual( a[ name ], b[ name ] );
+				} );
+			} else {
+				return a === b;
+			}
+		},
+
+		clone: function( obj ) {
+			var clone;
+
+			if ( this.isArray( obj ) ) {
+				clone = obj.map( function( value ) {
+					return this.clone( value );
+				}, this );
+			} else if ( this.isObject( obj ) ) {
+				clone = {};
+
+				Object.getOwnPropertyNames( obj ).forEach( function( name ) {
+					clone[ name ] = this.clone( obj[ name ] );
+				}, this );
+			} else {
+				clone = obj;
+			}
+
+			return clone;
+		},
 		// create a new detached document from an HTML string
 		createDocumentFromHTML: function( html ) {
 			if ( DOMParser ) {
@@ -57,26 +104,6 @@ define( function() {
 					configurable: true
 				}
 			} );
-		},
-
-		clone: function( obj ) {
-			var clone;
-
-			if ( this.isArray( obj ) ) {
-				clone = obj.map( function( value ) {
-					return this.clone( value );
-				}, this );
-			} else if ( this.isObject( obj ) ) {
-				clone = {};
-
-				Object.getOwnPropertyNames( obj ).forEach( function( name ) {
-					clone[ name ] = this.clone( obj[ name ] );
-				}, this );
-			} else {
-				clone = obj;
-			}
-
-			return clone;
 		},
 
 		isArray: function( obj ) {

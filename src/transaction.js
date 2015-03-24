@@ -171,7 +171,6 @@ define( [
 
 			// recursively compares arrays of nodes and applies necessary changes to the given parent
 			function updateTree( parent, oldChildren, newChildren ) {
-				// console.log( 'update tree', oldChildren, newChildren );
 				var edits = diff( oldChildren, newChildren, function( a, b ) {
 					// nodes are "equal" if their data matches
 					// TODO what about text nodes? how to force re-render without replacing the nodes
@@ -198,7 +197,6 @@ define( [
 							if ( lastMatching ) {
 								addIndex = parent.indexOf( lastMatching ) + 1;
 							}
-							// console.log( '+', stack );
 
 							// place new children relative to the old matching child
 							parent.spliceArray( addIndex, 0, stack );
@@ -211,7 +209,6 @@ define( [
 
 						// remove old child nodes
 						if ( last === diff.DELETE ) {
-							// console.log( '-', stack );
 							parent.splice( parent.indexOf( stack[ 0 ] ), stack.length );
 
 							removed += stack.length;
@@ -237,7 +234,6 @@ define( [
 
 					// nodes match so we have to rework the children of the old node
 					if ( edit === diff.EQUAL ) {
-						// console.log( '=', oldChild );
 						var oldChildLength = oldChild.length;
 
 						updateTree( oldChild, [].concat( oldChild.children ), [].concat( newChild.children ) );
@@ -319,39 +315,9 @@ define( [
 		}
 	} );
 
-	function areEqual( a, b ) {
-		if ( utils.isArray( a ) && utils.isArray( b ) ) {
-			// different lengths, so nope
-			if ( a.length !== b.length ) {
-				return false;
-			}
-
-			return a.every( function( value, i ) {
-				return areEqual( value, b[ i ] );
-			} );
-
-		} else if ( utils.isObject( a ) && utils.isObject( b ) ) {
-			var aKeys = Object.keys( a ),
-				bKeys = Object.keys( b );
-
-			// different keys, so nope
-			if ( !areEqual( aKeys, bKeys ) ) {
-				return false;
-			}
-
-			return aKeys.every( function( name ) {
-				return areEqual( a[ name ], b[ name ] );
-			} );
-		} else {
-			return a === b;
-		}
-	}
-
 	function makeOperationsFromDiff( oldData, newData, offset ) {
 		// TODO see if it's worth comparing objects and arrays as strings (via JSON.stringify)
-		console.time( 'diff' );
-		var edits = diff( oldData, newData, areEqual );
-		console.timeEnd( 'diff' );
+		var edits = diff( oldData, newData, utils.areEqual );
 
 		var ops = [];
 		// include element offset in the first retain
