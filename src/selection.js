@@ -2,11 +2,13 @@ define( [
 	'selectionwatcher',
 	'range',
 	'tools/element',
+	'tools/emitter',
 	'tools/utils'
 ], function(
 	SelectionWatcher,
 	Range,
 	Element,
+	Emitter,
 	utils
 ) {
 	'use strict';
@@ -18,6 +20,9 @@ define( [
 		this.watcher = new SelectionWatcher( editable.$el );
 		this.watcher.on( 'selection:change', this.update, this );
 		this.startWatching();
+
+		this.previousSelection = null;
+		this.currentSelection = null;
 	}
 
 	utils.extend( Selection, {
@@ -32,7 +37,30 @@ define( [
 		}
 	} );
 
-	utils.extend( Selection.prototype, {
+	utils.extend( Selection.prototype, Emitter, {
+		buildFromNativeSelection: function( selection ) {
+			var result = {
+				ranges: [],
+				type: Selection.EMPTY
+			};
+
+			selection = selection || this.nativeSelection;
+
+			var count;
+
+			if ( !( count = selection.rangeCount ) ) {
+				return result;
+			}
+
+			for ( var i = 0; i < count; i++ ) {
+				result.ranges.push( Range.createFromNativeRange( this.nativeSelection.getRangeAt( i ), this.document ) );
+			}
+
+			result.type = count === 1 && result.ranges[ 0 ].collapsed ? Selection.CARRET : Selection.RANGE;
+
+			return result;
+		},
+
 		clear: function() {
 			this.nativeSelection.clearAllRanges();
 		},
@@ -49,35 +77,15 @@ define( [
 
 		},
 
-		getSelectedDataRange: function() {
-			var nativeRange, start, end;
+		getSelectedDataRanges: function() {
 
-			if ( !this.nativeSelection.rangeCount ) {
-				return null;
-			}
-
-			nativeRange = this.nativeSelection.getRangeAt( 0 );
-
-			start = this.document.getOffsetAndAttributes(
-				nativeRange.startContainer,
-				nativeRange.startOffset
-			);
-
-			if ( !nativeRange.collapsed ) {
-				end = this.document.getOffsetAndAttributes(
-					nativeRange.endContainer,
-					nativeRange.endOffset
-				);
-			}
-
-			return new Range( start, end );
 		},
 
-		selectDataRange: function( range ) {
+		selectDataRanges: function( ranges ) {
 			console.log( 'select data range', range );
 		},
 
-		selectDomRange: function( ranges ) {
+		selectDomRanges: function( ranges ) {
 
 		},
 
@@ -98,8 +106,14 @@ define( [
 		},
 
 		update: function( selection ) {
-			console.log( 'update', selection );
+			var nextSelection = this.buildFromNativeSelection( selection );
 
+			if ( !utils.areEqual( this.currentSelection, nextSelection ) ) {
+				this.previousSelection = this.currentSelection;
+				this.currentSelection = nextSelection;
+
+				this.trigger( 'selection:change', this.currentSelection, this.previousSelection );
+			}
 		}
 	} );
 
