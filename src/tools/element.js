@@ -40,6 +40,12 @@ define( [
 
 
 	// prototype properties
+	Object.defineProperty( Element.prototype, 'childNodes', {
+		get: function() {
+			return this._el.childNodes;
+		}
+	} );
+
 	Object.defineProperty( Element.prototype, 'detached', {
 		get: function() {
 			return !this._el.parentNode;
