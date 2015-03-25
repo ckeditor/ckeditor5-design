@@ -135,8 +135,8 @@ define( [
 			this.selection.stopWatching();
 
 			var historyItem = {
-				previousSelection: this.selection.previousSelection,
-				selection: this.selection.currentSelection,
+				previousSelection: this.selection.currentSelection,
+				selection: null,
 				transactions: []
 			};
 
@@ -154,8 +154,6 @@ define( [
 				}
 			}
 
-			this.history.push( historyItem );
-
 			// re-disable the mutation observer before removing unneeded DOM elements
 			this.mutationObserver.disable();
 
@@ -171,7 +169,10 @@ define( [
 			// enable the mutation observer
 			this.mutationObserver.enable();
 
+			historyItem.selection = '?';
 			// TODO restore the selection
+
+			this.history.push( historyItem );
 
 			// re-enable the selection watcher in another tick - we don't want to trigger current changes
 			setTimeout( function() {

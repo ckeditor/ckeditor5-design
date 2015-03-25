@@ -14,21 +14,22 @@ define( [
 	'use strict';
 
 	function Selection( editable ) {
-		this.editable = editable;
 		this.document = editable.document;
-		this.nativeSelection = editable.$document.getSelection();
+		this.$document = editable.$document;
 		this.watcher = new SelectionWatcher( editable.$el );
 		this.watcher.on( 'selection:change', this.update, this );
 		this.startWatching();
 
-		this.previousSelection = null;
+		this.nativeSelection = editable.$document.getSelection();
 		this.currentSelection = null;
+		this.previousSelection = null;
 	}
 
 	utils.extend( Selection, {
 		EMPTY: 'empty',
 		CARRET: 'carret',
-		RANGE: 'range'
+		RANGE: 'range',
+		MULTIRANGE: 'multirange'
 	} );
 
 	Object.defineProperty( Selection.prototype, 'collapsed', {
@@ -56,45 +57,68 @@ define( [
 				result.ranges.push( Range.createFromNativeRange( this.nativeSelection.getRangeAt( i ), this.document ) );
 			}
 
-			result.type = count === 1 && result.ranges[ 0 ].collapsed ? Selection.CARRET : Selection.RANGE;
+			result.type = count === 1 ?
+				result.ranges[ 0 ].collapsed ? Selection.CARRET : Selection.RANGE :
+				Selection.MULTIRANGE;
 
 			return result;
 		},
 
 		clear: function() {
-			this.nativeSelection.clearAllRanges();
+			this.nativeSelection.removeAllRanges();
 		},
 
-		getDataRange: function() {
+		getSelectedNode: function( selection ) {
+			selection = selection || this.currentSelection;
 
-		},
+			if ( selection.type === Selection.EMPTY ) {
+				return null;
+			}
 
-		getSelectedNode: function() {
-
+			return this.document.getNodeAtPosition( selection.ranges[ 0 ].start.offset );
 		},
 
 		getSelectedData: function() {
-
+			return this.currentSelection ?
+				this.currentSelection.ranges.map( function( range ) {
+					return this.document.data.getDataForRange( range );
+				}, this ) : [];
 		},
 
-		getSelectedDataRanges: function() {
-
+		getSelectedRanges: function() {
+			return this.currentSelection.ranges;
 		},
 
-		selectDataRanges: function( ranges ) {
-			console.log( 'select data range', range );
-		},
+		selectDataRange: function( range ) {
+			var nativeRange = this.$document.createRange();
 
-		selectDomRanges: function( ranges ) {
+			var start = this.document.getDomNodeAndOffset( range.start.offset, range.start.attributes );
+			var end = this.document.getDomNodeAndOffset( range.end.offset, range.end.attributes );
 
+			nativeRange.setStart( start.node, start.offset );
+			nativeRange.setEnd( end.node, end.offset );
+
+			this.selectRange( nativeRange );
 		},
 
 		selectElement: function( element ) {
+			var nativeRange = this.$document.createRange();
 
+			nativeRange.selectNode( element );
+
+			this.selectRange( nativeRange );
 		},
 
 		selectNode: function( node ) {
+			var offset = node.offset,
+				range = Range.createFromOffsets( offset, offset + node.length );
 
+			this.selectDataRange( range );
+		},
+
+		selectRange: function( range ) {
+			this.nativeSelection.removeAllRanges();
+			this.nativeSelection.addRange( range );
 		},
 
 		startWatching: function() {

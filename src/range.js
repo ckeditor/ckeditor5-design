@@ -14,6 +14,13 @@ define( [
 
 	// static
 	utils.extend( Range, {
+		createFromOffsets: function( startOffset, endOffset ) {
+			var start = new Position( startOffset );
+			var end = new Position( endOffset );
+
+			return new Range( start, end );
+		},
+
 		createFromNativeRange: function( range, document ) {
 			var start, end;
 
