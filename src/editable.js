@@ -46,6 +46,9 @@ define( [
 		this.mutationObserver.enable();
 
 		this.selection = new Selection( this );
+		this.selection.on( 'selection:change', function( selection ) {
+			console.log( selection );
+		} );
 	}
 
 	utils.extend( Editable.prototype, Emitter, {
@@ -66,6 +69,9 @@ define( [
 
 			// get the top-most affected node
 			for ( i = 0, len = mutations.length; i < len; i++ ) {
+				// rule #1 - always reset your variables...
+				node = null;
+
 				var mutation = mutations[ i ];
 				var target = mutation.target,
 					view;
@@ -197,9 +203,9 @@ define( [
 				}
 			}
 
-			function findParentView( element ) {
-				var topEl = that.$el.getElement();
+			var topEl = this.$el.getElement();
 
+			function findParentView( element ) {
 				while ( element ) {
 					// we've found a parent view
 					if ( element.dataset && element.dataset.vid ) {
