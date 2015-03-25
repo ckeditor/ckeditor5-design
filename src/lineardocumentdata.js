@@ -105,6 +105,10 @@ define( [
 			return null;
 		},
 
+		getDataForRange: function( range ) {
+			return this.slice( range.start.offset, range.end.offset );
+		},
+
 		getTypeAt: function( idx ) {
 			var item = this.data[ idx ];
 
