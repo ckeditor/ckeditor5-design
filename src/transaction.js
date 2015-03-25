@@ -17,7 +17,7 @@ define( [
 	utils.extend( Transaction, {
 		createFromNodeAndElement: function( document, node, element ) {
 			var oldData = document.getNodeData( node ),
-				offset = node.getOffset(),
+				offset = node.offset,
 				newData = converter.getDataForDom( element, document.store, null, node.type === 'root' ),
 				transaction = new Transaction();
 
@@ -118,9 +118,9 @@ define( [
 
 			if ( parent ) {
 				// beginning of the data to be rebuilt
-				start = firstNode.getOffset();
+				start = firstNode.offset;
 				// end of the data to be rebuilt
-				end = lastNode.getOffset() + lastNode.length + added - removed;
+				end = lastNode.offset + lastNode.length + added - removed;
 				// a subset of linear data for new tree nodes
 				data = document.data.sliceInstance( start, end );
 				// initial length of the parent node, will be used later to update lengths of its ancestors
@@ -133,8 +133,8 @@ define( [
 
 					parent = firstNode.parent;
 					parentLength = parent.length;
-					start = firstNode.getOffset();
-					end = lastNode.getOffset() + lastNode.length + added - removed;
+					start = firstNode.offset;
+					end = lastNode.offset + lastNode.length + added - removed;
 					data = document.data.sliceInstance( start, end );
 				}
 

@@ -123,6 +123,38 @@ define( [
 		}
 	} );
 
+	// offset of a node from the beginning of the document, corresponds to the position in the linear data
+	Object.defineProperty( Node.prototype, 'offset', {
+		get: function() {
+			// it's the topmost element
+			if ( !this.parent ) {
+				return 0;
+			}
+
+			var offset = this.parent.offset;
+
+			// add 1 for parent's opening element
+			if ( this.parent ) {
+				offset += 1;
+			}
+
+			// add lengths of the siblings to the final offset
+			var found = this.parent.children.some( function( child ) {
+				if ( child === this ) {
+					return true;
+				}
+
+				offset += child.length;
+			}, this );
+
+			if ( !found ) {
+				throw new Error( 'Node not found in its parent\'s children array.' );
+			}
+
+			return offset;
+		}
+	} );
+
 	Object.defineProperty( Node.prototype, 'previousSibling', {
 		get: function() {
 			var idx;
@@ -158,37 +190,6 @@ define( [
 		detach: function() {
 			this.parent = null;
 			this.document = null;
-		},
-
-		// returns the offset of a node from the beginning of the document,
-		// this corresponds to the position in the linear data
-		getOffset: function() {
-			// it's the topmost element
-			if ( !this.parent ) {
-				return 0;
-			}
-
-			var offset = this.parent.getOffset();
-
-			// add 1 for parent's opening element
-			if ( this.parent ) {
-				offset += 1;
-			}
-
-			// add lengths of the siblings to the final offset
-			var found = this.parent.children.some( function( child ) {
-				if ( child === this ) {
-					return true;
-				}
-
-				offset += child.length;
-			}, this );
-
-			if ( !found ) {
-				throw new Error( 'Node not found in its parent\'s children array.' );
-			}
-
-			return offset;
 		},
 
 		// check if the given node is this node's ancestor

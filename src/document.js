@@ -80,7 +80,7 @@ define( [
 				throw new Error( 'No branch at the given position.' );
 			}
 
-			var offset = parent.getOffset();
+			var offset = parent.offset;
 
 			// now work with the actual DOM element
 			parent = parent.view.getElement();
@@ -177,7 +177,7 @@ define( [
 					if ( ( view = viewManager.getByElement( child ) ) ) {
 						var node = view.node;
 
-						if ( position === node.getOffset() ) {
+						if ( position === node.offset ) {
 							return {
 								node: child.parentNode,
 								offset: getNodeOffset( child )
@@ -235,7 +235,7 @@ define( [
 
 		// retrieve linear data for the given node
 		getNodeData: function( node ) {
-			var offset = node.getOffset();
+			var offset = node.offset;
 
 			return this.data.slice( offset, offset + node.length );
 		},
@@ -307,7 +307,7 @@ define( [
 						node = view.node;
 
 						// node's offset + node's length - 1 for the node's closing element
-						return new Position( node.getOffset() + node.length - 1, attributes );
+						return new Position( node.offset + node.length - 1, attributes );
 					}
 
 					searchElem = element;
@@ -347,7 +347,7 @@ define( [
 			length += Element.hasAncestor( searchElem, element ) ? 1 : node.length;
 
 			// compute the final offset
-			offset = node.getOffset() + length;
+			offset = node.offset + length;
 
 			// finds the closest preceding element that has a view attached to it
 			function findClosest( element ) {
