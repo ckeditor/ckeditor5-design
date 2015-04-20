@@ -363,6 +363,11 @@ define( [
 					if ( viewManager.getByElement( element ) ) {
 						return element;
 					}
+
+					// include the opening tag for a mutated element
+					if ( element.dataset && element.dataset.mutated ) {
+						length++;
+					}
 				}
 
 				// check the previous sibling
@@ -373,8 +378,18 @@ define( [
 					return element;
 				}
 
+				// include the opening tag for a mutated element
+				if ( element.dataset && element.dataset.mutated ) {
+					length++;
+				}
+
 				while ( element.lastChild ) {
 					element = element.lastChild;
+
+					// include the closing tag for a mutated element
+					if ( element.dataset && element.dataset.mutated ) {
+						length++;
+					}
 				}
 
 				return element;

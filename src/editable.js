@@ -1,6 +1,7 @@
 define( [
 	'document',
 	'mutationobserver',
+	'range',
 	'selection',
 	'transaction',
 	'viewmanager',
@@ -10,6 +11,7 @@ define( [
 ], function(
 	Document,
 	MutationObserver,
+	Range,
 	Selection,
 	Transaction,
 	viewManager,
@@ -60,6 +62,7 @@ define( [
 			var nodes = [];
 			var elements = [];
 			var nodesToRemove = [];
+			var nodesToFix = [];
 
 			// disable the mutation observer while manipulating "dirty" DOM elements
 			this.mutationObserver.disable();
@@ -90,7 +93,16 @@ define( [
 					}
 
 					if ( !node || node.type !== 'root' ) {
+						// mark the element as a "mutated"
+						target.dataset.mutated = true;
+						// save the original VID
+						target.dataset.ovid = target.dataset.vid;
+						// remove the VID to avoid selection offset miscalculations
 						delete target.dataset.vid;
+
+						if ( nodesToFix.indexOf( target ) === -1 ) {
+							nodesToFix.push( target );
+						}
 					}
 
 					// collect nodes created by contenteditable to be removed later
@@ -140,6 +152,10 @@ define( [
 				transactions: []
 			};
 
+			var range = this.selection.nativeSelection.getRangeAt( 0 );
+			var start = this.document.getOffsetAndAttributes( range.startContainer, range.startOffset );
+			var end = this.document.getOffsetAndAttributes( range.endContainer, range.endOffset );
+
 			// create and apply transactions to the document
 			for ( i = 0, len = nodes.length; i < len; i++ ) {
 				node = nodes[ i ];
@@ -166,11 +182,21 @@ define( [
 				}
 			}
 
+			// fix nodes' data - restore the original VID and remove unneeded properties
+			for ( i = 0, len = nodesToFix.length; i < len; i++ ) {
+				node = nodesToFix[ i ];
+				node.dataset.vid = node.dataset.ovid;
+
+				delete node.dataset.mutated;
+				delete node.dataset.ovid;
+			}
+
 			// enable the mutation observer
 			this.mutationObserver.enable();
 
-			historyItem.selection = '?';
-			// TODO restore the selection
+			this.selection.selectDataRange( new Range( start, end ) );
+
+			historyItem.selection = this.selection.currentSelection;
 
 			this.history.push( historyItem );
 
@@ -188,6 +214,10 @@ define( [
 
 					if ( nodesToRemove.indexOf( addedNode ) === -1 ) {
 						nodesToRemove.push( addedNode );
+					}
+
+					if ( addedNode.dataset ) {
+						addedNode.dataset.mutated = true;
 					}
 				}
 			}
