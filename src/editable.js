@@ -2,7 +2,7 @@ define( [
 	'document',
 	'mutationobserver',
 	'range',
-	'selection',
+	'selectionwatcher',
 	'transaction',
 	'viewmanager',
 	'tools/element',
@@ -12,7 +12,7 @@ define( [
 	Document,
 	MutationObserver,
 	Range,
-	Selection,
+	SelectionWatcher,
 	Transaction,
 	viewManager,
 	Element,
@@ -31,7 +31,7 @@ define( [
 		this.$document = $el.getElement().ownerDocument;
 
 		// create a document for this editable area
-		this.document = new Document( $el, this );
+		this.document = new Document( $el );
 
 		this.$documentView = this.document.root.view;
 		this.$documentView.appendTo( this.$el );
@@ -47,10 +47,9 @@ define( [
 		// start listening for DOM mutations
 		this.mutationObserver.enable();
 
-		this.selection = new Selection( this );
-		this.selection.on( 'selection:change', function( selection ) {
-			console.log( selection );
-		} );
+		// create a selection watcher
+		this.selectionWatcher = new SelectionWatcher( this.$el );
+		this.selectionWatcher.on( 'selection:change', this.document.selection.update, this.document.selection );
 	}
 
 	utils.extend( Editable.prototype, Emitter, {
@@ -144,15 +143,16 @@ define( [
 			}
 
 			// stop watching for selection changes
-			this.selection.stopWatching();
+			this.selectionWatcher.stop();
 
 			var historyItem = {
-				previousSelection: this.selection.currentSelection,
+				previousSelection: this.document.selection.currentSelection,
 				selection: null,
 				transactions: []
 			};
 
-			var range = this.selection.nativeSelection.getRangeAt( 0 );
+			// save current selection
+			var range = this.document.selection.nativeSelection.getRangeAt( 0 );
 			var start = this.document.getOffsetAndAttributes( range.startContainer, range.startOffset );
 			var end = this.document.getOffsetAndAttributes( range.endContainer, range.endOffset );
 
@@ -194,15 +194,16 @@ define( [
 			// enable the mutation observer
 			this.mutationObserver.enable();
 
-			this.selection.selectDataRange( new Range( start, end ) );
+			// restore the selection
+			this.document.selection.selectDataRange( new Range( start, end ) );
 
-			historyItem.selection = this.selection.currentSelection;
+			historyItem.selection = this.document.selection.currentSelection;
 
 			this.history.push( historyItem );
 
 			// re-enable the selection watcher in another tick - we don't want to trigger current changes
 			setTimeout( function() {
-				that.selection.startWatching();
+				that.selectionWatcher.start();
 			}, 0 );
 
 			// TODO this is just a temporary solution for development purposes

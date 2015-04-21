@@ -4,6 +4,7 @@ define( [
 	'lineardocumentdata',
 	'linearmetadata',
 	'position',
+	'selection',
 	'store',
 	'viewmanager',
 	'tools/element',
@@ -15,6 +16,7 @@ define( [
 	LinearDocumentData,
 	LinearMetaData,
 	Position,
+	Selection,
 	Store,
 	viewManager,
 	Element,
@@ -39,6 +41,9 @@ define( [
 		// document's linear data
 		this.data = new LinearDocumentData( data, this.store );
 		this.metadata = new LinearMetaData();
+
+		// document's selection API
+		this.selection = new Selection( this, $el.getElement().ownerDocument );
 
 		// create document tree root element
 		this.root = converter.getNodesForData( this.data, this )[ 0 ];

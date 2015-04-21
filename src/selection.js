@@ -1,11 +1,9 @@
 define( [
-	'selectionwatcher',
 	'range',
 	'tools/element',
 	'tools/emitter',
 	'tools/utils'
 ], function(
-	SelectionWatcher,
 	Range,
 	Element,
 	Emitter,
@@ -13,14 +11,11 @@ define( [
 ) {
 	'use strict';
 
-	function Selection( editable ) {
-		this.document = editable.document;
-		this.$document = editable.$document;
-		this.watcher = new SelectionWatcher( editable.$el );
-		this.watcher.on( 'selection:change', this.update, this );
-		this.startWatching();
+	function Selection( document, $document ) {
+		this.document = document;
+		this.$document = $document;
 
-		this.nativeSelection = editable.$document.getSelection();
+		this.nativeSelection = this.$document.getSelection();
 		this.currentSelection = null;
 		this.previousSelection = null;
 	}
@@ -120,14 +115,6 @@ define( [
 		selectRange: function( range ) {
 			this.nativeSelection.removeAllRanges();
 			this.nativeSelection.addRange( range );
-		},
-
-		startWatching: function() {
-			this.watcher.start();
-		},
-
-		stopWatching: function() {
-			this.watcher.stop();
 		},
 
 		update: function( selection ) {
