@@ -75,10 +75,6 @@ define( [
 				}, this ) : [];
 		},
 
-		getSelectedRanges: function() {
-			return this.currentSelection.ranges;
-		},
-
 		selectDataRange: function( range ) {
 			var nativeRange = this.$document.createRange();
 

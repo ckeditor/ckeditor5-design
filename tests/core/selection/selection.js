@@ -172,4 +172,72 @@ bender.require( [
 			expect( selection.previousSelection ).to.equal( current );
 		} );
 	} );
+
+	describe( 'getSelectedNode', function() {
+		it( 'should return null if there\'s no selection', function() {
+			var selection = new Selection( doc, document );
+
+			selection.clear();
+
+			var result = selection.getSelectedNode();
+
+			expect( result ).to.be.null();
+		} );
+
+		it( 'should return the selected node', function() {
+			var selection = new Selection( doc, document );
+
+			var range = document.createRange();
+			range.selectNode( doc.root.view.getElement().firstChild );
+			selection.selectRange( range );
+
+			var result = selection.getSelectedNode();
+
+			expect( result ).to.equal( doc.root.children[ 0 ] );
+		} );
+	} );
+
+	describe( 'getSelectedData', function() {
+		it( 'should return empty array if there\'s no selection', function() {
+			var selection = new Selection( doc, document );
+			var result = selection.getSelectedData();
+
+			expect( result ).to.be.an( 'array' ).to.have.length( 0 );
+		} );
+
+		it( 'should return the selected data', function() {
+			var selection = new Selection( doc, document );
+
+			var range = document.createRange();
+			range.selectNode( doc.root.view.getElement().firstChild );
+			selection.selectRange( range );
+
+			var result = selection.getSelectedData();
+
+			expect( result ).to.have.length( 1 );
+			expect( result[ 0 ] ).to.deep.equal( doc.data.slice( 1, 5 ) );
+		} );
+	} );
+
+	describe( 'getSelectedData', function() {
+		it( 'should return empty array if there\'s no selection', function() {
+			var selection = new Selection( doc, document );
+			var result = selection.getSelectedData();
+
+			expect( result ).to.be.an( 'array' ).to.have.length( 0 );
+		} );
+
+		it( 'should return the selected data', function() {
+			var selection = new Selection( doc, document );
+
+			var range = document.createRange();
+			range.selectNode( doc.root.view.getElement().firstChild );
+			selection.selectRange( range );
+
+			var result = selection.getSelectedData();
+
+			expect( result ).to.have.length( 1 );
+			expect( result[ 0 ] ).to.deep.equal( doc.data.slice( 1, 5 ) );
+		} );
+	} );
 } );
