@@ -130,5 +130,34 @@ bender.require( [
 
 			expect( result ).to.deep.equal( expected );
 		} );
+
+		it( 'should ignore nodes that aren\'t elements nor text nodes', function() {
+			var dom = document.getElementById( 'test3' );
+
+			var expected = [ {
+					"type": "div",
+					"attributes": {}
+				}, {
+					"type": "paragraph",
+					"attributes": {}
+				},
+				"F",
+				"o",
+				"o",
+				" ",
+				"b",
+				"a",
+				"r",
+				{
+					"type": "/paragraph"
+				}, {
+					"type": "/div"
+				}
+			];
+
+			var result = converter.getDataForDom( dom, store );
+
+			expect( result ).to.deep.equal( expected );
+		} );
 	} );
 } );
