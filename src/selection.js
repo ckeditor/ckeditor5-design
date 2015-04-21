@@ -55,13 +55,7 @@ define( [
 
 		clear: function() {
 			this.nativeSelection.removeAllRanges();
-
-			this.previousSelection = this.currentSelection;
-
-			this.currentSelection = {
-				ranges: [],
-				type: Selection.EMPTY
-			};
+			this.update( this.nativeSelection );
 		},
 
 		getSelectedNode: function( selection ) {
@@ -115,6 +109,7 @@ define( [
 		selectRange: function( range ) {
 			this.nativeSelection.removeAllRanges();
 			this.nativeSelection.addRange( range );
+			this.update( this.nativeSelection );
 		},
 
 		update: function( selection ) {
