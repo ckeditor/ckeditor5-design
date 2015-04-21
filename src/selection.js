@@ -32,12 +32,6 @@ define( [
 		MULTIRANGE: 'multirange'
 	} );
 
-	Object.defineProperty( Selection.prototype, 'collapsed', {
-		get: function() {
-			return this.range && this.range.collapsed;
-		}
-	} );
-
 	utils.extend( Selection.prototype, Emitter, {
 		buildFromNativeSelection: function( selection ) {
 			var result = {
@@ -66,6 +60,13 @@ define( [
 
 		clear: function() {
 			this.nativeSelection.removeAllRanges();
+
+			this.previousSelection = this.currentSelection;
+
+			this.currentSelection = {
+				ranges: [],
+				type: Selection.EMPTY
+			};
 		},
 
 		getSelectedNode: function( selection ) {
