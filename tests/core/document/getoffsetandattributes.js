@@ -246,5 +246,76 @@ bender.require( [
 				} );
 			} );
 		} );
+
+		describe( 't8', function() {
+			var doc = makeDocument( 't8' );
+			// references to DOM elements
+			var p1 = doc.root.children[ 0 ].view.getElement();
+			var t1 = p1.firstChild;
+			var p2 = doc.root.children[ 1 ].view.getElement();
+			var t2 = p2.firstChild;
+
+			// simulate a mutation
+			p1.dataset.ovid = p1.dataset.vid;
+			delete p1.dataset.vid;
+			p1.dataset.mutated = true;
+
+			delete p2.dataset.vid;
+			p2.dataset.mutated = true;
+
+			var testCases = [
+				[ '<p data-mutated="true" data-ovid="4">ab</p><p data-mutated="true">^cd</p>', t2, 0, 6, [] ],
+				[ '<p data-mutated="true" data-ovid="4">ab</p><p data-mutated="true">cd^</p>', t2, 2, 8, [] ]
+			];
+
+			testCases.forEach( function( tc ) {
+				it( 'should return a valid offset and attributes for ' + tc[ 0 ], function() {
+					var result = doc.getOffsetAndAttributes( tc[ 1 ], tc[ 2 ] );
+
+					expect( result.offset ).to.equal( tc[ 3 ] );
+					expect( result.attributes ).to.deep.equal( tc[ 4 ] || [] );
+				} );
+			} );
+		} );
+
+		describe( 't9', function() {
+			var doc = makeDocument( 't9' );
+			// references to DOM elements
+			var ul1 = doc.root.children[ 0 ].view.getElement();
+			var li1 = ul1.firstChild;
+			var t1 = li1.firstChild;
+			var ul2 = li1.lastChild;
+			var li2 = ul2.firstChild;
+			var t2 = li2.firstChild;
+			var li3 = ul2.lastChild;
+			var t3 = li3.firstChild;
+
+			li2.dataset.ovid = li2.dataset.vid;
+			delete li2.dataset.vid;
+			li2.dataset.mutated = true;
+
+			delete li3.dataset.vid;
+			li3.dataset.mutated = true;
+
+			var testCases = [
+				[ '<ul><li>ab<ul><li data-mutated="true" data-ovid="4">cd</li>' +
+					'<li data-mutated="true">^ef</li></ul</li></ul>',
+					t3, 0, 11, []
+				],
+				[ '<ul><li>ab<ul><li data-mutated="true" data-ovid="4">cd</li>' +
+					'<li data-mutated="true">ef^</li></ul</li></ul>',
+					t3, 2, 13, []
+				]
+			];
+
+			testCases.forEach( function( tc ) {
+				it( 'should return a valid offset and attributes for ' + tc[ 0 ], function() {
+					var result = doc.getOffsetAndAttributes( tc[ 1 ], tc[ 2 ] );
+
+					expect( result.offset ).to.equal( tc[ 3 ] );
+					expect( result.attributes ).to.deep.equal( tc[ 4 ] || [] );
+				} );
+			} );
+		} );
 	} );
 } );
