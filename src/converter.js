@@ -1,11 +1,11 @@
 define( [
-	'lineardata',
+	'lineardocumentdata',
 	'nodemanager',
 	'inline/inlinenode',
 	'tools/utils',
 	'nodetypes'
 ], function(
-	LinearData,
+	LinearDocumentData,
 	nodeManager,
 	InlineNode,
 	utils
@@ -33,9 +33,7 @@ define( [
 				// get index of a style in the store
 				var index = store.store( attributes );
 
-				if ( result.indexOf( index ) === -1 ) {
-					result.unshift( index );
-				}
+				result.unshift( index );
 
 				element = element.parentNode;
 			}
@@ -115,15 +113,16 @@ define( [
 			var elementStack = [],
 				textStack = [],
 				currentElement,
-				parentElement;
+				parentElement,
+				nodeConstructor,
+				childElements;
 
 			function appendToCurrent( child ) {
 				currentElement.appendChild( child );
 			}
 
 			for ( var i = 0, len = data.length; i < len; i++ ) {
-				var item = data[ i ],
-					nodeConstructor;
+				var item = data[ i ];
 
 				// text or styled-text
 				if ( utils.isString( item ) || utils.isArray( item ) ) {
@@ -135,7 +134,7 @@ define( [
 					if ( textStack.length ) {
 						nodeConstructor = nodeManager.get( 'text' );
 
-						var childElements = nodeConstructor.toDom( textStack, doc, store );
+						childElements = nodeConstructor.toDom( textStack, doc, store );
 
 						// append children to the current element
 						if ( currentElement ) {
@@ -149,12 +148,12 @@ define( [
 						textStack.length = 0;
 					}
 
-					var nodeType = LinearData.getType( item );
+					var nodeType = LinearDocumentData.getType( item );
 
 					nodeConstructor = nodeManager.get( nodeType ) || nodeManager.get( 'unknown' );
 
 					// opening element
-					if ( LinearData.isOpenElement( item ) ) {
+					if ( LinearDocumentData.isOpenElement( item ) ) {
 						// we're inside of an element so let's make it a parent
 						if ( currentElement ) {
 							parentElement = currentElement;
@@ -171,11 +170,21 @@ define( [
 						}
 
 						// closing element
-					} else if ( LinearData.isCloseElement( item ) ) {
+					} else if ( LinearDocumentData.isCloseElement( item ) ) {
 						currentElement = currentElement.parentNode;
 						parentElement = currentElement ? currentElement.parentNode : null;
 					}
 				}
+			}
+
+			// flush the remaining text stack
+			if ( textStack.length ) {
+				nodeConstructor = nodeManager.get( 'text' );
+
+				childElements = nodeConstructor.toDom( textStack, doc, store );
+
+				// push them to the element stack
+				elementStack = elementStack.concat( childElements );
 			}
 
 			return elementStack;
