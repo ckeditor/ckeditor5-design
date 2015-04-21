@@ -55,17 +55,6 @@ define( [
 				return diffIndex;
 			}
 
-			function gatherStack( stack ) {
-				for ( var i = stack.length - 1; i > 0; i-- ) {
-					var item = stack[ i ],
-						parent = stack[ i - 1 ];
-
-					if ( parent && item ) {
-						parent.appendChild( item );
-					}
-				}
-			}
-
 			// create DOM elements for the given style
 			function getStyledElement( id ) {
 				var styleDef = store.get( id ),
