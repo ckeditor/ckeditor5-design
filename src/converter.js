@@ -87,11 +87,7 @@ define( [
 			} else if ( elem.nodeType === Node.TEXT_NODE ) {
 				var text = elem.data;
 
-				// TODO IMPROOOOOOVE
-				// don't add empty text nodes, except non-breaking white space
-				if ( text === '' || text.match( /^\s+$/ ) && text !== String.fromCharCode( 160 ) ) {
-					return data;
-				}
+				// TODO take care of white spaces
 
 				var textData = this._getDataForText( elem.textContent, parentAttributes );
 
