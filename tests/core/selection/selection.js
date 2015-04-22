@@ -1,10 +1,12 @@
 bender.require( [
 	'document',
+	'range',
 	'selection',
 	'tools/element',
 	'tools/utils'
 ], function(
 	Document,
+	Range,
 	Selection,
 	Element,
 	utils
@@ -238,6 +240,147 @@ bender.require( [
 
 			expect( result ).to.have.length( 1 );
 			expect( result[ 0 ] ).to.deep.equal( doc.data.slice( 1, 5 ) );
+		} );
+	} );
+
+	describe( 'selectDataRange', function() {
+		it( 'should select a data range', function() {
+			var selection = new Selection( doc, document );
+
+			selection.clear();
+
+			expect( selection.nativeSelection.rangeCount ).to.equal( 0 );
+
+			var range = Range.createFromOffsets( 2, 4 );
+
+			selection.selectDataRange( range );
+
+			expect( selection.currentSelection.ranges ).to.have.length( 1 );
+			expect( selection.currentSelection.ranges[ 0 ] ).to.deep.equal( range );
+
+			range = selection.nativeSelection.getRangeAt( 0 );
+
+			var txt = doc.root.view.getElement().firstChild.firstChild;
+
+			expect( range.startContainer ).to.equal( range.endContainer ).to.equal( txt );
+			expect( range.startOffset ).to.equal( 0 );
+			expect( range.endOffset ).to.equal( 2 );
+		} );
+	} );
+
+	describe( 'selectElement', function() {
+		it( 'should select an element', function() {
+			var selection = new Selection( doc, document );
+
+			var txt = doc.root.view.getElement().firstChild.firstChild;
+
+			selection.clear();
+			selection.selectElement( txt );
+
+			expect( selection.currentSelection.ranges ).to.have.length( 1 );
+
+			var range = selection.currentSelection.ranges[ 0 ];
+
+			expect( range.start.offset ).to.equal( 2 );
+			expect( range.start.attributes ).to.have.length( 0 );
+			expect( range.end.offset ).to.equal( 4 );
+			expect( range.end.attributes ).to.have.length( 0 );
+
+			range = selection.nativeSelection.getRangeAt( 0 );
+
+			expect( range.startContainer ).to.equal( range.endContainer ).to.equal( txt.parentNode );
+			expect( range.startOffset ).to.equal( 0 );
+			expect( range.endOffset ).to.equal( 1 );
+		} );
+	} );
+
+	describe( 'selectNode', function() {
+		it( 'should select a node', function() {
+			var selection = new Selection( doc, document );
+
+			selection.clear();
+			selection.selectNode( doc.root.children[ 0 ].children[ 0 ] );
+
+			expect( selection.currentSelection.ranges ).to.have.length( 1 );
+
+			var range = selection.currentSelection.ranges[ 0 ];
+
+			expect( range.start.offset ).to.equal( 2 );
+			expect( range.start.attributes ).to.have.length( 0 );
+			expect( range.end.offset ).to.equal( 4 );
+			expect( range.end.attributes ).to.have.length( 0 );
+
+			range = selection.nativeSelection.getRangeAt( 0 );
+
+			var txt = doc.root.view.getElement().firstChild.firstChild;
+
+			expect( range.startContainer ).to.equal( range.endContainer ).to.equal( txt );
+			expect( range.startOffset ).to.equal( 0 );
+			expect( range.endOffset ).to.equal( 2 );
+		} );
+	} );
+
+	describe( 'update', function() {
+		it( 'should update the selection', function() {
+			var selection = new Selection( doc, document );
+
+			selection.nativeSelection.removeAllRanges();
+
+			expect( selection.currentSelection ).to.be.null();
+			expect( selection.previousSelection ).to.be.null();
+
+			var range = document.createRange();
+
+			range.selectNode( doc.root.view.getElement().firstChild.firstChild );
+			selection.nativeSelection.addRange( range );
+			selection.update();
+
+			expect( selection.currentSelection.ranges ).to.have.length( 1 );
+			expect( selection.previousSelection ).to.be.null();
+
+			range = selection.currentSelection.ranges[ 0 ];
+
+			expect( range.start.offset ).to.equal( 2 );
+			expect( range.end.offset ).to.equal( 4 );
+		} );
+
+		it( 'should trigger "selection:change" event', function( done ) {
+			var selection = new Selection( doc, document );
+
+			selection.on( 'selection:change', function( current, previous ) {
+				expect( current.ranges ).to.have.length( 1 );
+
+				var range = current.ranges[ 0 ];
+
+				expect( range.start.offset ).to.equal( 2 );
+				expect( range.end.offset ).to.equal( 4 );
+				expect( previous ).to.be.null();
+
+				done();
+			} );
+
+			var range = document.createRange();
+
+			range.selectNode( doc.root.view.getElement().firstChild.firstChild );
+			selection.nativeSelection.removeAllRanges();
+			selection.nativeSelection.addRange( range );
+			selection.update();
+		} );
+
+		it( 'shouldn\'t trigger "selection:change" if the selection hasn\'t changed', function() {
+			var selection = new Selection( doc, document );
+			var range = document.createRange();
+
+			range.selectNode( doc.root.view.getElement().firstChild.firstChild );
+			selection.nativeSelection.removeAllRanges();
+			selection.nativeSelection.addRange( range );
+			selection.update();
+
+			selection.on( 'selection:change', function() {
+				throw new Error( '"selection:change" event shouldn\'t be triggered' );
+			} );
+
+			selection.update();
 		} );
 	} );
 } );
