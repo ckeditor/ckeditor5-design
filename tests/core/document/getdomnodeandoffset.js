@@ -218,6 +218,49 @@ bender.require( [
 				} );
 			} );
 		} );
+
+		describe( 'should return valid elements and offsets for t6 -', function() {
+			var doc = makeDocument( 't6' );
+			// references to DOM elements
+			var ul1 = doc.root.children[ 0 ].view.getElement();
+			var li1 = ul1.firstChild;
+			var b1 = li1.childNodes[ 0 ];
+			var t1 = b1.firstChild;
+			var b2 = li1.childNodes[ 2 ];
+			var i1 = b2.firstChild;
+			var t2 = i1.firstChild;
+			var ul2 = li1.childNodes[ 3 ];
+			var li2 = ul2.firstChild;
+			var t3 = li2.firstChild;
+
+			var testCases = [
+				[ '<ul>^<li><b>foo</b> <b><il>bar</i></b><ul><li>baz</li></ul></li></ul>', ul1, 0 ],
+				[ '<ul><li>^<b>foo</b> <b><il>bar</i></b><ul><li>baz</li></ul></li></ul>', li1, 0 ],
+				[ '<ul><li><b>^foo</b> <b><il>bar</i></b><ul><li>baz</li></ul></li></ul>', b1, 0, t1, 0 ],
+				[ '<ul><li><b>foo^</b> <b><il>bar</i></b><ul><li>baz</li></ul></li></ul>', b1, 1, t1, 3 ],
+				[ '<ul><li><b>foo</b> <b>^<i>bar</i></b><ul><li>baz</li></ul></li></ul>', b2, 0 ],
+				[ '<ul><li><b>foo</b> <b><i>^bar</i></b><ul><li>baz</li></ul></li></ul>', i1, 0, t2, 0 ],
+				[ '<ul><li><b>foo</b> <b><i>bar^</i></b><ul><li>baz</li></ul></li></ul>', i1, 1 ],
+				[ '<ul><li><b>foo</b> <b><i>bar</i>^</b><ul><li>baz</li></ul></li></ul>', b2, 1 ],
+				[ '<ul><li><b>foo</b> <b><il>bar</i></b>^<ul><li>baz</li></ul></li></ul>', li1, 3 ],
+				[ '<ul><li><b>foo</b> <b><il>bar</i></b><ul>^<li>baz</li></ul></li></ul>', ul2, 0 ],
+				[ '<ul><li><b>foo</b> <b><il>bar</i></b><ul><li>^baz</li></ul></li></ul>', li2, 0, t3, 0 ],
+				[ '<ul><li><b>foo</b> <b><il>bar</i></b><ul><li>baz^</li></ul></li></ul>', li2, 1, t3, 3 ],
+				[ '<ul><li><b>foo</b> <b><il>bar</i></b><ul><li>baz</li>^</ul></li></ul>', ul2, 1 ],
+				[ '<ul><li><b>foo</b> <b><il>bar</i></b><ul><li>baz</li></ul>^</li></ul>', li1, 4 ],
+				[ '<ul><li><b>foo</b> <b><il>bar</i></b><ul><li>baz</li></ul></li>^</ul>', ul1, 1 ]
+			];
+
+			testCases.forEach( function( tc ) {
+				it( tc[ 0 ], function() {
+					var data = doc.getOffsetAndAttributes( tc[ 1 ], tc[ 2 ] );
+					var result = doc.getDomNodeAndOffset( data.offset, data.attributes );
+
+					expect( result.node ).to.equal( tc[ 3 ] !== undefined ? tc[ 3 ] : tc[ 1 ] );
+					expect( result.offset ).to.equal( tc[ 4 ] !== undefined ? tc[ 4 ] : tc[ 2 ] );
+				} );
+			} );
+		} );
 	} );
 
 } );

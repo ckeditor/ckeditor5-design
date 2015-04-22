@@ -77,7 +77,7 @@ define( [
 		// TODO exclude internal elements from calculations
 		// return an element and offset representing the given position in the linear data
 		getDomNodeAndOffset: function( position, attributes ) {
-			var child, sibling, ancestor, ancestorAttributes;
+			var child, element, ancestor, attrs;
 
 			var parent = this.getBranchAtPosition( position );
 
@@ -88,31 +88,45 @@ define( [
 			var offset = parent.offset;
 
 			// now work with the actual DOM element
-			parent = parent.view.getElement();
+			var parentEl = parent.view.getElement();
 
-			// position points to the parent node
-			if ( position === offset && !attributes.length ) {
-				sibling = parent.previousSibling;
+			// position points to the parent node so we most likely want to work with the previous sibling
+			if ( position === offset ) {
+				element = parentEl.previousSibling;
 
-				// there's a text node right before the parent, let's use it
-				if ( sibling && sibling.nodeType === Node.TEXT_NODE ) {
+				// see if the sibling or any of its children match the attributes
+				if ( attributes.length ) {
+					do {
+						attrs = converter.getAttributesForDomElement( element, this.store );
+
+						if ( utils.areEqual( attrs, attributes ) ) {
+							return {
+								node: element,
+								offset: element.data ? element.data.length : element.childNodes.length
+							};
+						}
+					} while ( ( element = element.lastChild ) );
+				} else {
+					// there's a text node right before the parent, let's use it
+					if ( element && element.nodeType === Node.TEXT_NODE ) {
+						return {
+							node: element,
+							offset: element.data.length
+						};
+					}
+
 					return {
-						node: sibling,
-						offset: sibling.data.length
+						node: parentEl.parentNode,
+						offset: getNodeOffset( parentEl )
 					};
 				}
-
-				return {
-					node: parent.parentNode,
-					offset: getNodeOffset( parent )
-				};
 			}
 
 			// +1 for the parent's opening tag
 			offset++;
 
 			var current = {
-				children: parent.childNodes,
+				children: parentEl.childNodes,
 				index: 0
 			};
 
@@ -135,10 +149,10 @@ define( [
 				if ( child.nodeType === Node.TEXT_NODE ) {
 					// position fits in this text node
 					if ( position >= offset && position < offset + child.data.length ) {
-						var childAttributes = converter.getAttributesForDomElement( child, this.store );
+						attrs = converter.getAttributesForDomElement( child, this.store );
 
 						// child attributes match the attributes so we return the text node and offset
-						if ( utils.areEqual( childAttributes, attributes ) ) {
+						if ( utils.areEqual( attrs, attributes ) ) {
 							return {
 								node: child,
 								offset: position - offset
@@ -148,11 +162,11 @@ define( [
 						// text node doesn't meet the criteria, let's check its ancestors
 						ancestor = child;
 						// traverse ancestors up to the parent node
-						while ( ( ancestor = ancestor.parentNode ) !== parent ) {
-							ancestorAttributes = converter.getAttributesForDomElement( ancestor.parentNode, this.store );
+						while ( ( ancestor = ancestor.parentNode ) !== parentEl ) {
+							attrs = converter.getAttributesForDomElement( ancestor.parentNode, this.store );
 
 							// ancestor's attributes match the attributes
-							if ( utils.areEqual( ancestorAttributes, attributes ) ) {
+							if ( utils.areEqual( attrs, attributes ) ) {
 								return {
 									node: ancestor.parentNode,
 									offset: getNodeOffset( ancestor )
@@ -209,11 +223,11 @@ define( [
 				ancestor = child.parentNode;
 
 				// traverse ancestors up to the parent node
-				while ( ancestor !== parent ) {
-					ancestorAttributes = converter.getAttributesForDomElement( ancestor.parentNode, this.store );
+				while ( ancestor !== parentEl ) {
+					attrs = converter.getAttributesForDomElement( ancestor.parentNode, this.store );
 
 					// ancestor's attributes match the attributes
-					if ( utils.areEqual( ancestorAttributes, attributes ) ) {
+					if ( utils.areEqual( attrs, attributes ) ) {
 						return {
 							node: ancestor.parentNode,
 							// + include the node in the final offset
