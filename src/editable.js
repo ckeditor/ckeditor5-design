@@ -217,7 +217,7 @@ define( [
 						nodesToRemove.push( addedNode );
 					}
 
-					if ( addedNode.dataset ) {
+					if ( addedNode.dataset && addedNode.dataset.ovid ) {
 						addedNode.dataset.mutated = true;
 					}
 				}
