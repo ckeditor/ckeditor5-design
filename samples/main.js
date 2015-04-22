@@ -105,4 +105,26 @@ require( [
 
 	tree.innerHTML = '';
 	buildTree( editor.editable.document.root, tree );
+
+	var selection = document.getElementById( 'selection' );
+
+	editor.editable.document.selection.on( 'selection:change', function( current ) {
+		var range = current.ranges[ 0 ];
+
+		var html = 'Current selection: ';
+
+		if ( !range ) {
+			html += 'none';
+		}
+
+		html += '[ ' + range.start.offset +
+			( range.start.attributes.length ? ', ' + JSON.stringify( range.start.attributes ) : '' ) + ' ]';
+
+		if ( !range.start.equals( range.end ) ) {
+			html += ' - [ ' + range.end.offset +
+				( range.end.attributes.length ? ', ' + JSON.stringify( range.end.attributes ) : '' ) + ' ]';
+		}
+
+		selection.innerHTML = html;
+	} );
 } );
