@@ -115,14 +115,14 @@ require( [
 
 		if ( !range ) {
 			html += 'none';
-		}
+		} else {
+			html += '[ ' + range.start.offset +
+				( range.start.attributes.length ? ', ' + JSON.stringify( range.start.attributes ) : '' ) + ' ]';
 
-		html += '[ ' + range.start.offset +
-			( range.start.attributes.length ? ', ' + JSON.stringify( range.start.attributes ) : '' ) + ' ]';
-
-		if ( !range.start.equals( range.end ) ) {
-			html += ' - [ ' + range.end.offset +
-				( range.end.attributes.length ? ', ' + JSON.stringify( range.end.attributes ) : '' ) + ' ]';
+			if ( !range.start.equals( range.end ) ) {
+				html += ' - [ ' + range.end.offset +
+					( range.end.attributes.length ? ', ' + JSON.stringify( range.end.attributes ) : '' ) + ' ]';
+			}
 		}
 
 		selection.innerHTML = html;
