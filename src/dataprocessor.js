@@ -2,7 +2,7 @@ define( function() {
 	'use strict';
 
 	var allWhitePattern = /^\s+$/,
-		startEndWhitePattern = /^\s+|\s+$/;
+		startEndWhitePattern = /^\s+|\s+$/g;
 
 	function DataProcessor() {}
 
