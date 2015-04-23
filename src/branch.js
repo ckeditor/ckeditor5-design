@@ -235,7 +235,6 @@ define( [
 		},
 
 		splice: function() {
-			console.log( 'splice', arguments );
 			var removed = this.children.splice.apply( this.children, arguments ),
 				added = [].slice.call( arguments, 2 ),
 				index = arguments[ 0 ],
