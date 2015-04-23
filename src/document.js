@@ -3,6 +3,7 @@ define( [
 	'dataprocessor',
 	'lineardocumentdata',
 	'linearmetadata',
+	'nodemanager',
 	'position',
 	'selection',
 	'store',
@@ -15,6 +16,7 @@ define( [
 	dataProcessor,
 	LinearDocumentData,
 	LinearMetaData,
+	nodeManager,
 	Position,
 	Selection,
 	Store,
@@ -384,9 +386,7 @@ define( [
 					}
 
 					// include the opening tag for a mutated element
-					if ( element.dataset && element.dataset.mutated ) {
-						length++;
-					}
+					adjustLength( element );
 				}
 
 				// check the previous sibling
@@ -398,20 +398,23 @@ define( [
 				}
 
 				// include the opening tag for a mutated element
-				if ( element.dataset && element.dataset.mutated ) {
-					length++;
-				}
+				adjustLength( element );
 
 				while ( element.lastChild ) {
 					element = element.lastChild;
 
 					// include the closing tag for a mutated element
-					if ( element.dataset && element.dataset.mutated ) {
-						length++;
-					}
+					adjustLength( element );
 				}
 
 				return element;
+			}
+
+			function adjustLength( element ) {
+				var nodeType = nodeManager.matchForDom( element );
+				if ( element.dataset && element.dataset.mutated && nodeType && nodeType.isWrapped ) {
+					length++;
+				}
 			}
 
 			return new Position( offset, attributes );
