@@ -95,10 +95,7 @@
 	}
 
 	#selection {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 50%;
+		padding: 5px;
 	}
 
 	.wrap {
@@ -177,7 +174,6 @@
     <p>by <a href="http://cksource.com">CKSource</a><br></p>
     <p><br></p>
 	</div>
-	<div id="selection">Current selection:</div>
 	<div class="wrap">
 		<ul class="tabs">
 			<li>
@@ -200,6 +196,9 @@
 				<input type="radio" name="tabs" id="tab2">
 				<label for="tab2">Document Tree</label>
 				<ul id="tree" class="tab-content"></ul>
+			</li>
+			<li>
+				<div id="selection">Current selection:</div>
 			</li>
 		</ul>
 	</div>
