@@ -98,6 +98,11 @@ define( [
 
 			var views, jLen, j;
 
+			// nothing to be added
+			if ( !added.length ) {
+				return;
+			}
+
 			// insert new child views
 			if ( index && ( leftAnchor || rightAnchor ) ) {
 				// we have a child view on the left which we can refer to
@@ -131,7 +136,7 @@ define( [
 				}
 			}
 
-			// TODO find an anchor, where we should put new nodes
+			// find an anchor, where we should put new nodes
 			function findAnchor( index, dir ) {
 				var i = index + ( dir < 0 ? dir : 0 ),
 					len = that.childLength,
@@ -186,6 +191,7 @@ define( [
 				} else {
 					var data = doc.getNodeData( child );
 					// build child element(s)
+					// TODO don't use global document object
 					views = child.constructor.toDom( data, document, doc.store );
 				}
 
@@ -217,14 +223,12 @@ define( [
 
 		// render the branch and all its descendants
 		render: function() {
-			if ( this.isWrapped ) {
-				if ( !this.isRendered ) {
-					Node.prototype.render.call( this );
-				}
+			if ( !this.isRendered ) {
+				Node.prototype.render.call( this );
+			}
 
-				if ( this.children ) {
-					this.trigger( 'update', 0, [], this.children );
-				}
+			if ( this.children ) {
+				this.trigger( 'update', 0, [], this.children );
 			}
 		},
 
