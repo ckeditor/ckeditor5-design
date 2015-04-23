@@ -158,8 +158,17 @@ define( [
 				end = start + added - removed;
 				data = document.data.sliceInstance( start, end );
 				newNodes = converter.getNodesForData( data, document );
-				// inject new nodes at the end of the root node
-				firstNode.spliceArray( firstNode.childLength, 0, newNodes );
+
+				// node that's currently at the insertion position
+				var currentNode = document.getNodeAtPosition( start );
+
+				var idx = currentNode && currentNode.parent ?
+					// insert at currentNode's position
+					currentNode.parent.indexOf( currentNode ) :
+					// insert at the end of the parent
+					firstNode.childLength;
+
+				firstNode.spliceArray( idx, 0, newNodes );
 			} else {
 				throw new Error( 'WAT?' );
 			}
