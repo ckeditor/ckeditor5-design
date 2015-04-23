@@ -138,6 +138,7 @@ define( [
 						nodes.splice( i, 1 );
 						elements.splice( i, 1 );
 						i--;
+						break;
 					}
 				}
 			}
