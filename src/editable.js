@@ -163,7 +163,7 @@ define( [
 
 				var transaction = Transaction.createFromNodeAndElement( this.document, node, elements[ i ] );
 
-				transaction.applyTo( this.document );
+				this.document.applyTransaction( transaction );
 
 				// store applied transactions only
 				if ( transaction.applied ) {
