@@ -12,12 +12,17 @@ require( [
 	'use strict';
 
 	var editor = window.editor = new Editor( '#input' );
+	var table = document.querySelector( '#data>tbody' );
+	var tree = document.getElementById( 'tree' );
+	var selection = document.getElementById( 'selection' );
 
 	function printLinearData( data ) {
 		var html = [];
 
-		html = data.map( function( op ) {
-			op = utils.clone( op );
+		data = utils.clone( data );
+
+		for ( var i = 0, len = data.length; i < len; i++ ) {
+			var op = data[ i ];
 
 			if ( Array.isArray( op ) ) {
 				if ( op[ 0 ] === ' ' ) {
@@ -39,27 +44,25 @@ require( [
 				op[ 2 ] = 'tag';
 			}
 
-			return op;
-		} ).map( function( op, idx ) {
-			return [ '<tr>',
-				'<td>', idx, '</td>',
+			html.push( [ '<tr>',
+				'<td>', i, '</td>',
 				'<td class="', op[ 2 ], '">', op[ 0 ], '</td>',
 				'<td>', formatAttributes( op[ 1 ] ), '</td>',
 				'<td></td>',
 				'</tr>'
-			].join( '' );
-		} );
+			].join( '' ) );
+		}
 
-		document.querySelector( '#data>tbody' ).innerHTML = html.join( '\n' );
+		table.innerHTML = html.join( '\n' );
 	}
 
 	function formatAttributes( attributes ) {
-		if ( utils.isArray( attributes ) ) {
+		if ( Array.isArray( attributes ) ) {
 			// retrieve attribute values from the store
 			attributes = attributes.map( function( attr ) {
 				return editor.editable.document.store.get( attr );
 			} );
-			attributes.unshift( [] );
+			attributes.unshift( {} );
 			attributes = utils.extend.apply( utils, attributes );
 		}
 
@@ -93,6 +96,7 @@ require( [
 	}
 
 	printLinearData( editor.editable.document.data.get() );
+	buildTree( editor.editable.document.root, tree );
 
 	// update the UI on document change
 	editor.editable.on( 'change', function() {
@@ -100,13 +104,6 @@ require( [
 		tree.innerHTML = '';
 		buildTree( editor.editable.document.root, tree );
 	} );
-
-	var tree = document.getElementById( 'tree' );
-
-	tree.innerHTML = '';
-	buildTree( editor.editable.document.root, tree );
-
-	var selection = document.getElementById( 'selection' );
 
 	editor.editable.document.selection.on( 'selection:change', function( current ) {
 		var range = current.ranges[ 0 ];
