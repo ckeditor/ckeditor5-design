@@ -1,5 +1,13 @@
 require.config( {
-	baseUrl: '../src/'
+	baseUrl: '../src/',
+	paths: {
+		diff: '../node_modules/diff/diff'
+	},
+	shim: {
+		diff: {
+			exports: 'JsDiff'
+		}
+	}
 } );
 
 require( [
@@ -100,9 +108,11 @@ require( [
 
 	// update the UI on document change
 	editor.editable.on( 'change', function() {
-		printLinearData( editor.editable.document.data.get() );
-		tree.innerHTML = '';
-		buildTree( editor.editable.document.root, tree );
+		setTimeout( function() {
+			printLinearData( editor.editable.document.data.get() );
+			tree.innerHTML = '';
+			buildTree( editor.editable.document.root, tree );
+		}, 0 );
 	} );
 
 	editor.editable.document.selection.on( 'selection:change', function( current ) {
