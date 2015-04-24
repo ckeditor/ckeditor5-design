@@ -1,10 +1,12 @@
 define( [
 	'converter',
 	'tools/arraydiff',
+	'diff',
 	'tools/utils'
 ], function(
 	converter,
 	diff,
+	diff2,
 	utils
 ) {
 	'use strict';
@@ -324,19 +326,25 @@ define( [
 		}
 	} );
 
-	function makeOperationsFromDiff( oldData, newData, offset ) {
-		// TODO see if it's worth comparing objects and arrays as strings (via JSON.stringify)
-		var edits = diff( oldData, newData, utils.areEqual );
+	// patch for JSDiff
+	var d = new diff2.Diff();
 
+	d.tokenize = d.untokenize = function( value ) {
+		return value;
+	};
+
+	d.equals = utils.areEqual;
+
+	function makeOperationsFromDiff( oldData, newData, offset ) {
+		var edits = d.diff( oldData, newData );
 		var ops = [];
-		// include element offset in the first retain
 		var retain = offset || 0;
 
 		for ( var i = 0, len = edits.length; i < len; i++ ) {
-			var edit = edits[ i ];
+			var edit = edits[ i ],
+				j, jLen;
 
-			// insert operation
-			if ( edit === diff.INSERT ) {
+			if ( edit.added || edit.removed ) {
 				if ( retain ) {
 					ops.push( {
 						retain: retain
@@ -345,32 +353,15 @@ define( [
 					retain = 0;
 				}
 
-				ops.push( {
-					insert: newData.shift()
-				} );
-			}
+				for ( j = 0, jLen = edit.value.length; j < jLen; j++ ) {
+					var item = {};
 
-			// remove operation
-			if ( edit === diff.DELETE ) {
-				if ( retain ) {
-					ops.push( {
-						retain: retain
-					} );
+					item[ edit.added ? 'insert' : 'remove' ] = edit.value[ j ];
 
-					retain = 0;
+					ops.push( item );
 				}
-
-				ops.push( {
-					remove: oldData.shift()
-				} );
-			}
-
-			// retain operation
-			if ( edit === diff.EQUAL ) {
-				retain++;
-
-				oldData.shift();
-				newData.shift();
+			} else {
+				retain += edit.count;
 			}
 		}
 

@@ -8,6 +8,7 @@
     "benderjs-amd": "^0.2.3",
     "benderjs-chai": "^0.2.0",
     "benderjs-mocha": "^0.1.4",
+    "diff": "gregpabian/jsdiff#arrays",
     "grunt": "^0.4.5",
     "grunt-contrib-clean": "^0.6.0",
     "grunt-requirejs": "^0.4.2",
