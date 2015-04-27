@@ -12,6 +12,13 @@ define( [
 ) {
 	'use strict';
 
+	var blockElements = [
+		'address', 'article', 'aside', 'audio', 'blockquote', 'canvas', 'dd', 'div', 'dl', 'dt',
+		'fieldset', 'figcaption', 'figure', 'footer', 'form', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+		'header', 'hgroup', 'hr', 'main', 'nav', 'noscript', 'ol', 'output', 'p', 'pre', 'section',
+		'table', 'tbody', 'tfoot', 'thead', 'ul', 'video'
+	];
+
 	var converter = {
 		// retrieve an array of attributes for the given element
 		getAttributesForDomElement: function( element, store ) {
@@ -83,22 +90,31 @@ define( [
 
 					data = data.concat( this.getDataForDom( child, store, attributes ) );
 				}
+
+				// close the current element
+				if ( current ) {
+					data.push( {
+						type: '/' + current.type
+					} );
+				}
 				// text
 			} else if ( elem.nodeType === Node.TEXT_NODE ) {
 				var text = elem.data;
 
-				// TODO take care of white spaces
+				// TODO review this concept
+				// process text nodes containing whitespaces only
+				if ( text.match( /^\s+$/ ) && ( !elem.previousSibling || !elem.nextSibling ||
+						// ignore whitespaces between block elements
+						( elem.previousSibling && blockElements.indexOf( elem.previousSibling.tagName.toLowerCase() ) > -1 ) ||
+						( elem.nextSibling && blockElements.indexOf( elem.nextSibling.tagName.toLowerCase() ) > -1 ) ||
+						// ignore whitespaces between tags containing newline characters
+						( elem.previousSibling && elem.nextSibling && text.match( /\n/ ) ) ) ) {
+					return data;
+				}
 
 				var textData = this._getDataForText( elem.textContent, parentAttributes );
 
 				data = data.concat( textData );
-			}
-
-			// close the current element
-			if ( current ) {
-				data.push( {
-					type: '/' + current.type
-				} );
 			}
 
 			return data;
