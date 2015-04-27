@@ -40,7 +40,9 @@ define( [
 		this.history = [];
 
 		this.mutationObserver = new MutationObserver( this.$documentView.getElement() );
-		this.mutationObserver.on( 'mutation', this.handleMutations, this );
+		this.mutationObserver.on( 'mutation:content', this.onContentChange, this );
+		this.mutationObserver.on( 'mutation:childlist', this.onChildlistChange, this );
+
 		this.document.on( 'transaction:start', this.mutationObserver.disable, this.mutationObserver );
 		this.document.on( 'transaction:end', this.mutationObserver.enable, this.mutationObserver );
 
@@ -53,7 +55,126 @@ define( [
 	}
 
 	utils.extend( Editable.prototype, Emitter, {
-		handleMutations: function( mutations ) {
+		onContentChange: function( mutations ) {
+			var nodes = [],
+				elements = [],
+				node,
+				len,
+				i;
+
+			for ( i = 0, len = mutations.length; i < len; i++ ) {
+				var mutation = mutations[ i ];
+
+				if ( mutation.oldValue !== mutation.target.data ) {
+					node = findTextNode( mutation.target );
+
+					if ( node && nodes.indexOf( node ) === -1 ) {
+						nodes.push( node );
+						elements.push( findElements( node ) );
+					}
+				}
+			}
+
+			var transactions = [];
+
+			for ( i = 0, len = nodes.length; i < len; i++ ) {
+				var transaction = Transaction.createFromNodeAndElements( this.document, nodes[ i ], elements[ i ] );
+
+				// ignore transactions without operations
+				if ( transaction.operations.length ) {
+					this.document.applyTransaction( transaction );
+				}
+
+				// store applied transactions only
+				if ( transaction.applied ) {
+					transactions.push( transaction );
+				}
+			}
+
+			// store in the history only items containing transactions
+			if ( transactions.length ) {
+				this.history.push( {
+					previousSelection: this.document.selection.currentSelection,
+					selection: this.document.selection.buildFromNativeSelection(),
+					transactions: transactions
+				} );
+
+				this.trigger( 'change' );
+			}
+
+			// find a TextNode that contains the target element
+			function findTextNode( target ) {
+				var element = target,
+					view;
+
+				// try using the previous sibling
+				do {
+					element = element.previousSibling;
+				} while ( element && !( view = viewManager.getByElement( element ) ) );
+
+				if ( view && view.node ) {
+					return view.node.nextSibling;
+				}
+
+				element = target;
+
+				// try using the next sibling
+				do {
+					element = element.nextSibling;
+				} while ( element && !( view = viewManager.getByElement( element ) ) );
+
+				if ( view && view.node ) {
+					return view.node.previousSibling;
+				}
+
+				// try using the parent
+				if ( ( element = target.parentNode ) &&
+					( view = viewManager.getByElement( element ) ) &&
+					view.node ) {
+					// return the only children
+					return view.node.children[ 0 ];
+				} else if ( element ) {
+					return findTextNode( element );
+				} else {
+					return null;
+				}
+			}
+
+			// find elements represented by the node
+			// TODO at some point we'll have to exclude internal elements
+			function findElements( node ) {
+				var previous = node.previousSibling,
+					next = node.nextSibling,
+					parent = node.parent.view.getElement(),
+					result = [],
+					prevIdx,
+					nextIdx,
+					i;
+
+				if ( previous && previous.view ) {
+					previous = previous.view.getElement();
+				}
+
+				if ( next && next.view ) {
+					next = next.view.getElement();
+				}
+
+				if ( previous || next ) {
+					prevIdx = previous && Array.prototype.indexOf.call( parent.childNodes, previous ) + 1 || 0;
+					nextIdx = next && Array.prototype.indexOf.call( parent.childNodes, next ) || parent.childNodes.length;
+
+					for ( i = prevIdx; i < nextIdx; i++ ) {
+						result.push( parent.childNodes[ i ] );
+					}
+				} else {
+					result = Array.prototype.slice.call( parent.childNodes );
+				}
+
+				return result;
+			}
+		},
+
+		onChildlistChange: function( mutations ) {
 			var that = this;
 
 			var node, len, i;
@@ -130,7 +251,6 @@ define( [
 
 			// go through all the nodes and check if they already have their ancestors in the array
 			// in order to reduce the number of transactions
-			// TODO maybe we could combine it with mutation processing to speed things up
 			for ( i = 0; i < nodes.length; i++ ) {
 				node = nodes[ i ];
 				for ( var j = 0; j < nodes.length; j++ ) {
@@ -146,11 +266,7 @@ define( [
 			// stop watching for selection changes
 			this.selectionWatcher.stop();
 
-			var historyItem = {
-				previousSelection: this.document.selection.currentSelection,
-				selection: null,
-				transactions: []
-			};
+			var transactions = [];
 
 			// save current selection
 			var range = this.document.selection.nativeSelection.getRangeAt( 0 );
@@ -159,15 +275,16 @@ define( [
 
 			// create and apply transactions to the document
 			for ( i = 0, len = nodes.length; i < len; i++ ) {
-				node = nodes[ i ];
+				var transaction = Transaction.createFromNodeAndElements( this.document, nodes[ i ], elements[ i ] );
 
-				var transaction = Transaction.createFromNodeAndElement( this.document, node, elements[ i ] );
-
-				this.document.applyTransaction( transaction );
+				// ignore transactions without operations
+				if ( transaction.operations.length ) {
+					this.document.applyTransaction( transaction, true );
+				}
 
 				// store applied transactions only
 				if ( transaction.applied ) {
-					historyItem.transactions.push( transaction );
+					transactions.push( transaction );
 				}
 			}
 
@@ -198,9 +315,11 @@ define( [
 			// restore the selection
 			this.document.selection.selectDataRange( new Range( start, end ) );
 
-			historyItem.selection = this.document.selection.currentSelection;
-
-			this.history.push( historyItem );
+			this.history.push( {
+				previousSelection: this.document.selection.previousSelection,
+				selection: this.document.selection.currentSelection,
+				transactions: transactions
+			} );
 
 			// re-enable the selection watcher in another tick - we don't want to trigger current changes
 			setTimeout( function() {

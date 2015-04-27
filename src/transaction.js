@@ -15,11 +15,19 @@ define( [
 	}
 
 	utils.extend( Transaction, {
-		createFromNodeAndElement: function( document, node, element ) {
+		createFromNodeAndElements: function( document, node, elements ) {
 			var oldData = document.getNodeData( node ),
 				offset = node.offset,
-				newData = converter.getDataForDom( element, document.store, null, node.type === 'root' ),
-				transaction = new Transaction();
+				transaction = new Transaction(),
+				newData = [];
+
+			if ( !Array.isArray( elements ) ) {
+				elements = [ elements ];
+			}
+
+			for ( var i = 0, len = elements.length; i < len; i++ ) {
+				newData = newData.concat( converter.getDataForDom( elements[ i ], document.store, null, node.type === 'root' ) );
+			}
 
 			transaction.operations = makeOperationsFromDiff( oldData, newData, offset );
 

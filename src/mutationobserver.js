@@ -11,13 +11,14 @@ define( [
 		childList: true,
 		attributes: true,
 		characterData: true,
+		characterDataOldValue: true,
 		subtree: true
 	};
 
 	function MutationObserver( target, config ) {
 		this.target = target;
 		this.config = config || defaultConfig;
-		this.mutationObserver = new window.MutationObserver( this.handleMutations.bind( this ) );
+		this.mutationObserver = new window.MutationObserver( this.onMutations.bind( this ) );
 	}
 
 	utils.extend( MutationObserver.prototype, Emitter, {
@@ -29,8 +30,12 @@ define( [
 			this.mutationObserver.disconnect();
 		},
 
-		handleMutations: function( mutations ) {
-			this.trigger( 'mutation', mutations );
+		onMutations: function( mutations ) {
+			var contentOnly = mutations.every( function( mutation ) {
+				return mutation.type === 'characterData';
+			} );
+
+			this.trigger( 'mutation:' + ( contentOnly ? 'content' : 'childlist' ), mutations );
 		}
 	} );
 

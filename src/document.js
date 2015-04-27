@@ -57,7 +57,7 @@ define( [
 
 	utils.extend( Document.prototype, Emitter, {
 		// apply a transaction to the document - update the linear data and document tree
-		applyTransaction: function( transaction ) {
+		applyTransaction: function( transaction, forceRender ) {
 			if ( transaction.applied ) {
 				throw new Error( 'The transaction has already been applied.' );
 			}
@@ -113,86 +113,116 @@ define( [
 
 			// rework the adjacent text node instead of inserting another one next to it
 			if ( !this.data.isElementAt( leftOffset ) &&
-				!this.data.isElementAt( leftOffset - 1 ) ) {
+				!this.data.isElementAt( leftOffset - 1 ) && leftOffset ) {
 				leftOffset--;
 			}
 
+			// first and last affected nodes
 			var firstNode = this.getNodeAtPosition( leftOffset );
 			var lastNode = this.getNodeAtPosition( rightOffset );
 
-			// we found a text node but to rebuild the tree we need something that refers to the actual DOM element
-			if ( !firstNode.isWrapped ) {
-				firstNode = firstNode.parent;
-			}
+			// update the document tree
+			if ( forceRender ) {
+				// we found a text node but to rebuild the tree we need something that refers to the actual DOM element
+				if ( !firstNode.isWrapped ) {
+					firstNode = firstNode.parent;
+				}
 
-			if ( !lastNode.isWrapped ) {
-				lastNode = lastNode.parent;
-			}
+				if ( !lastNode.isWrapped ) {
+					lastNode = lastNode.parent;
+				}
 
-			// the first node is an ancestor of the last node so let's rework that one
-			if ( lastNode.hasAncestor( firstNode ) ) {
-				lastNode = firstNode;
-			}
+				// the first node is an ancestor of the last node so let's rework that one
+				if ( lastNode.hasAncestor( firstNode ) ) {
+					lastNode = firstNode;
+				}
 
-			// first affected node's parent
-			var parent = firstNode.parent,
-				start, end, data, newNodes;
+				// first affected node's parent
+				var parent = firstNode.parent,
+					start, end, data, newNodes;
 
-			if ( parent ) {
-				// beginning of the data to be rebuilt
-				start = firstNode.offset;
-				// end of the data to be rebuilt
-				end = lastNode.offset + lastNode.length + added - removed;
-				// a subset of linear data for new tree nodes
-				data = this.data.sliceInstance( start, end );
-				// initial length of the parent node, will be used later to update lengths of its ancestors
-				var parentLength = parent.length;
-
-				// extend the range to produce a valid set of nodes
-				if ( !data.isValid() ) {
-					// depth of the invalid node
-					validateData( data );
-
-					parent = firstNode.parent;
-					parentLength = parent.length;
+				if ( parent ) {
+					// beginning of the data to be rebuilt
 					start = firstNode.offset;
+					// end of the data to be rebuilt
 					end = lastNode.offset + lastNode.length + added - removed;
+					// a subset of linear data for new tree nodes
 					data = this.data.sliceInstance( start, end );
+					// initial length of the parent node, will be used later to update lengths of its ancestors
+					var parentLength = parent.length;
+
+					// extend the range to produce a valid set of nodes
+					if ( !data.isValid() ) {
+						// depth of the invalid node
+						validateData( data );
+
+						parent = firstNode.parent;
+						parentLength = parent.length;
+						start = firstNode.offset;
+						end = lastNode.offset + lastNode.length + added - removed;
+						data = this.data.sliceInstance( start, end );
+					}
+
+					newNodes = converter.getNodesForData( data, this );
+
+					var firstIdx = parent.indexOf( firstNode );
+					var lastIdx = parent.indexOf( lastNode );
+
+					updateTree( parent, parent.children.slice( firstIdx, lastIdx + 1 ), newNodes );
+
+					var parentNode = parent;
+					var deltaLength = parentNode.length - parentLength;
+
+					// update lengths of all the parent's ancestors
+					while ( deltaLength && ( parentNode = parentNode.parent ) ) {
+						parentNode.adjustLength( deltaLength );
+					}
+					// we're working with the root node
+				} else if ( firstNode.type === 'root' ) {
+					start = leftOffset;
+					end = start + added - removed;
+					data = this.data.sliceInstance( start, end );
+					newNodes = converter.getNodesForData( data, this );
+
+					// node that's currently at the insertion position
+					var currentNode = this.getNodeAtPosition( start );
+
+					var idx = currentNode && currentNode.parent ?
+						// insert at currentNode's position
+						currentNode.parent.indexOf( currentNode ) :
+						// insert at the end of the parent
+						firstNode.childLength;
+
+					firstNode.spliceArray( idx, 0, newNodes );
+				} else {
+					throw new Error( 'WAT?' );
 				}
 
-				newNodes = converter.getNodesForData( data, this );
-
-				var firstIdx = parent.indexOf( firstNode );
-				var lastIdx = parent.indexOf( lastNode );
-
-				updateTree( parent, parent.children.slice( firstIdx, lastIdx + 1 ), newNodes );
-
-				var parentNode = parent;
-				var deltaLength = parentNode.length - parentLength;
-
-				// update lengths of all the parent's ancestors
-				while ( deltaLength && ( parentNode = parentNode.parent ) ) {
-					parentNode.adjustLength( deltaLength );
-				}
-				// we're working with the root node
-			} else if ( firstNode.type === 'root' ) {
-				start = leftOffset;
-				end = start + added - removed;
-				data = this.data.sliceInstance( start, end );
-				newNodes = converter.getNodesForData( data, this );
-
-				// node that's currently at the insertion position
-				var currentNode = this.getNodeAtPosition( start );
-
-				var idx = currentNode && currentNode.parent ?
-					// insert at currentNode's position
-					currentNode.parent.indexOf( currentNode ) :
-					// insert at the end of the parent
-					firstNode.childLength;
-
-				firstNode.spliceArray( idx, 0, newNodes );
+				// no structural changes - just update lengths of the nodes
 			} else {
-				throw new Error( 'WAT?' );
+				if ( lastNode.type !== 'text' ) {
+					if ( this.data.isCloseElementAt( offset ) ) {
+						lastNode = lastNode.children[ lastNode.childLength - 1 ];
+					} else {
+						lastNode = lastNode.previousSibling;
+					}
+				}
+
+				// a single text node was affected
+				if ( firstNode === lastNode ) {
+					var delta = added - removed;
+					var node = firstNode;
+
+					// update lengths of affected nodes
+					while ( node ) {
+						node.adjustLength( delta );
+						node = node.parent;
+					}
+
+					// mulitple nodes affected, what now?
+				} else {
+					throw new Error( 'Houston, we\'ve got a problem...' );
+				}
 			}
 
 			// mark the transaction as applied
