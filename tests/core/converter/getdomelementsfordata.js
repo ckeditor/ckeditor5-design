@@ -23,8 +23,15 @@ bender.require( [
 		beforeEach( function() {
 			store = new Store();
 
+			function onAttributes( attr ) {
+				store.store( attr );
+			}
+
 			styles.forEach( function( style ) {
-				store.store( nodeManager.get( style[ 0 ] ).toData( document.createElement( style[ 1 ] ) ) );
+				nodeManager.get( style[ 0 ] ).toData( {
+					element: document.createElement( style[ 1 ] ),
+					onAttributes: onAttributes
+				} );
 			} );
 		} );
 
