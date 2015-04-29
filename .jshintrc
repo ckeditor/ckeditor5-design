@@ -1,0 +1,12 @@
+{
+	"browser": true,
+	"immed": true,
+	"latedef": "nofunc",
+	"noarg": true,
+	"nonbsp": true,
+	"undef": true,
+	"unused": true,
+	"strict": true,
+	"predef": [ "define" ],
+	"globalstrict": true
+}
