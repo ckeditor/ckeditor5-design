@@ -127,7 +127,7 @@ define( [
 						node.children.push( output.node );
 						output.node.document = document;
 						output.node.parent = node;
-					} else if ( output.data && !output.node ) {
+					} else if ( output.data && output.data.length && !output.node ) {
 						if ( !textNode ) {
 							textNode = nodeManager.create( 'text' );
 							textNode.document = document;
