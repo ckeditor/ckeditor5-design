@@ -1,13 +1,11 @@
 define( [
 	'lineardocumentdata',
 	'nodemanager',
-	'inline/inlinenode',
 	'tools/utils',
 	'nodetypes' // added as last just to force loading the module
 ], function(
 	LinearDocumentData,
 	nodeManager,
-	InlineNode,
 	utils
 ) {
 	'use strict';
@@ -16,34 +14,32 @@ define( [
 		// retrieve an array of attributes for the given element
 		getAttributesForDomElement: function( element, store ) {
 			var result = [],
-				nodeConstructor;
+				constructors = nodeManager.get();
 
 			// we care about actual elements only
 			if ( element.nodeType === window.Node.TEXT_NODE ) {
 				element = element.parentNode;
 			}
 
-			function onAttributes( attrs ) {
-				// get index of a style in the store
-				var index = store.store( attrs );
-				result.unshift( index );
-			}
-
 			var options = {
 				element: element,
-				onAttributes: onAttributes
+				onAttributes: function( attributes ) {
+					// store a style (or get it's index from the store) and add it to results
+					var index = store.store( attributes );
+					result.unshift( index );
+				}
 			};
 
-			// TODO review - we can have mulitple constructors matching the DOM
-			while ( element && ( nodeConstructor = nodeManager.matchForDom( element ) ) ) {
-				// at the moment we don't expect having branch nodes wrapped by inline nodes (?)
-				if ( !( nodeConstructor.prototype instanceof InlineNode ) ) {
-					return result;
+			while ( options.element ) {
+				for ( var i = 0, len = constructors.length; i < len; i++ ) {
+					var constructor = constructors[ i ];
+
+					if ( constructor.match( options ) && constructor.inline ) {
+						constructor.toData( options );
+					}
 				}
 
-				nodeConstructor.toData( options );
-
-				element = element.parentNode;
+				options.element = options.element.parentNode;
 			}
 
 			return result;

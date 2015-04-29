@@ -13,6 +13,8 @@ define( [
 
 	// inherit statics
 	utils.extend( InlineNode, TextNode, {
+		inline: true,
+
 		toData: function( options ) {
 			var attributes = {};
 
