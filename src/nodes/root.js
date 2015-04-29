@@ -22,7 +22,7 @@ define( [
 
 	utils.inherit( RootNode, Branch );
 
-	nodeManager.register( RootNode );
+	nodeManager.register( RootNode, 0 );
 
 	return RootNode;
 } );

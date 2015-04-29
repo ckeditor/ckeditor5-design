@@ -159,8 +159,8 @@ define( [
 		// return data produced for the given DOM element
 		getDataForDom: function( element, store, parentAttributes, isRoot ) {
 			var constructors = nodeManager.get(),
-				data = [],
 				attributes = parentAttributes ? parentAttributes.slice() : [],
+				data = [],
 				current,
 				len,
 				i;
@@ -178,7 +178,6 @@ define( [
 			// set the current item
 			function onItem( item ) {
 				current = item;
-				data.push( item );
 			}
 
 			// add new attributes
@@ -206,6 +205,10 @@ define( [
 						constructors[ i ].toData( options );
 					}
 				}
+			}
+
+			if ( current ) {
+				data.push( current );
 			}
 
 			// process child nodes
