@@ -17,13 +17,13 @@ define( [
 		tags: [ 'ul', 'ol' ],
 		type: 'list',
 
-		toData: function( dom ) {
-			return {
+		toData: function( options ) {
+			options.onItem( {
 				type: this.type,
 				attributes: {
-					style: dom.nodeName.toLowerCase() == 'ol' ? 'number' : 'bullet'
+					style: options.element.nodeName.toLowerCase() == 'ol' ? 'number' : 'bullet'
 				}
-			};
+			});
 		},
 
 		toDom: function( data, doc ) {

@@ -59,8 +59,8 @@ define( function() {
 		},
 		// create a new detached document from an HTML string
 		createDocumentFromHTML: function( html ) {
-			if ( DOMParser ) {
-				var parser = new DOMParser();
+			if ( window.DOMParser ) {
+				var parser = new window.DOMParser();
 
 				return parser.parseFromString( html, 'text/html' );
 			} else {
@@ -117,7 +117,7 @@ define( function() {
 		isDate: makeIs( 'Date' ),
 
 		isElement: function( obj ) {
-			return obj instanceof HTMLElement;
+			return obj instanceof window.HTMLElement;
 		},
 
 		isFunction: function( obj ) {

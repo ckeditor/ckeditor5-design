@@ -27,7 +27,21 @@ define( [
 	Node.attributes = [];
 	Node.isWrapped = true;
 
+
 	// static methods
+	Node.match = function( options ) {
+		// match by tag name (node name to support matching comments/text nodes)
+		if ( this.tags.length ) {
+			var tag = options.element.nodeName.toLowerCase();
+
+			if ( this.tags.indexOf( tag ) > -1 ) {
+				return true;
+			}
+		}
+
+		return false;
+	};
+
 	Node.pickAttributes = function( dom, attributes ) {
 		var result = {};
 
@@ -42,12 +56,12 @@ define( [
 		return result;
 	};
 
-	// convert a DOM element into data
-	Node.toData = function( dom ) {
-		return {
+	// convert a DOM element into item
+	Node.toData = function( options ) {
+		options.onItem( {
 			type: this.type,
-			attributes: this.pickAttributes( dom, this.attributes )
-		};
+			attributes: this.pickAttributes( options.element, this.attributes )
+		} );
 	};
 
 	// convert data into a DOM element

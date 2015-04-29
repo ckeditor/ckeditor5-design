@@ -13,15 +13,15 @@ define( [
 
 	// inherit statics
 	utils.extend( InlineNode, TextNode, {
-		toData: function( dom ) {
+		toData: function( options ) {
 			var attributes = {};
 
 			attributes[ this.type ] = true;
 
 			// save additional attributes
-			utils.extend( attributes, this.pickAttributes( dom, this.attributes ) );
+			utils.extend( attributes, this.pickAttributes( options.element, this.attributes ) );
 
-			return attributes;
+			options.onAttributes( attributes );
 		},
 
 		toDom: function( data, doc ) {

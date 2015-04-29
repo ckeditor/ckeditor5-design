@@ -17,13 +17,13 @@ define( [
 		tags: [ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ],
 		type: 'heading',
 
-		toData: function( dom ) {
-			return {
+		toData: function( options ) {
+			options.onItem( {
 				type: this.type,
 				attributes: {
-					level: dom.nodeName.toLowerCase().replace( 'h', '' )
+					level: options.element.nodeName.toLowerCase().replace( 'h', '' )
 				}
-			};
+			} );
 		},
 
 		toDom: function( data, doc ) {

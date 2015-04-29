@@ -3,7 +3,7 @@ define( [
 	'nodemanager',
 	'inline/inlinenode',
 	'tools/utils',
-	'nodetypes'
+	'nodetypes' // added as last just to force loading the module
 ], function(
 	LinearDocumentData,
 	nodeManager,
@@ -12,13 +12,6 @@ define( [
 ) {
 	'use strict';
 
-	var blockElements = [
-		'address', 'article', 'aside', 'audio', 'blockquote', 'canvas', 'dd', 'div', 'dl', 'dt',
-		'fieldset', 'figcaption', 'figure', 'footer', 'form', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-		'header', 'hgroup', 'hr', 'main', 'nav', 'noscript', 'ol', 'output', 'p', 'pre', 'section',
-		'table', 'tbody', 'tfoot', 'thead', 'ul', 'video'
-	];
-
 	var converter = {
 		// retrieve an array of attributes for the given element
 		getAttributesForDomElement: function( element, store ) {
@@ -26,95 +19,213 @@ define( [
 				nodeConstructor;
 
 			// we care about actual elements only
-			if ( element.nodeType === Node.TEXT_NODE ) {
+			if ( element.nodeType === window.Node.TEXT_NODE ) {
 				element = element.parentNode;
 			}
 
+			function onAttributes( attrs ) {
+				// get index of a style in the store
+				var index = store.store( attrs );
+				result.unshift( index );
+			}
+
+			var options = {
+				element: element,
+				onAttributes: onAttributes
+			};
+
+			// TODO review - we can have mulitple constructors matching the DOM
 			while ( element && ( nodeConstructor = nodeManager.matchForDom( element ) ) ) {
 				// at the moment we don't expect having branch nodes wrapped by inline nodes (?)
 				if ( !( nodeConstructor.prototype instanceof InlineNode ) ) {
 					return result;
 				}
 
-				var attributes = nodeConstructor.toData( element );
-				// get index of a style in the store
-				var index = store.store( attributes );
-
-				result.unshift( index );
+				nodeConstructor.toData( options );
 
 				element = element.parentNode;
 			}
 
 			return result;
 		},
-		// prepare linear data for the given DOM
-		getDataForDom: function( elem, store, parentAttributes, isRoot ) {
-			var data = [],
-				attributes,
-				current;
 
-			// element
-			if ( elem.nodeType === Node.ELEMENT_NODE ) {
-				// we want to treat the topmost element as a root node
-				var nodeConstructor = isRoot ?
-					nodeManager.get( 'root' ) :
-					nodeManager.matchForDom( elem );
+		// return an object containing data and a node produced for the given DOM element
+		getDataAndNodeForElement: function( element, store, parentAttributes, document, isRoot ) {
+			var constructors = nodeManager.get(),
+				attributes = parentAttributes ? parentAttributes.slice() : [],
+				result = {},
+				data = [],
+				textNode,
+				current,
+				node,
+				len,
+				i;
 
-				// inline text
-				if ( nodeConstructor && nodeConstructor.prototype instanceof InlineNode ) {
-					// inline node's data contains attributes only
-					attributes = nodeConstructor.toData( elem );
+			// add new attributes
+			function onAttributes( attrs ) {
+				var index = store.store( attrs );
+				options.attributes.push( index );
+			}
 
-					// get index of a style in the store
-					var index = store.store( attributes );
+			// add new data
+			function onData( items ) {
+				data = data.concat( items );
+			}
 
-					// merge child's and parent's styles
-					attributes = [].concat( parentAttributes || [] );
+			// replace the element with new one
+			function onElement( el ) {
+				options.element = el;
+			}
 
-					// add child's style
-					if ( attributes.indexOf( index ) === -1 ) {
-						attributes.push( index );
+			// set current item
+			function onItem( item ) {
+				current = item;
+			}
+
+			var options = {
+				element: element,
+				attributes: attributes,
+				onAttributes: onAttributes,
+				onData: onData,
+				onElement: onElement,
+				onItem: onItem
+			};
+
+			// handle root node
+			if ( isRoot ) {
+				nodeManager.get( 'root' ).toData( options );
+			} else {
+				// process with all constructors as long as there's still an element to work with
+				for ( i = 0, len = constructors.length; i < len && options.element; i++ ) {
+					if ( constructors[ i ].match( options ) ) {
+						constructors[ i ].toData( options );
 					}
-
-					// regular element
-				} else if ( nodeConstructor ) {
-					// create an opening data for current element
-					current = nodeConstructor.toData( elem );
-
-					data.push( current );
 				}
+			}
 
-				// collect data for all children
-				for ( var i = 0, len = elem.childNodes.length; i < len; i++ ) {
-					var child = elem.childNodes[ i ];
+			// create a node for the current item
+			if ( current ) {
+				data.push( current );
+				node = nodeManager.create( current );
+				node.document = document;
+			}
 
-					data = data.concat( this.getDataForDom( child, store, attributes ) );
+			// process child nodes
+			if ( options.element && options.element.childNodes ) {
+				for ( i = 0, len = options.element.childNodes.length; i < len; i++ ) {
+					var output = this.getDataAndNodeForElement( options.element.childNodes[ i ], store, attributes, document );
+
+					data = data.concat( output.data );
+
+					if ( output.node && node ) {
+						// "close" the text node
+						if ( textNode ) {
+							node.children.push( textNode );
+							textNode = null;
+						}
+
+						node.children.push( output.node );
+						output.node.document = document;
+						output.node.parent = node;
+					} else if ( output.data && !output.node ) {
+						if ( !textNode ) {
+							textNode = nodeManager.create( 'text' );
+							textNode.document = document;
+							textNode.parent = node;
+						}
+
+						textNode.adjustLength( output.data.length );
+					}
 				}
+			}
 
-				// close the current element
-				if ( current ) {
-					data.push( {
-						type: '/' + current.type
-					} );
+			result.data = data;
+
+			// close current item
+			if ( current ) {
+				data.push( {
+					type: '/' + current.type
+				} );
+
+				// adjust the length by adding child data (exclude opening/closing elements)
+				node.adjustLength( data.length - 2 );
+
+				result.node = node;
+
+				if ( textNode ) {
+					node.children.push( textNode );
 				}
-				// text
-			} else if ( elem.nodeType === Node.TEXT_NODE ) {
-				var text = elem.data;
+			}
 
-				// TODO review this concept
-				// process text nodes containing whitespaces only
-				if ( text.match( /^\s+$/ ) && ( !elem.previousSibling || !elem.nextSibling ||
-						// ignore whitespaces between block elements
-						( elem.previousSibling && blockElements.indexOf( elem.previousSibling.tagName.toLowerCase() ) > -1 ) ||
-						( elem.nextSibling && blockElements.indexOf( elem.nextSibling.tagName.toLowerCase() ) > -1 ) ||
-						// ignore whitespaces between tags containing newline characters
-						( elem.previousSibling && elem.nextSibling && text.match( /\n/ ) ) ) ) {
-					return data;
+			return result;
+		},
+
+		// return data produced for the given DOM element
+		getDataForDom: function( element, store, parentAttributes, isRoot ) {
+			var constructors = nodeManager.get(),
+				data = [],
+				attributes = parentAttributes ? parentAttributes.slice() : [],
+				current,
+				len,
+				i;
+
+			// replace the element with new one
+			function onElement( el ) {
+				options.element = el;
+			}
+
+			// add new data
+			function onData( items ) {
+				data = data.concat( items );
+			}
+
+			// set the current item
+			function onItem( item ) {
+				current = item;
+				data.push( item );
+			}
+
+			// add new attributes
+			function onAttributes( attrs ) {
+				var index = store.store( attrs );
+				options.attributes.push( index );
+			}
+
+			var options = {
+				element: element,
+				attributes: attributes,
+				onAttributes: onAttributes,
+				onData: onData,
+				onElement: onElement,
+				onItem: onItem
+			};
+
+			// handle root node
+			if ( isRoot ) {
+				nodeManager.get( 'root' ).toData( options );
+			} else {
+				// process with all constructors as long as there's still an element to work with
+				for ( i = 0, len = constructors.length; i < len && options.element; i++ ) {
+					if ( constructors[ i ].match( options ) ) {
+						constructors[ i ].toData( options );
+					}
 				}
+			}
 
-				var textData = this._getDataForText( elem.textContent, parentAttributes );
+			// process child nodes
+			if ( options.element && options.element.childNodes ) {
+				for ( i = 0, len = options.element.childNodes.length; i < len; i++ ) {
+					var result = this.getDataAndNodeForElement( options.element.childNodes[ i ], store, attributes );
 
-				data = data.concat( textData );
+					data = data.concat( result.data );
+				}
+			}
+
+			// close the current item
+			if ( current ) {
+				data.push( {
+					type: '/' + current.type
+				} );
 			}
 
 			return data;
@@ -162,7 +273,7 @@ define( [
 
 					var nodeType = LinearDocumentData.getType( item );
 
-					nodeConstructor = nodeManager.get( nodeType ) || nodeManager.get( 'unknown' );
+					nodeConstructor = nodeManager.get( nodeType );
 
 					// opening element
 					if ( LinearDocumentData.isOpenElement( item ) ) {
@@ -235,11 +346,8 @@ define( [
 
 					// an opening element
 					if ( data.isOpenElementAt( i ) ) {
-						var type = data.getTypeAt( i );
-						var item = data.get( i );
-
 						// create a node for this element and add it to the stack
-						currentNode = nodeManager.create( type, item );
+						currentNode = nodeManager.create( data.get( i ) );
 						currentNode.document = document;
 						currentStack.push( currentNode );
 
@@ -290,19 +398,6 @@ define( [
 			}
 
 			return currentStack;
-		},
-
-		// prepare linear data for the given text
-		_getDataForText: function( text, parentAttributes ) {
-			text = text.split( '' );
-
-			if ( !parentAttributes ) {
-				return text;
-			}
-
-			return text.map( function( char ) {
-				return [ char, parentAttributes ];
-			} );
 		}
 	};
 

@@ -9,7 +9,7 @@ define( [
 	'nodes/paragraph',
 	'nodes/root',
 	'nodes/text',
-	'nodes/unknown',
+	'nodes/whitespace',
 	'inline/bold',
 	'inline/italic',
 	'inline/link',

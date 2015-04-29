@@ -1,6 +1,5 @@
 define( [
 	'converter',
-	'dataprocessor',
 	'lineardocumentdata',
 	'linearmetadata',
 	'nodemanager',
@@ -14,7 +13,6 @@ define( [
 	'tools/utils'
 ], function(
 	converter,
-	dataProcessor,
 	LinearDocumentData,
 	LinearMetaData,
 	nodeManager,
@@ -35,23 +33,18 @@ define( [
 		// create a detached copy of the source HTML
 		var dom = utils.createDocumentFromHTML( $el.html() ).body;
 
-		// TODO combine the data processing with data conversion loop
-		// normalize the DOM
-		dataProcessor.normalizeWhitespaces( dom );
-
-		// prepare the data array for the linear data
-		var data = converter.getDataForDom( dom, this.store, null, true );
-
-		// document's linear data
-		this.data = new LinearDocumentData( data, this.store );
-		this.metadata = new LinearMetaData();
-
 		// document's selection API
 		this.selection = new Selection( this, $el.getElement().ownerDocument );
 
-		// create document tree root element
-		this.root = converter.getNodesForData( this.data, this )[ 0 ];
+		// prepare document data
+		var data = converter.getDataAndNodeForElement( dom, this.store, null, this, true );
 
+		// document's linear data
+		this.data = new LinearDocumentData( data.data, this.store );
+		this.metadata = new LinearMetaData();
+
+		// assign root node and render it
+		this.root = data.node;
 		this.root.render();
 	}
 
@@ -391,7 +384,7 @@ define( [
 					} while ( ( element = element.lastChild ) );
 				} else {
 					// there's a text node right before the parent, let's use it
-					if ( element && element.nodeType === Node.TEXT_NODE ) {
+					if ( element && element.nodeType === window.Node.TEXT_NODE ) {
 						return {
 							node: element,
 							offset: element.data.length
@@ -429,7 +422,7 @@ define( [
 				current.index++;
 
 				// child  is a text node, check if the position sits within the child
-				if ( child.nodeType === Node.TEXT_NODE ) {
+				if ( child.nodeType === window.Node.TEXT_NODE ) {
 					// position fits in this text node
 					if ( position >= offset && position < offset + child.data.length ) {
 						attrs = converter.getAttributesForDomElement( child, this.store );
@@ -472,7 +465,7 @@ define( [
 				}
 
 				// child is an element
-				if ( child.nodeType === Node.ELEMENT_NODE ) {
+				if ( child.nodeType === window.Node.ELEMENT_NODE ) {
 					var view;
 
 					// we have a view attached to this node
@@ -589,7 +582,7 @@ define( [
 			// validate the offset first
 			if (
 				offset < 0 ||
-				offset > ( element.nodeType === Node.ELEMENT_NODE ? element.childNodes.length : element.data.length )
+				offset > ( element.nodeType === window.Node.ELEMENT_NODE ? element.childNodes.length : element.data.length )
 			) {
 				throw new Error( 'Invalid offset.' );
 			}
@@ -601,7 +594,7 @@ define( [
 			var attributes = converter.getAttributesForDomElement( element, this.store );
 
 			// it's an element
-			if ( element.nodeType === Node.ELEMENT_NODE ) {
+			if ( element.nodeType === window.Node.ELEMENT_NODE ) {
 				// the selection is at the end of the element
 				if ( element.childNodes.length === offset ) {
 					// the element has a view so we can easily get its offset in the linear data
@@ -618,7 +611,7 @@ define( [
 						searchElem = searchElem.lastChild;
 
 						// include last text node's length in the offset
-						if ( searchElem.nodeType === Node.TEXT_NODE ) {
+						if ( searchElem.nodeType === window.Node.TEXT_NODE ) {
 							length += searchElem.data.length;
 						}
 					}
@@ -638,7 +631,7 @@ define( [
 				element = findClosest( element );
 
 				// include the element's length in the final offset
-				if ( element.nodeType === Node.TEXT_NODE ) {
+				if ( element.nodeType === window.Node.TEXT_NODE ) {
 					length += element.data.length;
 				}
 			} while ( !( view = viewManager.getByElement( element ) ) );
@@ -692,6 +685,7 @@ define( [
 			}
 
 			function adjustLength( element ) {
+				// TODO review this approach - we can have multiple constructors matching the DOM
 				var nodeType = nodeManager.matchForDom( element );
 				if ( element.dataset && element.dataset.mutated && nodeType && nodeType.isWrapped ) {
 					length++;

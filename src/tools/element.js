@@ -226,8 +226,6 @@ define( [
 		},
 
 		toggleClass: function( value, state ) {
-			var hasClass = this.hasClass( value );
-
 			if ( state === undefined ) {
 				this._el.classList.toggle( value );
 			} else if ( state ) {

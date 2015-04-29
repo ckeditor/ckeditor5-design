@@ -2,19 +2,60 @@ define( function() {
 	'use strict';
 
 	function NodeManager() {
-		this.store = {};
+		this._list = [];
+		this._items = {};
 	}
 
 	NodeManager.prototype = {
 		// create a node from the given data if a proper node type constructor exists
-		create: function( name, data ) {
-			return this.store[ name ] ? new this.store[ name ]( data ) : null;
+		create: function( data ) {
+			var constructor = this._items[ typeof data === 'string' ? data : data.type ];
+			return constructor ? new constructor[ 1 ]( data ) : null;
 		},
 
-		// register a constructor for a node type
-		register: function( constructor ) {
-			if ( constructor.type && !this.store[ constructor.type ] ) {
-				this.store[ constructor.type ] = constructor;
+		// return an ordered list of node constructors names
+		list: function() {
+			return this._list.map( function( item ) {
+				return item[ 0 ];
+			} );
+		},
+
+		// register a constructor for a node type, default priority = 10
+		register: function( constructor, priority ) {
+			var type = constructor.type;
+
+			if ( typeof priority != 'number' ) {
+				priority = 10;
+			}
+
+			var item = [ type, constructor, priority ];
+
+			// override the existing node constructor with the same type
+			if ( this._items[ type ] ) {
+				this.unregister( type );
+			}
+
+			this._items[ type ] = item;
+
+			for ( var i = this._list.length - 1; i > 0; i-- ) {
+				if ( this._list[ i ][ 2 ] <= priority ) {
+					this._list.splice( i + 1, 0, item );
+					return;
+				}
+			}
+
+			this._list.unshift( item );
+		},
+
+		// unregister a node constructor
+		unregister: function( name ) {
+			delete this._items[ name ];
+
+			for ( var i = this.length - 1; i >= 0; i-- ) {
+				if ( this._list[ i ][ 0 ] === name ) {
+					this._list.splice( i, 1 );
+					return;
+				}
 			}
 		},
 
@@ -24,8 +65,8 @@ define( function() {
 
 			Object.keys( data ).some( function( name ) {
 				// we use booleans for style flags only (for now at least)
-				if ( data[ name ] === true && this.store[ name ] ) {
-					result = this.store[ name ];
+				if ( data[ name ] === true && this._items[ name ] ) {
+					result = this._items[ name ][ 1 ];
 
 					return true;
 				}
@@ -39,9 +80,8 @@ define( function() {
 			var result = null,
 				tag = dom.nodeName.toLowerCase();
 
-			Object.keys( this.store ).some( function( name ) {
-				var nodeClass = this.store[ name ];
-
+			this._list.some( function( item ) {
+				var nodeClass = item[ 1 ];
 				// match the tag
 				if ( nodeClass.tags.indexOf( tag ) > -1 ) {
 					result = nodeClass;
@@ -54,18 +94,11 @@ define( function() {
 			return result;
 		},
 
-		// return a node constructor with the given name
+		// return a node constructor with the given name or all the constructors
 		get: function( name ) {
-			return this.store[ name ] || null;
-		},
-
-		// check if a node produced by the node construtor with the given name should be empty
-		isEmpty: function( name ) {
-			if ( this.store[ name ] ) {
-				return this.store[ name ].isEmpty;
-			}
-
-			throw new Error( 'Unknown node type: ' + name );
+			return name !== undefined ? this._items[ name ][ 1 ] : this._list.map( function( item ) {
+				return item[ 1 ];
+			} );
 		}
 	};
 

@@ -133,11 +133,10 @@ define( [
 	}
 
 	function newWeakMap() {
-		if ( typeof WeakMap !== 'undefined' ) {
-			return new WeakMap();
+		if ( typeof window.WeakMap !== 'undefined' ) {
+			return new window.WeakMap();
 		} else {
-			console.error( 'selectionchange: WeakMap not supported' );
-			return null;
+			throw new Error( 'selectionchange: WeakMap not supported' );
 		}
 	}
 

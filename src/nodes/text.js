@@ -16,12 +16,15 @@ define( [
 	utils.extend( TextNode, Node, {
 		isEmpty: true,
 		isWrapped: false,
+		tags: [ '#text' ],
 		type: 'text',
 
-		toData: function( dom ) {
-			var text = dom.textContent;
+		toData: function( options ) {
+			var text = options.element.textContent;
 
-			return text.split( '' );
+			options.onData( options.attributes.length ? text.split( '' ).map( function( char ) {
+				return [ char, options.attributes ];
+			} ) : text.split( '' ) );
 		},
 
 		toDom: function( data, doc, store ) {
