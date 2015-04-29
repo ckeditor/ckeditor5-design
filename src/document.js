@@ -685,10 +685,20 @@ define( [
 			}
 
 			function adjustLength( element ) {
-				// TODO review this approach - we can have multiple constructors matching the DOM
-				var nodeType = nodeManager.matchForDom( element );
-				if ( element.dataset && element.dataset.mutated && nodeType && nodeType.isWrapped ) {
-					length++;
+				if ( element.dataset && element.dataset.mutated ) {
+					var constructors = nodeManager.get(),
+						options = {
+							element: element
+						};
+
+					for ( var i = 0, len = constructors.length; i < len; i++ ) {
+						var constructor = constructors[ i ];
+
+						if ( constructor.match( options ) && constructor.isWrapped ) {
+							length++;
+							return;
+						}
+					}
 				}
 			}
 
