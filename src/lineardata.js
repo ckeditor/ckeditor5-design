@@ -21,7 +21,7 @@ define( [
 
 	utils.extend( LinearData.prototype, {
 		clone: function() {
-			return this.constructor( utils.clone( this.data ), this.store );
+			return new this.constructor( utils.clone( this.data ), this.store );
 		},
 
 		cloneSlice: function( start, end ) {
