@@ -12,7 +12,7 @@ define( [ 'tools/utils' ], function( utils ) {
 		},
 
 		equals: function( position ) {
-			return position && this.offset === position.offset &&
+			return !!position && this.offset === position.offset &&
 				utils.areEqual( this.attributes, position.attributes );
 		},
 

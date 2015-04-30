@@ -52,7 +52,7 @@ define( [
 			return range && this.start.equals( range.start ) && this.end.equals( range.end );
 		},
 
-		translateOffset: function( offset ) {
+		translate: function( offset ) {
 			this.start.translate( offset );
 			this.end.translate( offset );
 		}
