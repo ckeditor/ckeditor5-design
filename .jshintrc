@@ -7,6 +7,6 @@
 	"undef": true,
 	"unused": true,
 	"strict": true,
-	"predef": [ "define" ],
+	"predef": [ "define", "bender", "it", "describe", "beforeEach", "afterEach", "expect" ],
 	"globalstrict": true
 }

@@ -7,19 +7,19 @@ define( [
 ) {
 	'use strict';
 
-	var defaultConfig = {
+	function MutationObserver( target, config ) {
+		this.target = target;
+		this.config = config || MutationObserver.defaultConfig;
+		this.mutationObserver = new window.MutationObserver( this.onMutations.bind( this ) );
+	}
+
+	MutationObserver.defaultConfig = {
 		childList: true,
 		attributes: true,
 		characterData: true,
 		characterDataOldValue: true,
 		subtree: true
 	};
-
-	function MutationObserver( target, config ) {
-		this.target = target;
-		this.config = config || defaultConfig;
-		this.mutationObserver = new window.MutationObserver( this.onMutations.bind( this ) );
-	}
 
 	utils.extend( MutationObserver.prototype, Emitter, {
 		enable: function() {
@@ -35,6 +35,7 @@ define( [
 				return mutation.type === 'characterData';
 			} );
 
+			this.trigger( 'mutation', mutations );
 			this.trigger( 'mutation:' + ( contentOnly ? 'content' : 'childlist' ), mutations );
 		}
 	} );
