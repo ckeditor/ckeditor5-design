@@ -56,7 +56,9 @@ define( [
 				if ( this.getTypeAt( i ) === type ) {
 					if ( this.isOpenElementAt( i ) ) {
 						openingStack.push( this.get( i ) );
-					} else if ( this.isCloseElementAt( i ) ) {
+					}
+
+					if ( this.isCloseElementAt( i ) ) {
 						if ( openingStack.length ) {
 							openingStack.pop();
 						} else {
@@ -90,7 +92,9 @@ define( [
 				if ( this.getTypeAt( i ) === type ) {
 					if ( this.isCloseElementAt( i ) ) {
 						closingStack.push( this.get( i ) );
-					} else if ( this.isOpenElementAt( i ) ) {
+					}
+
+					if ( this.isOpenElementAt( i ) ) {
 						if ( closingStack.length ) {
 							closingStack.pop();
 						} else {
@@ -136,7 +140,9 @@ define( [
 				if ( this.isElementAt( i ) ) {
 					if ( this.isOpenElementAt( i ) ) {
 						open.push( this.get( i ) );
-					} else if ( this.isCloseElementAt( i ) ) {
+					}
+
+					if ( this.isCloseElementAt( i ) ) {
 						var lastOpen = open.pop();
 
 						if ( this.getTypeAt( i ) !== this.constructor.getType( lastOpen ) ) {
