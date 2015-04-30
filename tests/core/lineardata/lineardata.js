@@ -1,8 +1,10 @@
 bender.require( [
 	'lineardata',
+	'range',
 	'store'
 ], function(
 	LinearData,
+	Range,
 	Store
 ) {
 	'use strict';
@@ -46,6 +48,11 @@ bender.require( [
 
 		it( 'should return all items', function() {
 			expect( ld.get() ).to.deep.equal( data );
+		} );
+
+		it( 'should return items for a range', function() {
+			var range = Range.createFromOffsets( 2, 5 );
+			expect( ld.getDataForRange( range ) ).to.deep.equal( [ 'c', 'd', 'e' ] );
 		} );
 
 		it( 'should clone an instance', function() {

@@ -38,6 +38,10 @@ define( [
 			return idx !== undefined ? this.data[ idx ] : this.data;
 		},
 
+		getDataForRange: function( range ) {
+			return this.slice( range.start.offset, range.end.offset );
+		},
+
 		push: function( value ) {
 			this.data.push( value );
 		},

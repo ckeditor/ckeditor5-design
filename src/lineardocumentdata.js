@@ -40,13 +40,13 @@ define( [
 			var i;
 
 			// we accept opening elements only
-			if ( !utils.isObject( item ) || !LinearData.isOpenElement( item ) ||
+			if ( !utils.isObject( item ) || !LinearDocumentData.isOpenElement( item ) ||
 				( i = this.data.indexOf( item ) ) === -1 ) {
 				return null;
 			}
 
 			var openingStack = [],
-				type = LinearData.getType( item ),
+				type = LinearDocumentData.getType( item ),
 				len = this.length;
 
 			// we don't want to check the given item again
@@ -75,13 +75,13 @@ define( [
 			var i;
 
 			// we accept opening items only
-			if ( !utils.isObject( item ) || !LinearData.isCloseElement( item ) ||
+			if ( !utils.isObject( item ) || !LinearDocumentData.isCloseElement( item ) ||
 				( i = this.data.indexOf( item ) ) === -1 ) {
 				return null;
 			}
 
 			var closingStack = [],
-				type = LinearData.getType( item );
+				type = LinearDocumentData.getType( item );
 
 			// we don't want to check the given item again
 			i--;
@@ -103,10 +103,6 @@ define( [
 			}
 
 			return null;
-		},
-
-		getDataForRange: function( range ) {
-			return this.slice( range.start.offset, range.end.offset );
 		},
 
 		getTypeAt: function( idx ) {
