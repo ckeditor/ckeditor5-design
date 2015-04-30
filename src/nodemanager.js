@@ -21,9 +21,11 @@ define( function() {
 
 		// return a node constructor with the given name or all the constructors
 		get: function( name ) {
-			return name !== undefined ? this._items[ name ][ 1 ] : this._list.map( function( item ) {
-				return item[ 1 ];
-			} );
+			return name !== undefined ?
+				this._items[ name ] && this._items[ name ][ 1 ] :
+				this._list.map( function( item ) {
+					return item[ 1 ];
+				} );
 		},
 
 		// return an ordered list of node constructors names
@@ -34,6 +36,7 @@ define( function() {
 		},
 
 		// find a style constructor for the given data
+		// TODO deprecated
 		matchStyleForData: function( data ) {
 			var result = null;
 
