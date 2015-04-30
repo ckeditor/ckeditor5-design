@@ -1,11 +1,9 @@
 bender.require( [
 	'converter',
-	'store',
-	'tools/utils'
+	'store'
 ], function(
 	converter,
-	Store,
-	utils
+	Store
 ) {
 	'use strict';
 

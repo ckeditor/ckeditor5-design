@@ -1,11 +1,9 @@
 bender.require( [
 	'document',
-	'tools/element',
-	'tools/utils'
+	'tools/element'
 ], function(
 	Document,
-	Element,
-	utils
+	Element
 ) {
 	'use strict';
 
@@ -145,7 +143,6 @@ bender.require( [
 			var p = doc.root.children[ 0 ].view.getElement();
 			var b = p.firstChild;
 			var t1 = b.firstChild;
-			var br = doc.root.children[ 0 ].children[ 1 ].view.getElement();
 			var i = p.lastChild;
 			var t2 = i.firstChild;
 
@@ -192,7 +189,6 @@ bender.require( [
 		it( 'should return valid offsets for block elements <p><img /></p>', function() {
 			var doc = makeDocument( 't6' );
 			// references to DOM elements
-			var root = doc.root.view.getElement();
 			var p = doc.root.children[ 0 ].view.getElement();
 
 			var testCases = [
@@ -251,7 +247,6 @@ bender.require( [
 			var doc = makeDocument( 't8' );
 			// references to DOM elements
 			var p1 = doc.root.children[ 0 ].view.getElement();
-			var t1 = p1.firstChild;
 			var p2 = doc.root.children[ 1 ].view.getElement();
 			var t2 = p2.firstChild;
 
@@ -283,10 +278,8 @@ bender.require( [
 			// references to DOM elements
 			var ul1 = doc.root.children[ 0 ].view.getElement();
 			var li1 = ul1.firstChild;
-			var t1 = li1.firstChild;
 			var ul2 = li1.lastChild;
 			var li2 = ul2.firstChild;
-			var t2 = li2.firstChild;
 			var li3 = ul2.lastChild;
 			var t3 = li3.firstChild;
 

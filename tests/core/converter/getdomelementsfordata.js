@@ -1,13 +1,11 @@
 bender.require( [
 	'converter',
 	'nodemanager',
-	'store',
-	'tools/utils'
+	'store'
 ], function(
 	converter,
 	nodeManager,
-	Store,
-	utils
+	Store
 ) {
 	'use strict';
 

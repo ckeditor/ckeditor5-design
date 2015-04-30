@@ -1,13 +1,11 @@
 bender.require( [
 	'document',
 	'transaction',
-	'tools/element',
-	'tools/utils'
+	'tools/element'
 ], function(
 	Document,
 	Transaction,
-	Element,
-	utils
+	Element
 ) {
 	'use strict';
 
@@ -214,7 +212,6 @@ bender.require( [
 
 		it( 'should not remove text nodes during simple text manipulations', function() {
 			var doc = new Document( t1 );
-			var t = doc.root.children[ 0 ].children[ 0 ];
 			var textNode = doc.root.children[ 0 ].view.childNodes[ 0 ];
 
 			var transaction = new Transaction();
@@ -242,7 +239,6 @@ bender.require( [
 
 		it( 'should re-render parts of the dirty DOM when forceRender is called', function() {
 			var doc = new Document( t1 );
-			var t = doc.root.children[ 0 ].children[ 0 ];
 			var paragraph = doc.root.children[ 0 ].view.getElement();
 			var textNode = paragraph.childNodes[ 0 ];
 

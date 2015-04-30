@@ -2,14 +2,12 @@ bender.require( [
 	'document',
 	'range',
 	'selection',
-	'tools/element',
-	'tools/utils'
+	'tools/element'
 ], function(
 	Document,
 	Range,
 	Selection,
-	Element,
-	utils
+	Element
 ) {
 	'use strict';
 

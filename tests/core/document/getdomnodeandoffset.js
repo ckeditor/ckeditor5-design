@@ -1,11 +1,9 @@
 bender.require( [
 	'document',
-	'tools/element',
-	'tools/utils'
+	'tools/element'
 ], function(
 	Document,
-	Element,
-	utils
+	Element
 ) {
 	'use strict';
 
@@ -67,7 +65,6 @@ bender.require( [
 			var p = doc.root.children[ 0 ].view.getElement();
 
 			var b = p.childNodes[ 0 ];
-			var br = p.childNodes[ 1 ];
 			var i = p.childNodes[ 2 ];
 			var t1 = b.firstChild;
 			var t2 = i.firstChild;
@@ -190,7 +187,6 @@ bender.require( [
 			var b = p.childNodes[ 0 ];
 			var t1 = b.firstChild;
 			var t2 = p.childNodes[ 1 ];
-			var br = p.childNodes[ 2 ];
 			var t3 = p.childNodes[ 3 ];
 			var i = p.childNodes[ 4 ];
 			var t4 = i.firstChild;

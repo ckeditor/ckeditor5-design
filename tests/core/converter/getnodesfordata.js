@@ -1,13 +1,11 @@
 bender.require( [
 	'converter',
 	'lineardocumentdata',
-	'nodemanager',
-	'tools/utils'
+	'nodemanager'
 ], function(
 	converter,
 	LinearDocumentData,
-	nodeManager,
-	utils
+	nodeManager
 ) {
 	'use strict';
 

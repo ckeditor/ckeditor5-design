@@ -1,11 +1,9 @@
 bender.require( [
 	'document',
-	'tools/element',
-	'tools/utils'
+	'tools/element'
 ], function(
 	Document,
-	Element,
-	utils
+	Element
 ) {
 	'use strict';
 
