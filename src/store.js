@@ -12,6 +12,7 @@ define( [
 
 	// produce a "hash" of an item
 	function makeHash( value ) {
+		// we do no care about the order so collections with the same elements should return the same hash
 		function sort( key, value ) {
 			if ( !utils.isArray( value ) && utils.isObject( value ) ) {
 				var sorted = {};

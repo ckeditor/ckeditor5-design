@@ -350,7 +350,7 @@ define( [
 			return node;
 		},
 
-		// TODO exclude internal elements from calculations
+		// TODO exclude dirty (UI internal) elements from calculations
 		// return an element and offset representing the given position in the linear data
 		getDomNodeAndOffset: function( position, attributes ) {
 			var child, element, ancestor, attrs;
@@ -575,7 +575,7 @@ define( [
 			return findNode( this.root, 0 );
 		},
 
-		// TODO exclude internal elements from the offset calculation
+		// TODO exclude dirty (UI internal) elements from the offset calculation
 		// calculates the offset and attributes in the linear data
 		// and returns a Position object
 		getOffsetAndAttributes: function( element, offset ) {

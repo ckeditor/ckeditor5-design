@@ -56,11 +56,11 @@ define( [
 
 	utils.extend( Editable.prototype, Emitter, {
 		onContentChange: function( mutations ) {
+			// nodes and elements contains corresponding items, it means that nodes[ i ] corresponds to the elements[ i ]
 			var nodes = [],
-				elements = [],
-				node,
-				len,
-				i;
+				elements = [];
+
+			var node, len, i;
 
 			for ( i = 0, len = mutations.length; i < len; i++ ) {
 				var mutation = mutations[ i ];
@@ -141,7 +141,7 @@ define( [
 			}
 
 			// find elements represented by the node
-			// TODO at some point we'll have to exclude internal elements
+			// TODO at some point we'll have to exclude dirty (UI internal) elements
 			function findElements( node ) {
 				var previous = node.previousSibling,
 					next = node.nextSibling,
@@ -179,8 +179,10 @@ define( [
 
 			var node, len, i;
 
-			var nodes = [];
-			var elements = [];
+			// nodes and elements contains corresponding items, it means that nodes[ i ] corresponds to the elements[ i ]
+			var nodes = [],
+				elements = [];
+
 			var nodesToRemove = [];
 			var nodesToFix = [];
 
@@ -205,6 +207,11 @@ define( [
 				}
 
 				// try identifying a node in the document tree using a view
+				// all modified nodes will have the vid. Although e.g. when we press enter at the end of the bolded
+				// paragraph new <div> and <b> will be created with the bogus <br> inside. Because of bogus, there will
+				// be mutation (childList) on that <b> which has no `vid`. Another case is executing native bold command.
+				// For both cases we do not need to care, because the parent element will have vid and it will handle
+				// children.
 				if ( target.dataset && target.dataset.vid ) {
 					view = viewManager.get( target.dataset.vid );
 
@@ -216,6 +223,8 @@ define( [
 						// mark the element as a "mutated"
 						target.dataset.mutated = true;
 						// save the original VID
+						// we calculate selection position based on the width of the last element with the vid,
+						// if the element changed width may change too, so we can get the wrong selection
 						target.dataset.ovid = target.dataset.vid;
 						// remove the VID to avoid selection offset miscalculations
 						delete target.dataset.vid;
@@ -227,10 +236,9 @@ define( [
 
 					// collect nodes created by contenteditable to be removed later
 					if ( mutation.type === 'childList' ) {
-						addRemove( mutation.addedNodes );
-						delRemove( mutation.removedNodes );
+						markNodesToRemove( mutation.addedNodes );
+						unmarkNodesToRemove( mutation.removedNodes );
 					}
-					//*/
 				}
 
 				// node's parent doesn't refer to any view, lets find the closest ancestor that has one
@@ -278,13 +286,16 @@ define( [
 				var transaction = Transaction.createFromNodeAndElements( this.document, nodes[ i ], elements[ i ] );
 
 				// ignore transactions without operations
+				// Such transaction may be created for mutations which do not change DOM. We can get such mutation using IME.
 				if ( transaction.operations.length ) {
 					this.document.applyTransaction( transaction, true );
-				}
 
-				// store applied transactions only
-				if ( transaction.applied ) {
-					transactions.push( transaction );
+					// store applied transactions only
+					if ( transaction.applied ) {
+						transactions.push( transaction );
+					} else {
+						throw new Error( 'All transactions should be applied.' );
+					}
 				}
 			}
 
@@ -329,7 +340,7 @@ define( [
 			// TODO this is just a temporary solution for development purposes
 			this.trigger( 'change' );
 
-			function addRemove( addedNodes ) {
+			function markNodesToRemove( addedNodes ) {
 				for ( var i = 0, len = addedNodes.length; i < len; i++ ) {
 					var addedNode = addedNodes[ i ];
 
@@ -343,7 +354,7 @@ define( [
 				}
 			}
 
-			function delRemove( removedNodes ) {
+			function unmarkNodesToRemove( removedNodes ) {
 				var idx;
 
 				for ( var i = 0, len = removedNodes.length; i < len; i++ ) {

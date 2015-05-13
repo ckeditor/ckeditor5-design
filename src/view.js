@@ -11,6 +11,7 @@ define( [
 ) {
 	'use strict';
 
+	// View binds element with node. This is in fact viewmodel in the terms of MVC*.
 	function View( node, el ) {
 		Element.call( this, el );
 

@@ -15,7 +15,7 @@ define( [
 
 	MutationObserver.defaultConfig = {
 		childList: true,
-		attributes: true,
+		attributes: true, // TODO: check if we really need to listen on attributes
 		characterData: true,
 		characterDataOldValue: true,
 		subtree: true
