@@ -1,13 +1,5 @@
 require.config( {
-	baseUrl: '../src/',
-	paths: {
-		diff: '../node_modules/diff/diff'
-	},
-	shim: {
-		diff: {
-			exports: 'JsDiff'
-		}
-	}
+	baseUrl: '../src/'
 } );
 
 require( [

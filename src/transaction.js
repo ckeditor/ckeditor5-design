@@ -74,7 +74,6 @@ define( [
 	} );
 
 	function makeOperationsFromDiff( oldData, newData, offset ) {
-		// TODO see if it's worth comparing objects and arrays as strings (via JSON.stringify)
 		var edits = diff( oldData, newData, utils.areEqual );
 
 		var ops = [];
