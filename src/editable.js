@@ -60,7 +60,7 @@ define( [
 			var nodes = [],
 				elements = [];
 
-			var node, len, i;
+			var node, len, i, j;
 
 			for ( i = 0, len = mutations.length; i < len; i++ ) {
 				var mutation = mutations[ i ];
@@ -238,6 +238,14 @@ define( [
 					if ( mutation.type === 'childList' ) {
 						markNodesToRemove( mutation.addedNodes );
 						unmarkNodesToRemove( mutation.removedNodes );
+					}
+				}
+
+				// remove vid from all added nodes
+				for ( j = 0; j < mutation.addedNodes.length; j++ ) {
+					var addedNode = mutation.addedNodes[ j ];
+					if ( addedNode.dataset && addedNode.dataset.vid ) {
+						delete addedNode.dataset.vid;
 					}
 				}
 
