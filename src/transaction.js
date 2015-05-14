@@ -15,6 +15,7 @@ define( [
 	}
 
 	utils.extend( Transaction, {
+		// old node, new elements
 		createFromNodeAndElements: function( document, node, elements ) {
 			var oldData = document.getNodeData( node ),
 				offset = node.offset,

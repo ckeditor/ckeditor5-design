@@ -18,6 +18,7 @@ define( [
 			'table', 'tbody', 'tfoot', 'thead', 'ul', 'video'
 		];
 
+	// The converter to consume whitespaces (do not create any data for them).
 	function WhitespaceNode() {
 		Node.apply( this, arguments );
 	}

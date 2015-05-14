@@ -28,6 +28,7 @@ define( [
 	'use strict';
 
 	function Document( $el ) {
+		// Store for attributes, so we keep only IDs in the linearData.
 		this.store = new Store();
 
 		// create a detached copy of the source HTML

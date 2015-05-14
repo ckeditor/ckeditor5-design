@@ -58,13 +58,14 @@ define( [
 		onContentChange: function( mutations ) {
 			// nodes and elements contains corresponding items, it means that nodes[ i ] corresponds to the elements[ i ]
 			var nodes = [],
-				elements = [];
+				elements = []; // Array of arrays
 
 			var node, len, i, j;
 
 			for ( i = 0, len = mutations.length; i < len; i++ ) {
 				var mutation = mutations[ i ];
 
+				// Because of IME old and new value may be the same.
 				if ( mutation.oldValue !== mutation.target.data ) {
 					node = findTextNode( mutation.target );
 
@@ -131,7 +132,7 @@ define( [
 				if ( ( element = target.parentNode ) &&
 					( view = viewManager.getByElement( element ) ) &&
 					view.node ) {
-					// return the only children
+					// return the only children (if there is no other element with vid, parent will contain only a single text node).
 					return view.node.children[ 0 ];
 				} else if ( element ) {
 					return findTextNode( element );
