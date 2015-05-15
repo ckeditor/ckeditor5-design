@@ -53,6 +53,7 @@ define( [
 		// apply a transaction to the document - update the linear data and document tree
 		applyTransaction: function( transaction, forceRender ) {
 			if ( transaction.applied ) {
+				// TODO: why not? do we need transaction.applied?
 				throw new Error( 'The transaction has already been applied.' );
 			}
 
@@ -103,9 +104,24 @@ define( [
 			}
 
 			// calculate the ending offset to locate the last affected node
+			//
+			// if we remove ( removed > 0 ? 1 : 0 ) then we will get error removing last element (we will have root as
+			// the lastNode during remove); if we replace it with the simple -1 then we get error when we press enter at
+			// the end of the block. Anyway it is the ugly hack and should be replace with the better solution. Maybe finding
+			// common ancestor will fix the problem
 			var rightOffset = offset - added + removed - ( removed > 0 ? 1 : 0 );
 
 			// rework the adjacent text node instead of inserting another one next to it
+			//
+			// isElementAt use linear data (updated) and getNodeAtPosition use document tree (not updated yet), so
+			// if we just enter a single character at the end of the textNode getNodeAtPosition( leftOffset ) will refers to
+			// the parent node, not the text node.
+			//
+			// Before insertion: <p> foo </p>
+			// After insertion: <p> foob </p>
+			//
+			// operation.retain: 4 -> leftOffset: 4    -> getNodeAtPosition( leftOffset ) returns <p>
+			// operation.retain: 4 -> leftOffset: 4 -1 -> getNodeAtPosition( leftOffset ) returns "foo"
 			if ( !this.data.isElementAt( leftOffset ) &&
 				!this.data.isElementAt( leftOffset - 1 ) && leftOffset ) {
 				leftOffset--;
@@ -135,6 +151,7 @@ define( [
 				var parent = firstNode.parent,
 					start, end, data, newNodes;
 
+				// not root
 				if ( parent ) {
 					// beginning of the data to be rebuilt
 					start = firstNode.offset;
@@ -195,9 +212,16 @@ define( [
 				// no structural changes - just update lengths of the nodes
 			} else {
 				if ( lastNode.type !== 'text' ) {
+					// <p>  foo  </p>             <p>  foo  </p>
+					//       ^     ^      ->            ^
+					//     start   end            start & end
 					if ( this.data.isCloseElementAt( offset ) ) {
 						lastNode = lastNode.children[ lastNode.childLength - 1 ];
-					} else {
+					}
+					// <p>  foo  <br>  </br>  </p>           <p>  foo  <br>  </br>  </p>
+					//       ^    ^                   ->           ^
+					//     start end                         start & end
+					else {
 						lastNode = lastNode.previousSibling;
 					}
 				}
