@@ -259,6 +259,9 @@ define( [
 			this.trigger( 'transaction:end', transaction );
 
 			// recursively compares arrays of nodes and applies necessary changes to the given parent
+			// parent - node on which we will apply changes
+			// oldChildren - copy/slice of the parents children
+			// newChildren - target form of children
 			function updateTree( parent, oldChildren, newChildren ) {
 				var edits = diff( oldChildren, newChildren, function( a, b ) {
 					// nodes are "equal" if their data matches
@@ -272,7 +275,9 @@ define( [
 					removed = 0,
 					// last equal
 					lastMatching = null,
-					// the first index on which we should add new children to the parent
+					// the first index on which we should add new children to the parent;
+					// because the oldChildren might be a slice of the parents children `oldChildren[ 0 ]` might not be a first
+					// parents child so we need to get its index
 					addIndex = oldChildren[ 0 ] && parent.indexOf( oldChildren[ 0 ] ) || 0,
 					// stack with operations of the same type; `branch.splice` is heavy operation which causes re-rendering,
 					// so we do not want to call it too often; this is why we use stack to save all adjacent operations of
