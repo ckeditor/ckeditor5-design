@@ -153,6 +153,15 @@ define( [
 
 				// not root
 				if ( parent ) {
+					// Since the leftOffset & rightOffset might be inside nodes start and end are at the begging and end.
+					//
+					// <p>  f  o  o  </p>  <p>  b  a  r  </p>  <p>  b  o  m  </p>
+					//      ^     ^                                 ^     ^
+					//      | leftOffset                       rightOffset|
+					//    start                                          end
+					//     ---------                               --------
+					//     firstNode                               lastNode
+
 					// beginning of the data to be rebuilt
 					start = firstNode.offset;
 					// end of the data to be rebuilt
@@ -199,9 +208,10 @@ define( [
 					var currentNode = this.getNodeAtPosition( start );
 
 					var idx = currentNode && currentNode.parent ?
-						// insert at currentNode's position
+						// insert at currentNode's position (text directly in the root, firstNode will be
+						// replaced with the parent, so firstNode will be root, but currentNode will have parent)
 						currentNode.parent.indexOf( currentNode ) :
-						// insert at the end of the parent
+						// insert to the end of the root (firstNode is root)
 						firstNode.childLength;
 
 					firstNode.spliceArray( idx, 0, newNodes );
@@ -257,12 +267,18 @@ define( [
 					return a.data && a.children && a.data === b.data;
 				} );
 
-				var added = 0,
+				var // added/removed children count so we can get proper child index after changes
+					added = 0,
 					removed = 0,
+					// last equal
 					lastMatching = null,
 					// the first index on which we should add new children to the parent
 					addIndex = oldChildren[ 0 ] && parent.indexOf( oldChildren[ 0 ] ) || 0,
+					// stack with operations of the same type; `branch.splice` is heavy operation which causes re-rendering,
+					// so we do not want to call it too often; this is why we use stack to save all adjacent operations of
+					// the same type and call splice once.
 					stack = [],
+					// previous edit operation
 					last;
 
 				// process the edits
@@ -327,6 +343,11 @@ define( [
 			}
 
 			// checks if all the elements were properly closed, if not, update firstNode and lastNode
+			//
+			// <p> f o o <b> b a r </b> </p>
+			//                 |--------->|
+			// We met 2 close elements without corresponding open elements, what means we need to
+			// replace firstNode with firstNode.parent.parent. Similarly for the opposite situation.
 			function validateData( data ) {
 				var open = [],
 					close = [],
@@ -338,6 +359,7 @@ define( [
 					} else if ( data.isCloseElementAt( i ) ) {
 						var lastOpened = open.pop();
 
+						// TODO: find the case where this can happen or remove this code
 						if ( lastOpened && data.getTypeAt( i ) !== data.constructor.getType( lastOpened ) ) {
 							open.push( lastOpened );
 						} else if ( !lastOpened ) {

@@ -7,6 +7,7 @@ define( [
 ) {
 	'use strict';
 
+	// Base class for LinearDocumentData and LinearMetaData
 	function LinearData( data, store ) {
 		this.data = data || [];
 		this.store = store || new Store();
