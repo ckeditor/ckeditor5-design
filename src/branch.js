@@ -41,10 +41,12 @@ define( [
 			return this.children[ index ] || null;
 		},
 
+		// this method will update DOM
 		handleUpdate: function( index, removed, added ) {
 			var doc = this.document,
 				that = this;
 
+			// we do not want to change the DOM before we create a whole document
 			if ( !this.isRendered ) {
 				return;
 			}
@@ -62,7 +64,7 @@ define( [
 
 			var leftAnchor, rightAnchor, sibling;
 
-			// get the nearest anchor
+			// get the nearest anchor (element with the view)
 			if ( index ) {
 				leftAnchor = findAnchor( index, -1 );
 			}
@@ -104,7 +106,7 @@ define( [
 			}
 
 			// insert new child views
-			if ( index && ( leftAnchor || rightAnchor ) ) {
+			if ( leftAnchor || rightAnchor ) {
 				// we have a child view on the left which we can refer to
 				if ( leftAnchor ) {
 					for ( i = added.length - 1; i >= 0; i-- ) {
@@ -124,7 +126,8 @@ define( [
 						}
 					}
 				}
-				// index === 0 or no anchors found so just prepend all children (reverse order)
+				// no leftAnchor and rightAnchor so this is the only child in the element
+				// so just prepend all children (reverse order)
 			} else {
 				for ( i = added.length - 1; i >= 0; i-- ) {
 					views = getChildViews( added[ i ] );
@@ -143,6 +146,8 @@ define( [
 					toAdd = [],
 					anchor;
 
+				// When we change the text node we add new one and remove the old after that. The problem is then we can not
+				// find the border between 2 text nodes so we remove both of them and we need to add the new one again.
 				function readd() {
 					if ( removed.length ) {
 						if ( dir > 0 ) {

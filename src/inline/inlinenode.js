@@ -7,6 +7,7 @@ define( [
 ) {
 	'use strict';
 
+	// InlineNode is the base class for inline converters. It is not present in the document model.
 	function InlineNode() {
 		TextNode.apply( this, arguments );
 	}
@@ -21,7 +22,7 @@ define( [
 			attributes[ this.type ] = true;
 
 			// save additional attributes
-			utils.extend( attributes, this.pickAttributes( options.element, this.attributes ) );
+			utils.extend( attributes, this.pickAttributes( options.element ) );
 
 			options.onAttributes( attributes );
 		},

@@ -36,17 +36,27 @@ define( [
 			// TODO what about pre-formatted text? we shouldn't touch whitespaces, should we?
 
 			// remove unneeded text nodes
+				// <p> </p> -> <p></p>
+				// NOT: <b> </b>
+				// NOT: <p> 'foo' ' ' 'bar' </p>
+				// Element contains only whitespace
 			if ( allWhitePattern.test( text ) && ( (
+						// and parent is block element
 						( blockElements.indexOf( elem.parentNode.nodeName.toLowerCase() ) > -1 ) &&
+						// no sibling
 						( !elem.previousSibling || !elem.nextSibling )
 					) ||
-					// ignore whitespaces between block elements
+					// ignore whitespaces between block elements and its sibling
+					// <p>foo</p> <b>bar</b> -> <p>foo</p><b>bar</b>
+					// NOT: <b>foo</b> <b>bar</b>
 					( elem.previousSibling && blockElements.indexOf( elem.previousSibling.nodeName.toLowerCase() ) > -1 ) ||
 					( elem.nextSibling && blockElements.indexOf( elem.nextSibling.nodeName.toLowerCase() ) > -1 ) ||
 					// ignore whitespaces between tags containing newline characters
+					// 'foo' \n 'bar' -> 'foo' 'bar'
 					( elem.previousSibling && elem.nextSibling && text.match( /\n/ ) ) ) ) {
 				options.onElement( null );
 			} else {
+				// '  foo  ' -> 'foo'
 				elem.data = text.replace( startEndWhitePattern, ' ' );
 			}
 		}

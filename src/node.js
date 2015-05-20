@@ -9,9 +9,11 @@ define( [
 ) {
 	'use strict';
 
+	// data - linear data
 	function Node( data ) {
 		this.data = data || null;
 
+		// TODO: is seems to be not needed. It could be replaced with checking if view exists.
 		this.isRendered = false;
 
 		this.document = null;
@@ -22,13 +24,21 @@ define( [
 	}
 
 	// static properties
+	// Every specific node set its type.
 	Node.type = null;
+	// Every specific node set tags it accept. The first one will be used to create DOM element.
 	Node.tags = [];
+	// Every specific node set attributes witch it handle.
 	Node.attributes = [];
+	// Has open and close tag; at the moment only text node is not wrapped
+	// TODO: change isWrapped to isTextNode and move to the text node
 	Node.isWrapped = true;
 
 
 	// static methods
+
+	// used by converters to match node to the processing element
+	// options.element - DOM element
 	Node.match = function( options ) {
 		// match by tag name (node name to support matching comments/text nodes)
 		if ( this.tags.length ) {
@@ -42,10 +52,11 @@ define( [
 		return false;
 	};
 
-	Node.pickAttributes = function( dom, attributes ) {
+	// pick attributes from the DOM element during conversion
+	Node.pickAttributes = function( dom ) {
 		var result = {};
 
-		attributes.forEach( function( attribute ) {
+		this.attributes.forEach( function( attribute ) {
 			var value = dom.getAttribute( attribute );
 
 			if ( value !== null ) {
@@ -60,7 +71,7 @@ define( [
 	Node.toData = function( options ) {
 		options.onItem( {
 			type: this.type,
-			attributes: this.pickAttributes( options.element, this.attributes )
+			attributes: this.pickAttributes( options.element )
 		} );
 	};
 
@@ -114,6 +125,7 @@ define( [
 		},
 
 		set: function( length ) {
+			// TODO: node.length = node.length; will change value; this should be fixed
 			this._length = length;
 		}
 	} );
