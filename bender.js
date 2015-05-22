@@ -27,8 +27,7 @@ var config = {
 
 	applications: {
 		'prototype': {
-			path: 'src/',
-			files: [ 's' ]
+			path: 'src/'
 		}
 	},
 
@@ -38,7 +37,8 @@ var config = {
 	plugins: [
 		'benderjs-amd',
 		'benderjs-mocha',
-		'benderjs-chai'
+		'benderjs-chai',
+		'benderjs-coverage'
 	],
 
 	tests: {
@@ -50,7 +50,15 @@ var config = {
 				'!**/_assets/**'
 			]
 		}
-	}
+	},
+
+	coverage: {
+		paths: [
+			'src/**/*',
+			'samples/**/*',
+			'*.js'
+		]
+    }
 };
 
 module.exports = config;

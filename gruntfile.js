@@ -21,32 +21,17 @@ module.exports = function( grunt ) {
 						endFile: 'src/end.frag'
 					}
 				}
-			},
-			amdclean: {
-				options: {
-					onModuleBundleComplete: function( data ) {
-						var fs = require( 'fs' ),
-							amdclean = require( 'amdclean' ),
-							path = data.path;
-
-						fs.writeFileSync( path, amdclean.clean( {
-							filePath: path,
-							globalModules: [ 'CKEDITOR' ]
-						} ) );
-					}
-				}
 			}
 		},
 
 		watch: {
 			source: {
 				files: [ 'src/**/*' ],
-				tasks: [ 'build:almond' ]
+				tasks: [ 'build' ]
 			}
 		}
 	} );
 
-	grunt.registerTask( 'build:almond', [ 'clean', 'requirejs:almond' ] );
-	grunt.registerTask( 'build:amdclean', [ 'clean', 'requirejs:amdclean' ] );
+	grunt.registerTask( 'build', [ 'clean', 'requirejs:almond' ] );
 	grunt.registerTask( 'default', [ 'watch' ] );
 };
