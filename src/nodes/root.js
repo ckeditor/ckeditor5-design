@@ -9,6 +9,7 @@ define( [
 ) {
 	'use strict';
 
+	// Root node is handled by the special case, see `isRoot` in converters.
 	function RootNode( document ) {
 		Branch.call( this );
 		this.document = document;

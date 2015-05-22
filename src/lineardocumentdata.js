@@ -7,6 +7,23 @@ define( [
 ) {
 	'use strict';
 
+	// Data is an array. The item can be
+	//   - string - for characters without styles,
+	//   - array - for character with style, then:
+	//     - item[ 0 ] is character,
+	//     - item[ 1 ] is array of styles id in the store.
+	//   - object - for elements, then:
+	//     - item.type - the item type,
+	//     - item.attributes - object of attributes
+	//
+	// For example for <p> F <b> o o </b> </p> it will be:
+	//	[
+	//		{ type: paragraph, attributes: {} },
+	//		'F',
+	//		[ 'o', [] ],
+	//		[ 'o', [] ],
+	//		{ type: /paragraph }
+	//	]
 	function LinearDocumentData() {
 		LinearData.apply( this, arguments );
 	}
@@ -42,6 +59,7 @@ define( [
 			// we accept opening elements only
 			if ( !utils.isObject( item ) || !LinearDocumentData.isOpenElement( item ) ||
 				( i = this.data.indexOf( item ) ) === -1 ) {
+				// TODO: bad smell: incorrect input data should throw an error or break method instead on returning null.
 				return null;
 			}
 
@@ -79,6 +97,7 @@ define( [
 			// we accept opening items only
 			if ( !utils.isObject( item ) || !LinearDocumentData.isCloseElement( item ) ||
 				( i = this.data.indexOf( item ) ) === -1 ) {
+				// TODO: bad smell: incorrect input data should throw an error or break method instead on returning null.
 				return null;
 			}
 

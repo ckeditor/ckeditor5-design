@@ -59,13 +59,9 @@ define( function() {
 		},
 		// create a new detached document from an HTML string
 		createDocumentFromHTML: function( html ) {
-			if ( window.DOMParser ) {
-				var parser = new window.DOMParser();
+			var parser = new window.DOMParser();
 
-				return parser.parseFromString( html, 'text/html' );
-			} else {
-				// TODO handle IE < 10
-			}
+			return parser.parseFromString( html, 'text/html' );
 		},
 
 		extend: function( target, source ) {

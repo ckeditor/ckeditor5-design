@@ -43,9 +43,5 @@ define( [
 	// inherit prototype
 	utils.inherit( InlineNode, TextNode );
 
-	utils.extend( InlineNode.prototype, {
-		// TODO
-	} );
-
 	return InlineNode;
 } );

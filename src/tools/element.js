@@ -151,6 +151,7 @@ define( [
 			}
 		},
 
+		// TODO fix the bug: insert after the last element.
 		insertAfter: function( sibling ) {
 			if ( !this.detached ) {
 				this._el.parentNode.insertBefore(

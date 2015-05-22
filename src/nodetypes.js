@@ -1,3 +1,4 @@
+// We need to force loading notes (no one includes them).
 // YES, IT'S UGLY, BUT IT'S A TEMPORARY SOLUTION (hopefully)
 define( [
 	'nodes/break',

@@ -10,6 +10,11 @@ define( [
 ) {
 	'use strict';
 
+	// onElement - change the current DOM element for the other converters,
+	// onData - add new data, used to add more then one element,
+	// onItem - set the current linear data item,
+	// onAttributes - add attributes to the list of the attributes.
+
 	var converter = {
 		// retrieve an array of attributes for the given element
 		getAttributesForDomElement: function( element, store ) {
@@ -52,8 +57,8 @@ define( [
 				result = {},
 				data = [],
 				textNode,
-				current,
-				node,
+				current, // current linear data item
+				node, // node for current data item
 				len,
 				i;
 
@@ -247,6 +252,7 @@ define( [
 				var item = data[ i ];
 
 				// text or styled-text
+				// TODO: use linear data methods instead of utils
 				if ( utils.isString( item ) || utils.isArray( item ) ) {
 					// push the text item to the stack
 					textStack.push( item );
@@ -315,8 +321,11 @@ define( [
 		// build a node tree, collect the children first and then push them to their parents
 		// we use this order to calculate the lengths properly
 		getNodesForData: function( data, document ) {
+			// Stacks because we do not want to use recursive.
+				// Array of nodes
 			var currentStack = [],
 				parentStack = [],
+				// Array of stacks (arrays)
 				nodeStack = [];
 
 			// start with the topmost element - the document node

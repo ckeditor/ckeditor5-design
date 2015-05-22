@@ -6,6 +6,11 @@ define( [
 	'use strict';
 
 	var EmitterMixin = {
+		// Tell an object to listen to a particular event on an OTHER object.
+		// The advantage of using this form, instead of `.on`, is that listenTo allows the object to keep track of the
+		// events, and they can be removed all at once later on. The callback will always be called with object as context.
+		//
+		// Concept from http://backbonejs.org/
 		listenTo: function( target, type, callback, ctx ) {
 			if ( !this._listeningTo ) {
 				Object.defineProperty( this, '_listeningTo', {
@@ -44,40 +49,27 @@ define( [
 			return this;
 		},
 
-		off: function( type, callback, ctx ) {
-			if ( !this._events ) {
+		stopListening: function( target, type, callback ) {
+			if ( !this._listeningTo ) {
 				return this;
 			}
 
-			if ( !arguments.length ) {
-				Object.defineProperty( this, '_events', {
-					configurable: true,
-					value: {}
-				} );
+			if ( target ) {
+				target.off( type, callback, this );
+				if ( !Object.keys( target._events ).length ) {
+					var uid = target._emitterId;
 
-				return this;
-			}
-
-			var types = type ? [ type ] : Object.keys( this._events );
-
-			types.forEach( function( type ) {
-				var events = this._events[ type ];
-
-				this._events[ type ] = [];
-
-				events.forEach( function( event ) {
-					if (
-						( callback && event.callback !== callback && event.callback._original !== callback ) ||
-						( ctx && event.ctx !== ctx )
-					) {
-						this._events[ type ].push( event );
+					if ( uid ) {
+						delete this._listeningTo[ uid ];
 					}
-				}, this );
-
-				if ( !this._events[ type ].length ) {
-					delete this._events[ type ];
 				}
-			}, this );
+			} else {
+				Object.keys( this._listeningTo ).forEach( function( uid ) {
+					this._listeningTo[ uid ].off( type, callback, this );
+
+					delete this._listeningTo[ uid ];
+				}, this );
+			}
 
 			return this;
 		},
@@ -120,27 +112,40 @@ define( [
 			return this.on( type, once, ctx );
 		},
 
-		stopListening: function( target, type, callback ) {
-			if ( !this._listeningTo ) {
+		off: function( type, callback, ctx ) {
+			if ( !this._events ) {
 				return this;
 			}
 
-			if ( target ) {
-				target.off( type, callback, this );
-				if ( !Object.keys( target._events ).length ) {
-					var uid = target._emitterId;
+			if ( !arguments.length ) {
+				Object.defineProperty( this, '_events', {
+					configurable: true,
+					value: {}
+				} );
 
-					if ( uid ) {
-						delete this._listeningTo[ uid ];
-					}
-				}
-			} else {
-				Object.keys( this._listeningTo ).forEach( function( uid ) {
-					this._listeningTo[ uid ].off( type, callback, this );
-
-					delete this._listeningTo[ uid ];
-				}, this );
+				return this;
 			}
+
+			var types = type ? [ type ] : Object.keys( this._events );
+
+			types.forEach( function( type ) {
+				var events = this._events[ type ];
+
+				this._events[ type ] = [];
+
+				events.forEach( function( event ) {
+					if (
+						( callback && event.callback !== callback && event.callback._original !== callback ) ||
+						( ctx && event.ctx !== ctx )
+					) {
+						this._events[ type ].push( event );
+					}
+				}, this );
+
+				if ( !this._events[ type ].length ) {
+					delete this._events[ type ];
+				}
+			}, this );
 
 			return this;
 		},

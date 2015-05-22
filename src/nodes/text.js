@@ -35,6 +35,9 @@ define( [
 				currentStack;
 
 			// find where the two arrays of styles differ and return the difference index (-1 if they are the same)
+			// [ 0 ] and [ 0 ] -> do nothing
+			// [ 0 ] and [ 0, 1 ] -> open style 1
+			// [ 0, 1 ] and [ 1 ] -> close style 1 and 0 then open style 1.
 			function diffStyles( a, b ) {
 				var diffIndex = -1;
 
@@ -108,6 +111,7 @@ define( [
 			// append current elements to their parents
 			function flushParentStack() {
 				if ( parentStack && parentStack.length ) {
+					// TODO: concat.apply
 					for ( var j = parentStack.length - 1; j > 0; j-- ) {
 						parentStack[ j - 1 ].push( parentStack[ j ] );
 					}
@@ -145,6 +149,8 @@ define( [
 
 						// append removed elements to their parents
 						if ( removed.length ) {
+							// Array of arrays -> array
+							// TODO: concat.apply
 							for ( var j = removed.length - 1; j > 0; j-- ) {
 								removed[ j - 1 ].push( removed[ j ] );
 							}
