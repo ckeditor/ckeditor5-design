@@ -22,6 +22,10 @@ define( [
 		this.target.addListener( isWebkit ? 'DOMFocusOut' : 'blur', this._stopWatching.bind( this ) );
 	}
 
+	// WeakMap of ranges assigned to docs:
+	// 		doc1 -> [ range1a, range1b, ... ],
+	// 		doc2 -> [ range2a, range2b, ... ],
+	// 		...
 	var ranges;
 
 	utils.extend( SelectionWatcher.prototype, Emitter, {

@@ -28,11 +28,30 @@ define( [
 		},
 
 		toDom: function( data, doc, store ) {
-			var elementStack = [],
-				text = [],
+			var text = [], // content of the text node
+				currentStyles, // previous styles to compare with current
+				// top levels stack; output elements are build from that stack; we dump element to this stack when we
+				// reach top level during processing (all elements are close, diffStyles == 0 or no styles)
+				elementStack = [],
+				// array of parent stacks [ ..., [grand-grand-parent], [grand-parent], [parent] ]
+				// every item contains arrays build the same way: the element (as a first element of the array) and its children:
+				// [ <elem>, child, child, [ childStack ], ... ]
 				parentStack,
-				currentStyles,
+				// last item of the parentStack or the elementStack if parentStack is null
 				currentStack;
+
+			// F <b> o </b> o <b> b <u> a </u> r </b>
+			//                          ^
+			//	elementStack: [ 'F', [ <b>, o ], o ] // we didn't put the second <b> to elementStack because we still processing it
+			//	parentStack: [ [ <b>, 'b' ], [ <u> ] ] // grandparent and parent; we didn't put the second array into
+			//                                         // the first because we are keep processing it
+			//	currentStack: [ <u> ] // last element of the parentStack is the element we are currently processing
+			//
+			// F <b> o </b> o <b> b <u> a </u> r </b>
+			//                                 ^
+			//	elementStack: [ 'F', [ <b>, o ], o ] // as above
+			//	parentStack: [ [ <b>, 'b', [ <u>, 'a' ] ] ] // we left <u> so we put the second array into the first one
+			//	currentStack: [ [ <b>, 'b', [ <u>, 'a' ] ] ] // as above
 
 			// find where the two arrays of styles differ and return the difference index (-1 if they are the same)
 			// [ 0 ] and [ 0 ] -> do nothing
@@ -82,7 +101,6 @@ define( [
 			}
 
 			// append children elements to parent element located at index = 0
-			// input stack looks as follows: [<elem>, child, child, [ childStack ], ... ]
 			function appendToParent( stack ) {
 				if ( utils.isArray( stack ) ) {
 					var parent = stack.shift();
@@ -108,7 +126,7 @@ define( [
 				}
 			}
 
-			// append current elements to their parents
+			// append current elements to elementStack when the all tags are closed and we reach the top level
 			function flushParentStack() {
 				if ( parentStack && parentStack.length ) {
 					// TODO: concat.apply
@@ -132,6 +150,7 @@ define( [
 					var diffIndex = diffStyles( styles, currentStyles || [] );
 
 					// no styled items before or styles are completely different
+					// anyway we need to close all element and open new ones, see diffStyles
 					if ( diffIndex === 0 ) {
 						currentStyles = styles;
 						flushTextBuffer();

@@ -54,9 +54,9 @@ define( [
 		getDataAndNodeForElement: function( element, store, parentAttributes, document, isRoot ) {
 			var constructors = nodeManager.get(),
 				attributes = parentAttributes ? parentAttributes.slice() : [],
-				result = {},
-				data = [],
-				textNode,
+				result = {}, // result contains `result.data` (linear data) and `result.node` (root of the nodes tree)
+				data = [], // linear data
+				textNode, // variable to concatenate adjacent text nodes
 				current, // current linear data item
 				node, // node for current data item
 				len,
@@ -105,6 +105,7 @@ define( [
 			}
 
 			// create a node for the current item
+			// if `onItem` was not called (no constructor match or `onData` was used then the current will not exists)
 			if ( current ) {
 				data.push( current );
 				node = nodeManager.create( current );
@@ -128,6 +129,7 @@ define( [
 						node.children.push( output.node );
 						output.node.document = document;
 						output.node.parent = node;
+					// If no output.node it means that we called getDataAndNodeForElement on the text node.
 					} else if ( output.data && output.data.length && !output.node ) {
 						if ( !textNode ) {
 							textNode = nodeManager.create( 'text' );
@@ -244,6 +246,11 @@ define( [
 				nodeConstructor,
 				childElements;
 
+			// <list> <listItem> F o o </listItem> </list>
+			//                     ^
+			// currentElement: il
+			// parentElement: ul
+
 			function appendToCurrent( child ) {
 				currentElement.appendChild( child );
 			}
@@ -256,7 +263,7 @@ define( [
 				if ( utils.isString( item ) || utils.isArray( item ) ) {
 					// push the text item to the stack
 					textStack.push( item );
-					// element
+				// element
 				} else if ( utils.isObject( item ) ) {
 					// flush the text stack
 					if ( textStack.length ) {
@@ -267,7 +274,8 @@ define( [
 						// append children to the current element
 						if ( currentElement ) {
 							childElements.forEach( appendToCurrent );
-							// push them to the element stack
+						// there might be no currentElement, e.g. when process only text data,
+						// then push them to the element stack, e.g. elementStack = [ 'foo', '<br>', 'bar' ]
 						} else {
 							elementStack = elementStack.concat( childElements );
 						}
@@ -278,6 +286,7 @@ define( [
 
 					var nodeType = LinearDocumentData.getType( item );
 
+					// there can be only one converter from Node to DOM for each Node
 					nodeConstructor = nodeManager.get( nodeType );
 
 					// opening element
@@ -293,6 +302,7 @@ define( [
 						// append it to the parent or push it to the stack
 						if ( parentElement ) {
 							parentElement.appendChild( currentElement );
+						// as above, there can be no root element
 						} else {
 							elementStack.push( currentElement );
 						}
@@ -330,6 +340,15 @@ define( [
 
 			// start with the topmost element - the document node
 			var currentNode;
+
+			// For example:
+			//
+			// <list> <listItem> <paragraph> f o o <break> </break> b a r </paragraph> </listItem> </list>
+			//                                                          ^
+			// currentStack: [TextNode, BreakNode, TextNode]
+			// parentStack: [ParagraphNode]
+			// currentNode: TextNode
+			// nodeStack: [[], [ListNode], [ListItemNode], [ParagraphNode], [TextNode, BreakNode, TextNode] ]
 
 			// add the parent and current stacks to start with
 			nodeStack.push( parentStack, currentStack );
