@@ -418,8 +418,10 @@ define( [
 			// now work with the actual DOM element
 			var parentEl = parent.view.getElement();
 
-			// position points to the parent node so we most likely want to work with the previous sibling
+			// position points to the parent node, we are at the beginning of the element
 			if ( position === offset ) {
+				// so we most likely want to work with the previous sibling
+				// <b><i>foo</i></b><ul>^<li>bar</li></ul> -> <b><i>foo</i>^</b><ul><li>bar</li></ul>
 				element = parentEl.previousSibling;
 
 				// see if the sibling or any of its children match the attributes
@@ -436,6 +438,7 @@ define( [
 					} while ( ( element = element.lastChild ) );
 				} else {
 					// there's a text node right before the parent, let's use it
+					// foo<ul><li>bar</li></ul> -> position was <ul>, we return end of 'foo'
 					if ( element && element.nodeType === window.Node.TEXT_NODE ) {
 						return {
 							node: element,
@@ -443,6 +446,7 @@ define( [
 						};
 					}
 
+					// returns position in the parent
 					return {
 						node: parentEl.parentNode,
 						offset: getNodeOffset( parentEl )
@@ -450,14 +454,18 @@ define( [
 				}
 			}
 
+			// we will scan elements, moving offset forward until we met place where attributes match
+
 			// +1 for the parent's opening tag
 			offset++;
 
+			// current set of children we will process and the index of the child in this set which we will be processed
 			var current = {
 				children: parentEl.childNodes,
 				index: 0
 			};
 
+			// stack of element to be processed, it will contains child nodes to be processed
 			var stack = [ current ];
 
 			while ( stack.length ) {
@@ -473,7 +481,7 @@ define( [
 				// move to another node in the next loop
 				current.index++;
 
-				// child  is a text node, check if the position sits within the child
+				// child is a text node, check if the position sits within the child
 				if ( child.nodeType === window.Node.TEXT_NODE ) {
 					// position fits in this text node
 					if ( position >= offset && position < offset + child.data.length ) {
@@ -524,6 +532,7 @@ define( [
 					if ( ( view = viewManager.getByElement( child ) ) ) {
 						var node = view.node;
 
+						// TODO: why end of the node is not handled here too?
 						if ( position === node.offset ) {
 							return {
 								node: child.parentNode,
@@ -533,7 +542,7 @@ define( [
 
 						// include the node's length in the offset and proceed
 						offset += node.length;
-						// there's no view, let's process child's children
+					// there's no view, let's process child's children
 					} else {
 						// add current node's children to the stack to be processed in the next loop
 						current = {
@@ -547,6 +556,7 @@ define( [
 			}
 
 			// we went through all the children, check last child's ancestors if they match the offset and attributes
+			// TODO: remove and check tests
 			if ( position === offset ) {
 				ancestor = child.parentNode;
 
@@ -566,13 +576,14 @@ define( [
 					ancestor = ancestor.parentNode;
 				}
 
+				// TODO: remove and check tests
 				return {
 					node: child.parentNode,
 					offset: getNodeOffset( child ) + 1
 				};
-			} else {
-				throw new Error( 'Couldn\'t find a node and offset' );
 			}
+
+			throw new Error( 'Couldn\'t find a node and offset' );
 
 			// find a node's offset in a parent element
 			function getNodeOffset( node ) {
@@ -645,7 +656,9 @@ define( [
 			// get attributes for the given element
 			var attributes = converter.getAttributesForDomElement( element, this.store );
 
-			// it's an element
+			// PHASE 1, we can simplified some cases
+
+			// it's an element, but it could be <p> (node) or <b> (part of the text node)
 			if ( element.nodeType === window.Node.ELEMENT_NODE ) {
 				// the selection is at the end of the element
 				if ( element.childNodes.length === offset ) {
@@ -659,6 +672,8 @@ define( [
 
 					searchElem = element;
 
+					// we are at the end of the bold
+					// TODO: check if we need this? Maybe the phase 2 will handle this case.
 					while ( searchElem.lastChild ) {
 						searchElem = searchElem.lastChild;
 
@@ -667,18 +682,23 @@ define( [
 							length += searchElem.data.length;
 						}
 					}
-				} else {
+				}
+				// we are not at the end so we are between children of the element and need to find the position of that child
+				else {
 					searchElem = element.childNodes[ offset ];
 				}
 			} else {
-				// include the offset within a text node
+				// include the offset within a text node and start searching position of this element
 				length += offset;
 				searchElem = element;
 			}
 
+			// we need 2 variable because we will change element later and we need to keep the original searchElem to check
+			// if it is an ancestor of the element element
 			element = searchElem;
 
-			// find the closest element referring to a view
+			// PHASE 2, find the closest element referring to a view
+
 			do {
 				element = findClosest( element );
 
@@ -696,7 +716,19 @@ define( [
 			// compute the final offset
 			offset = node.offset + length;
 
-			// finds the closest preceding element that has a view attached to it
+			// try to find the closest preceding element that has a view attached to it
+			// go up in the DOM as long there is no previous element, back one element, and down as long as it is possible,
+			// return element if one with vid is met; for example:
+			//
+			// <p><b><i>foo</i></b><u><sub>bar</sub></u></p>
+			//                              ^
+			// bar -> <sub> -> <u> --------> b -> i -> foo
+			// ------------------- --------- -------------
+			//        go up         go back     go down
+			//
+			// <p><b><i>foo</i></b><u><sub>bar</sub></u></p>
+			//           ^
+			//
 			function findClosest( element ) {
 				// use the parent if there's no previous sibling
 				while ( !element.previousSibling ) {
@@ -736,6 +768,7 @@ define( [
 				return element;
 			}
 
+			// Add offset for opening and closing tag
 			function adjustLength( element ) {
 				if ( element.dataset && element.dataset.mutated ) {
 					var constructors = nodeManager.get(),
