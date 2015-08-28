@@ -14,6 +14,7 @@ require( [
 	var editor = window.editor = new Editor( '#input' );
 	var table = document.querySelector( '#data>tbody' );
 	var tree = document.getElementById( 'tree' );
+	var transactionView = document.querySelector( '#transaction>tbody' );
 	var selection = document.getElementById( 'selection' );
 
 	function printLinearData( data ) {
@@ -95,6 +96,40 @@ require( [
 		}
 	}
 
+	function showTransaction( transaction ) {
+		var operations = transaction.operations;
+		var html = '';
+		var operation, type, value;
+
+		for ( var i = 0, len = operations.length; i < len; i++ ) {
+			operation = operations[ i ];
+
+			if ( operation.insert ) {
+				type = 'insert';
+				value = operation.insert;
+			} else if ( operation.remove ) {
+				type = 'remove';
+				value = operation.remove;
+			} else if ( operation.retain ) {
+				type = 'retain';
+				value = operation.retain;
+			}
+
+			if ( Array.isArray( value ) ) {
+				value = value[ 0 ] + ' [' + formatAttributes( value[ 1 ] ) + ']';
+			} else if ( typeof value == 'object' ) {
+				value = value.type;
+			}
+
+			html += '<tr>' +
+					'<td class="operation-' + type + '">' + type + '</td>' +
+					'<td>' + value + '</td>' +
+				'</tr>'
+		}
+
+		transactionView.innerHTML = html;
+	}
+
 	printLinearData( editor.editable.document.data.get() );
 	buildTree( editor.editable.document.root, tree );
 
@@ -104,7 +139,12 @@ require( [
 			printLinearData( editor.editable.document.data.get() );
 			tree.innerHTML = '';
 			buildTree( editor.editable.document.root, tree );
+
 		}, 0 );
+	} );
+
+	editor.editable.document.on( 'transaction:start', function( transaction ) {
+			showTransaction( transaction );
 	} );
 
 	editor.editable.document.selection.on( 'selection:change', function( current ) {

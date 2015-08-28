@@ -32,19 +32,19 @@
 		margin: 0;
 	}
 
-	#data {
+	#data, #transaction {
 		float: right;
 		font-size: 0.75em;
 		border-collapse: collapse;
 	}
 
-	#data th {
+	#data th, #transaction th {
 		text-align: left;
 		font-weight: bold;
 	}
 
-	#data td,
-	#data th {
+	#data td, #transaction td,
+	#data th, #transaction th {
 		border: 1px solid #ccc;
 		vertical-align: top;
 		padding: 5px;
@@ -52,11 +52,12 @@
 
 	#input,
 	#tree,
-	#data {
+	#data,
+	#transaction {
 		box-sizing: border-box;
 	}
 
-	td.tag {
+	td.tag, td.operation-retain {
 		background: #cef;
 	}
 
@@ -64,8 +65,12 @@
 		background: #ccf;
 	}
 
-	td.text {
+	td.text, td.operation-insert {
 		background: #cfc;
+	}
+
+	td.operation-remove  {
+		background: #F88;
 	}
 
 	#tree, #tree ul {
@@ -197,6 +202,20 @@
 				<input type="radio" name="tabs" id="tab2">
 				<label for="tab2">Document Tree</label>
 				<ul id="tree" class="tab-content"></ul>
+			</li>
+			<li>
+				<input type="radio" name="tabs" id="tab3">
+				<label for="tab3">Transaction</label>
+				<table id="transaction" class="tab-content">
+					<thead>
+						<tr>
+							<th>Type</th>
+							<th>Value</th>
+						</tr>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>
 			</li>
 			<li>
 				<div id="selection">Current selection:</div>
