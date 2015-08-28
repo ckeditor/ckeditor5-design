@@ -17,6 +17,8 @@ require( [
 	var transactionView = document.querySelector( '#transaction>tbody' );
 	var selection = document.getElementById( 'selection' );
 
+	var lastRange = null;
+
 	function printLinearData( data ) {
 		var html = [];
 
@@ -130,6 +132,39 @@ require( [
 		transactionView.innerHTML = html;
 	}
 
+	function showRange( range ) {
+		var elems = table.getElementsByClassName( 'selection' );
+		var end, i;
+
+		while ( elems.length ) {
+			elems[ 0 ].classList.remove( 'selection' );
+		}
+
+		elems = table.getElementsByClassName( 'selection-start' )
+		if ( elems[ 0 ] ) {
+			elems[ 0 ].classList.remove( 'selection-start' );
+		}
+
+		elems = table.getElementsByClassName( 'selection-end' )
+		if ( elems[ 0 ] ) {
+			elems[ 0 ].classList.remove( 'selection-end' );
+		}
+
+		if ( !range ) {
+			return;
+		}
+
+		table.rows[ range.start.offset ].classList.add( 'selection-start' );
+
+		if ( !range.start.equals( range.end ) ) {
+			table.rows[ range.end.offset ].classList.add( 'selection-end' );
+
+			for ( i = range.start.offset, end = range.end.offset; i < end; i++ ) {
+				table.rows[ i ].classList.add( 'selection' );
+			}
+		}
+	}
+
 	printLinearData( editor.editable.document.data.get() );
 	buildTree( editor.editable.document.root, tree );
 
@@ -139,7 +174,7 @@ require( [
 			printLinearData( editor.editable.document.data.get() );
 			tree.innerHTML = '';
 			buildTree( editor.editable.document.root, tree );
-
+			showRange( lastRange );
 		}, 0 );
 	} );
 
@@ -165,5 +200,9 @@ require( [
 		}
 
 		selection.innerHTML = html;
+
+		showRange( range );
+
+		lastRange = range;
 	} );
 } );
