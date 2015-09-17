@@ -141,6 +141,13 @@ function copyAddress( address ) {
 	return createAddress( address.root, address.path, address.site );
 }
 
+function copyOperation( op ) {
+	var type = op.type;
+	op.address = copyAddress( op.address );
+
+	return createOperation( type, op );
+}
+
 function applyOperation( op ) {
 	var params = [];
 
@@ -193,7 +200,7 @@ var IT = {
 				var i = b.address.path.length;
 
 				// if (nb < Na[i]) or (nb = Na[i] and site(Na) < site(Nb))
-				if ( b.offset < a.address.path[ i ] || ( b.offset == a.address.path[ i ] && a.site < b.site ) ) {
+				if ( b.offset < a.address.path[ i ] || ( b.offset == a.address.path[ i ] && a.address.site < b.address.site ) ) {
 
 					// N'a[i] <- Na[i] + 1
 					a.address.path[ i ]++;
@@ -202,7 +209,7 @@ var IT = {
 			// elif (compare(Na, Nb) = SAME)
 			} else if ( compare( a.address, b.address ) == SAME ) {
 				// if (nb < na) or (nb = na and site(Na) < site(Nb))
-				if ( b.offset < a.offset || ( b.offset == a.offset && a.site < b.site ) ) {
+				if ( b.offset < a.offset || ( b.offset == a.offset && a.address.site < b.address.site ) ) {
 					// n'a <- na + 1
 					a.offset++;
 				}
@@ -261,7 +268,7 @@ var IT = {
 				var i = b.address.path.length;
 
 				// if (n < Na[i]) or (n = Na[i] and site(Na) < site(Nb))
-				if ( b.offset < a.address.path[ i ] || ( b.offset == a.address.path[ i ] && a.site < b.site ) ) {
+				if ( b.offset < a.address.path[ i ] || ( b.offset == a.address.path[ i ] && a.address.site < b.address.site ) ) {
 					// N'a[i] <- Na[i] + 1
 					a.address.path[ i ]++;
 				}
@@ -290,7 +297,7 @@ var IT = {
 					a.offset--;
 				}
 
-				// elif (nb = na) and (site(Na) = siteofNb)
+				// elif (nb = na) and (site(Na) = site(Nb))
 				// ** modified - removed site condition, which just doesn't seem to be right (and gives bad results)
 				// ** this is removing the same element, so each time when this happens, the incoming operation should be skipped
 				else if ( b.offset == a.offset ) {
@@ -381,8 +388,8 @@ var IT = {
 		},
 		change: function( a, b ) {
 			// If we change same node and same attr, one of operations have to get on top of the another.
-			// So if this happens and a.site < b.site, we skip this operation.
-			if ( compare( a.address, b.address ) == SAME && a.offset == b.offset && a.attr == b.attr && a.site < b.site ) {
+			// So if this happens and a.address.site < b.address.site, we skip this operation.
+			if ( compare( a.address, b.address ) == SAME && a.offset == b.offset && a.attr == b.attr && a.address.site < b.address.site ) {
 				return getNoOp( a );
 			}
 
