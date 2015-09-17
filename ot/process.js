@@ -154,16 +154,20 @@ function process( objs ) {
 	for ( var i = 0; i < incomingOperations.length; i++ ) {
 		var transformedSite = [];
 		var inOp = incomingOperations[ i ];
+		var transInOp = copyOperation( inOp );
 
 		for ( var j = 0; j < siteOperations.length; j++ ) {
 			var siOp = siteOperations[ j ];
+			var newTransInOp;
 
-			var transInOp = IT[ inOp.type ][ siOp.type ]( inOp, siOp );
-			var transSiOp = IT[ siOp.type ][ inOp.type ]( siOp, inOp );
+			newTransInOp = IT[ transInOp.type ][ siOp.type ]( transInOp, siOp );
+			siOp = IT[ siOp.type ][ transInOp.type ]( siOp, transInOp );
 
 			ITsDone+=2;
 
-			transformedSite.push( transSiOp );
+			transformedSite.push( siOp );
+
+			transInOp = newTransInOp;
 		}
 
 		applyOperation( transInOp );
