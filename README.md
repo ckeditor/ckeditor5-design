@@ -1,4 +1,4 @@
 CKEditor 5 Feature Prototype
 ============================
 
-[TODO: Describe the feature here]
+This is a playground for operational transformation algorithms. Open `ot/test_it.html` to start playing.
