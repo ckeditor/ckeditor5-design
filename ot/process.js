@@ -149,6 +149,8 @@ function process( objs ) {
 	var incomingOperations = getOperationsFromTextarea( objs.incoming, 2 );
 	var transformedOperations = [];
 
+	var timestamp = Number( new Date() );
+
 	for ( var i = 0; i < incomingOperations.length; i++ ) {
 		var inOp = incomingOperations[ i ];
 
@@ -164,10 +166,13 @@ function process( objs ) {
 		transformedOperations.push( inOp );
 	}
 
+	var timeTaken = Number( new Date() ) - timestamp;
+
 	objs.tree.innerHTML = '';
 	printTree( docRoot, objs.tree, 0 );
 	printOperations( transformedOperations, objs.transformed );
 
-	alert( 'IT transformations done: ' + ITsDone );
+	alert( 'IT transformations done: ' + ITsDone + '\n' + 'It took around: ' + timeTaken + 'ms' );
+
 	ITsDone = 0;
 }
