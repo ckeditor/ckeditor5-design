@@ -147,30 +147,36 @@ function process( objs ) {
 	applyOperations( siteOperations );
 
 	var incomingOperations = getOperationsFromTextarea( objs.incoming, 2 );
-	var transformedOperations = [];
+	var transformedIncoming = [];
 
 	var timestamp = Number( new Date() );
 
 	for ( var i = 0; i < incomingOperations.length; i++ ) {
+		var transformedSite = [];
 		var inOp = incomingOperations[ i ];
 
 		for ( var j = 0; j < siteOperations.length; j++ ) {
 			var siOp = siteOperations[ j ];
 
-			inOp = IT[ inOp.type ][ siOp.type ]( inOp, siOp );
-			ITsDone++;
+			var transInOp = IT[ inOp.type ][ siOp.type ]( inOp, siOp );
+			var transSiOp = IT[ siOp.type ][ inOp.type ]( siOp, inOp );
+
+			ITsDone+=2;
+
+			transformedSite.push( transSiOp );
 		}
 
-		applyOperation( inOp );
-		siteOperations.push( inOp );
-		transformedOperations.push( inOp );
+		applyOperation( transInOp );
+		transformedIncoming.push( transInOp );
+
+		siteOperations = transformedSite;
 	}
 
 	var timeTaken = Number( new Date() ) - timestamp;
 
 	objs.tree.innerHTML = '';
 	printTree( docRoot, objs.tree, 0 );
-	printOperations( transformedOperations, objs.transformed );
+	printOperations( transformedIncoming, objs.transformed );
 
 	alert( 'IT transformations done: ' + ITsDone + '\n' + 'It took around: ' + timeTaken + 'ms' );
 
