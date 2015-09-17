@@ -77,7 +77,7 @@ remove 1</textarea>
 		</div>
 
 		<br />
-		<center><button type="button" id="submit">Transform</button></center>
+		<center><button type="button" id="swap">Swap Site/Incoming</button><button type="button" id="submit">Transform</button></center>
 
 		<script type="text/javascript">
 			var objs = {
@@ -86,6 +86,12 @@ remove 1</textarea>
 				incoming: document.getElementById( 'incoming' ),
 				transformed: document.getElementById( 'transformed' ),
 				tree: document.getElementById( 'tree' )
+			};
+
+			document.getElementById( 'swap' ).onclick = function() {
+				var site = objs.site.value;
+				objs.site.value = objs.incoming.value;
+				objs.incoming.value = site;
 			};
 
 			document.getElementById( 'submit' ).onclick = function() {
