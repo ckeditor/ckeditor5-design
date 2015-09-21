@@ -20,6 +20,10 @@ class Node {
 		}
 	}
 
+	getAttrValue( attr ) {
+		return typeof this.attrs[ attr ] == 'undefined' ? null : this.attrs[ attr ];
+	}
+
 	setParent( parent ) {
 		this.parent = parent;
 	}
@@ -66,9 +70,6 @@ class TextNode extends Node {
 		this.char = char;
 	}
 }
-
-// The main root.
-var docRoot = new BlockNode( 'body' );
 
 // Compares two addresses.
 function compare( a, b ) {
@@ -138,7 +139,7 @@ function createAddress( root, path, site ) {
 }
 
 function copyAddress( address ) {
-	return createAddress( address.root, address.path, address.site );
+	return createAddress( address.root, address.path.slice(), address.site );
 }
 
 function copyOperation( op ) {
@@ -190,10 +191,7 @@ var IT = {
 			// if (<Na> = Mb)
 			if ( a.address.root == b.node ) {
 				// N'a <- (<Nb>, Nb[:] + [nb] + Na[:])
-				a.address = createAddress( {
-					root: b.address.root, // <Nb>
-					path: b.address.path.concat( b.offset, a.address.path ) // Nb[:] + [nb] + Na[:]
-				} );
+				a.address = createAddress( b.address.root, b.address.path.concat( b.offset, a.address.path ), a.address.site );
 
 			// elif (compare(Na, Nb) = PREFIX(i))
 			} else if ( compare( a.address, b.address ) == PREFIX ) {
@@ -201,7 +199,6 @@ var IT = {
 
 				// if (nb < Na[i]) or (nb = Na[i] and site(Na) < site(Nb))
 				if ( b.offset < a.address.path[ i ] || ( b.offset == a.address.path[ i ] && a.address.site < b.address.site ) ) {
-
 					// N'a[i] <- Na[i] + 1
 					a.address.path[ i ]++;
 				}
@@ -242,10 +239,7 @@ var IT = {
 				// elif (nb = Na[i])
 				else if ( b.offset == a.address.path[ i ] ) {
 					// N'a <- (Mb, Na[i + 1 :])
-					a.address = createAddress( {
-						root: b.node,
-						path: a.address.path.slice( i + 1 )
-					} );
+					a.address = createAddress( b.node, a.address.path.slice( i + 1 ), a.address.site );
 				}
 			}
 
@@ -318,10 +312,7 @@ var IT = {
 				// elif (nb = Na[i])
 				} else if ( b.offset == a.address.path[ i ] ) {
 					// N'a <- (Mb, Na[i + 1 :])
-					a.address = createAddress( {
-						root: b.root,
-						path: a.path.slice( i + 1 )
-					} );
+					a.address = createAddress( b.node, a.address.path.slice( i + 1 ), a.address.site );
 				}
 			}
 
@@ -342,10 +333,7 @@ var IT = {
 			// if (<Na> = M)
 			if ( a.address.root == b.node ) {
 				// N'a <- (<Nb>, Nb[:] + [n] + Na[:])
-				a.address = createAddress( {
-					root: b.address.root,
-					address: b.address.path.concat( b.offset, a.address.path )
-				} );
+				a.address = createAddress( b.address.root, b.address.path.concat( b.offset, a.address.path ), a.address.site );
 			}
 
 			// elif (compare(Na, Nb) = PREFIX(i)) and (n <= Na[i])
@@ -376,10 +364,7 @@ var IT = {
 				// elif (n = Na[i])
 				} else if ( b.offset == a.address.path[ i ] ) {
 					// N'a <- (M, Na[i + 1 :])
-					a.address = createAddress( {
-						root: b.node,
-						path: a.address.path.slice( i + 1 )
-					} );
+					a.address = createAddress( b.node, a.address.path.slice( i + 1 ), a.address.site );
 				}
 			}
 
@@ -397,3 +382,20 @@ var IT = {
 		}
 	}
 };
+
+if ( typeof module != 'undefined' ) {
+	module.exports = {
+		// classes
+		BlockNode: BlockNode,
+		TextNode: TextNode,
+
+		// namespaces
+		IT: IT,
+		OP: OP,
+
+		// other functions
+		createAddress: createAddress,
+		copyAddress: copyAddress,
+		createOperation: createOperation
+	};
+}

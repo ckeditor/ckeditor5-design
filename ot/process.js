@@ -1,3 +1,6 @@
+// The main root.
+var docRoot = new BlockNode( 'body' );
+
 function createOpFromLine( line, siteId ) {
 	var args = line.split( ' ', 4 );
 	var path = args[ 1 ].split( ',' );
