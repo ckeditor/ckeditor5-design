@@ -1,4 +1,5 @@
 'use strict';
+
 // Implementation of http://www.collide.info/Lehre/SeminarWS0405/DavisSunLu02.pdf
 
 // Some global constants.
@@ -128,6 +129,7 @@ function createOperation( type, props ) {
 
 	return op;
 }
+
 createOperation.ID = 0;
 
 function createAddress( root, path, site ) {
@@ -187,13 +189,15 @@ var OP = {
 var IT = {
 	insert: {
 		// IT(insert(Na, na, Ma, Ta), insert(Nb, nb, Mb, Tb))
-		insert: function( a, b ) {
+		insert: function ( a, b ) {
+			a = copyOperation( a );
+
 			// if (<Na> = Mb)
 			if ( a.address.root == b.node ) {
 				// N'a <- (<Nb>, Nb[:] + [nb] + Na[:])
 				a.address = createAddress( b.address.root, b.address.path.concat( b.offset, a.address.path ), a.address.site );
 
-			// elif (compare(Na, Nb) = PREFIX(i))
+				// elif (compare(Na, Nb) = PREFIX(i))
 			} else if ( compare( a.address, b.address ) == PREFIX ) {
 				var i = b.address.path.length;
 
@@ -203,7 +207,7 @@ var IT = {
 					a.address.path[ i ]++;
 				}
 
-			// elif (compare(Na, Nb) = SAME)
+				// elif (compare(Na, Nb) = SAME)
 			} else if ( compare( a.address, b.address ) == SAME ) {
 				// if (nb < na) or (nb = na and site(Na) < site(Nb))
 				if ( b.offset < a.offset || ( b.offset == a.offset && a.address.site < b.address.site ) ) {
@@ -217,7 +221,9 @@ var IT = {
 		},
 
 		// IT(insert(Na, na, Ma, T), delete(Nb, nb, Mb))
-		remove: function( a, b ) {
+		remove: function ( a, b ) {
+			a = copyOperation( a );
+
 			// if (compare(Na, Nb) = SAME)
 			if ( compare( a.address, b.address ) == SAME ) {
 				// if (nb < na)
@@ -226,7 +232,7 @@ var IT = {
 					a.offset--;
 				}
 
-			// elif (compare(Na, Nb) = PREFIX(i))
+				// elif (compare(Na, Nb) = PREFIX(i))
 			} else if ( compare( a.address, b.address ) == PREFIX ) {
 				var i = b.address.path.length;
 
@@ -248,21 +254,23 @@ var IT = {
 		},
 
 		// IT(insert(Na, n, M, T), change(Nb, k, f))
-		change: function( a, b ) {
+		change: function ( a, b ) {
 
 			// return insert(Na, n, M, T)
-			return a;
+			return copyOperation( a );
 		}
 	},
 	remove: {
 		// IT(delete(Na, na, Ma), insert(Nb, nb, Mb, Tb))
-		insert: function( a, b ) {
+		insert: function ( a, b ) {
+			a = copyOperation( a );
+
 			// if (compare(Na, Nb) = PREFIX(i))
 			if ( compare( a.address, b.address ) == PREFIX ) {
 				var i = b.address.path.length;
 
 				// if (n < Na[i]) or (n = Na[i] and site(Na) < site(Nb))
-				if ( b.offset < a.address.path[ i ] || ( b.offset == a.address.path[ i ] && a.address.site < b.address.site ) ) {
+				if ( b.offset <= a.address.path[ i ] || ( b.offset == a.address.path[ i ] && a.address.site < b.address.site ) ) {
 					// N'a[i] <- Na[i] + 1
 					a.address.path[ i ]++;
 				}
@@ -271,7 +279,7 @@ var IT = {
 			// elif (compare(Na, Nb) = SAME)
 			else if ( compare( a.address, b.address ) == SAME ) {
 				// if (nb < na)
-				if ( b.offset < a.offset ) {
+				if ( b.offset <= a.offset ) {
 					// n'a <- na + 1
 					a.offset++;
 				}
@@ -282,7 +290,9 @@ var IT = {
 		},
 
 		// IT(delete(Na, na, Ma), delete(Nb, nb, Mb))
-		remove: function( a, b ) {
+		remove: function ( a, b ) {
+			a = copyOperation( a );
+
 			// if (compare(Na, Nb) = SAME)
 			if ( compare( a.address, b.address ) == SAME ) {
 				// if (nb < na)
@@ -309,7 +319,7 @@ var IT = {
 					// N'a[i] <- Na[i] ? 1
 					a.address.path[ i ]--;
 
-				// elif (nb = Na[i])
+					// elif (nb = Na[i])
 				} else if ( b.offset == a.address.path[ i ] ) {
 					// N'a <- (Mb, Na[i + 1 :])
 					a.address = createAddress( b.node, a.address.path.slice( i + 1 ), a.address.site );
@@ -321,15 +331,17 @@ var IT = {
 		},
 
 		// IT(delete(Na, n, M), change(Nb, k, f))
-		change: function( a, b ) {
+		change: function ( a, b ) {
 
 			// return delete(Na, n, M)
-			return a;
+			return copyOperation( a );;
 		}
 	},
 	change: {
 		// IT(change(Na, k, f), insert(Nb, n, M, T))
-		insert: function( a, b ) {
+		insert: function ( a, b ) {
+			a = copyOperation( a );
+
 			// if (<Na> = M)
 			if ( a.address.root == b.node ) {
 				// N'a <- (<Nb>, Nb[:] + [n] + Na[:])
@@ -351,7 +363,9 @@ var IT = {
 		},
 
 		// IT(change(Na, k, f), delete(Nb, n, M))
-		remove: function( a, b ) {
+		remove: function ( a, b ) {
+			a = copyOperation( a );
+
 			// if (compare(Na, Nb) = PREFIX(i))
 			if ( compare( a.address, b.address ) == PREFIX ) {
 				var i = b.address.path.length;
@@ -361,7 +375,7 @@ var IT = {
 					// N'a[i] <- N'a[i] ? 1
 					a.address.path[ i ]--;
 
-				// elif (n = Na[i])
+					// elif (n = Na[i])
 				} else if ( b.offset == a.address.path[ i ] ) {
 					// N'a <- (M, Na[i + 1 :])
 					a.address = createAddress( b.node, a.address.path.slice( i + 1 ), a.address.site );
@@ -371,7 +385,9 @@ var IT = {
 			// return change(N'a, k, f)
 			return a;
 		},
-		change: function( a, b ) {
+		change: function ( a, b ) {
+			a = copyOperation( a );
+
 			// If we change same node and same attr, one of operations have to get on top of the another.
 			// So if this happens and a.address.site < b.address.site, we skip this operation.
 			if ( compare( a.address, b.address ) == SAME && a.offset == b.offset && a.attr == b.attr && a.address.site < b.address.site ) {
@@ -383,19 +399,20 @@ var IT = {
 	}
 };
 
-if ( typeof module != 'undefined' ) {
-	module.exports = {
-		// classes
-		BlockNode: BlockNode,
-		TextNode: TextNode,
+module.exports = {
+	// classes
+	BlockNode: BlockNode,
+	TextNode: TextNode,
 
-		// namespaces
-		IT: IT,
-		OP: OP,
+	// namespaces
+	IT: IT,
+	OP: OP,
 
-		// other functions
-		createAddress: createAddress,
-		copyAddress: copyAddress,
-		createOperation: createOperation
-	};
-}
+	// other functions
+	createAddress: createAddress,
+	copyAddress: copyAddress,
+	createOperation: createOperation,
+	copyOperation: copyOperation,
+	applyOperation: applyOperation,
+	getNode: getNode
+};

@@ -4,8 +4,7 @@
 		<meta charset="UTF-8">
 		<title>Test IT operations for Tree-OT</title>
 
-		<script type="text/javascript" src="ot.js"></script>
-		<script type="text/javascript" src="process.js"></script>
+		<script type="text/javascript" src="require.js" data-main="test_it"></script>
 
 		<style type="text/css">
 			html { width:100%; }
@@ -50,21 +49,22 @@ insert 3,1 text m</textarea>
 			</div>
 			<div class="panel">
 				<strong>Site operations:</strong>
-				<textarea id="site" cols="40" rows="10">
-remove 1
-change 2,0 bold 1
-insert 3,0 text a</textarea>
+				<textarea id="site" cols="40" rows="10">insert 0 text a
+remove 2
+change 3,0 bold 1
+insert 4,0 text a</textarea>
 			</div>
 			<div class="panel">
 				<strong>Incoming operations:</strong>
-				<textarea id="incoming" cols="40" rows="10">
+				<textarea id="incoming" cols="40" rows="10">insert 0 text b
 insert 2 block d
 insert 2,0 text x
-change 4,0 italic 1
-change 4,1 italic 1
-remove 1</textarea>
+change 5,0 italic 1
+change 5,1 italic 1
+remove 3</textarea>
 			</div>
 		</div>
+
 		<div class="box">
 			<div class="panel" style="width: 50%;">
 				<strong>Transformed incomings:</strong>
@@ -78,27 +78,5 @@ remove 1</textarea>
 
 		<br />
 		<center><button type="button" id="swap">Swap Site/Incoming</button><button type="button" id="submit">Transform</button></center>
-
-		<script type="text/javascript">
-			var objs = {
-				context: document.getElementById( 'context' ),
-				site: document.getElementById( 'site' ),
-				incoming: document.getElementById( 'incoming' ),
-				transformed: document.getElementById( 'transformed' ),
-				tree: document.getElementById( 'tree' )
-			};
-
-			document.getElementById( 'swap' ).onclick = function() {
-				var site = objs.site.value;
-				objs.site.value = objs.incoming.value;
-				objs.incoming.value = site;
-			};
-
-			document.getElementById( 'submit' ).onclick = function() {
-				process( objs );
-			};
-
-			init( objs );
-		</script>
 	</body>
 </html>

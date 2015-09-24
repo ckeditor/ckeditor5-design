@@ -26,7 +26,7 @@ describe( 'OT', function() {
 	 * that after applying those operations we have correct trees.
 	 */
 
-	describe( 'operation', function() {
+	describe( 'OP (operation)', function() {
 		describe( 'insert', function() {
 			it( 'should append given node to a node specified by an address', function() {
 				assert.equal( docRoot.getChildCount(), 0 );
@@ -132,7 +132,7 @@ describe( 'OT', function() {
 	 * So, "ins x ins" means "insert operation transformed against insert operation" should ...
 	 */
 
-	describe( 'IT', function() {
+	describe( 'IT (inclusion transformation)', function() {
 		var addressPair, nodeA, nodeB;
 
 		beforeEach( function() {
@@ -419,6 +419,24 @@ describe( 'OT', function() {
 				var transOp = getTransformedOp( 'insert', 'remove', {
 					address: adr,
 					offset: [ 0, 2 ],
+					node: [ nodeA, nodeB ]
+				} );
+
+				expectOperation( transOp, {
+					type: 'remove',
+					address: newAdr,
+					offset: 3,
+					node: nodeB
+				} );
+			} );
+
+			it( 'should increment offset if addresses are same and offset is same as applied operation', function() {
+				var adr = addressPair.same;
+				var newAdr = OT.copyAddress( adr[ 1 ] );
+
+				var transOp = getTransformedOp( 'insert', 'remove', {
+					address: adr,
+					offset: [ 2, 2 ],
 					node: [ nodeA, nodeB ]
 				} );
 
