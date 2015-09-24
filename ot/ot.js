@@ -334,7 +334,8 @@ var IT = {
 		change: function ( a, b ) {
 
 			// return delete(Na, n, M)
-			return copyOperation( a );;
+			return copyOperation( a );
+			;
 		}
 	},
 	change: {
@@ -399,7 +400,7 @@ var IT = {
 	}
 };
 
-module.exports = {
+var OT = {
 	// classes
 	BlockNode: BlockNode,
 	TextNode: TextNode,
@@ -416,3 +417,11 @@ module.exports = {
 	applyOperation: applyOperation,
 	getNode: getNode
 };
+
+if ( typeof module != 'undefined' ) {
+	module.exports = OT;
+}
+
+if ( typeof define != 'undefined' ) {
+	define( OT );
+}

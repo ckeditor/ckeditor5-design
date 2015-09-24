@@ -1,4 +1,10 @@
-var OT = require( './ot.js' );
+if ( typeof module != 'undefined' ) {
+	var OT = require( './ot.js' );
+}
+
+if ( typeof define != 'undefined' ) {
+	var OT = require( 'ot' );
+}
 
 // The main root.
 var docRoot = new OT.BlockNode( 'body' );
@@ -45,6 +51,7 @@ function dopt( siteOperations, incomingOperations ) {
 		ITsDone: ITsDone
 	};
 }
+
 function createOpFromTextLine( line, siteId ) {
 	var args = line.split( ' ', 4 );
 	var path = args[ 1 ].split( ',' );
@@ -110,10 +117,19 @@ function createOpFromTextLine( line, siteId ) {
 	return OT.createOperation( op.type, op.props );
 }
 
-module.exports = {
+var DOPT = {
 	dopt: dopt,
-	getDocRoot: function() {
+	applyOperations: applyOperations,
+	getDocRoot: function () {
 		return docRoot;
 	},
 	createOpFromTextLine: createOpFromTextLine
 };
+
+if ( typeof module != 'undefined' ) {
+	module.exports = DOPT;
+}
+
+if ( typeof define != 'undefined' ) {
+	define( DOPT );
+}

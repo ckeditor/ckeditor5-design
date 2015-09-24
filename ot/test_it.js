@@ -8,7 +8,7 @@ require( [ 'ot', 'dopt' ], function( OT, DOPT ) {
 		var ops = [];
 
 		for ( var i = 0; i < lines.length; i++ ) {
-			var op = createOpFromLine( lines[ i ], siteId );
+			var op = DOPT.createOpFromTextLine( lines[ i ], siteId );
 			if ( op ) {
 				ops.push( op );
 			}
@@ -32,11 +32,11 @@ require( [ 'ot', 'dopt' ], function( OT, DOPT ) {
 			element.innerHTML += '  ';
 		}
 
-		if ( node instanceof TextNode ) {
+		if ( node instanceof OT.TextNode ) {
 			element.innerHTML += '"' + node.char + '"';
 			printAttrs( node, element );
 			element.innerHTML += '\n';
-		} else if ( node instanceof BlockNode ) {
+		} else if ( node instanceof OT.BlockNode ) {
 			element.innerHTML += '[' + node.type + ']';
 			printAttrs( node, element );
 			element.innerHTML += '\n';
@@ -50,10 +50,10 @@ require( [ 'ot', 'dopt' ], function( OT, DOPT ) {
 
 	function init( objs ) {
 		var operations = getOperationsFromTextarea( objs.context );
-		applyOperations( operations );
+		DOPT.applyOperations( operations );
 
 		objs.tree.innerHTML = '';
-		printTree( docRoot, objs.tree, 0 );
+		printTree( DOPT.getDocRoot(), objs.tree, 0 );
 	}
 
 	function process( objs ) {
@@ -62,17 +62,15 @@ require( [ 'ot', 'dopt' ], function( OT, DOPT ) {
 
 		var timestamp = Number( new Date() );
 
-		var transformedIncoming = DOPT.dopt( siteOperations, incomingOperations );
+		var doptResult = DOPT.dopt( siteOperations, incomingOperations );
 
 		var timeTaken = Number( new Date() ) - timestamp;
 
 		objs.tree.innerHTML = '';
-		printTree( docRoot, objs.tree, 0 );
-		printOperations( transformedIncoming, objs.transformed );
+		printTree( DOPT.getDocRoot(), objs.tree, 0 );
+		printOperations( doptResult.transformedIncoming, objs.transformed );
 
-		alert( 'IT transformations done: ' + ITsDone + '\n' + 'It took around: ' + timeTaken + 'ms' );
-
-		ITsDone = 0;
+		alert( 'IT transformations done: ' + doptResult.ITsDone + '\n' + 'It took around: ' + timeTaken + 'ms' );
 	}
 
 	function printOperations( operations, element ) {
@@ -88,7 +86,7 @@ require( [ 'ot', 'dopt' ], function( OT, DOPT ) {
 				element.innerHTML += ' ' + path;
 
 				if ( op.type == 'insert' ) {
-					element.innerHTML += ' ' + ( op.node instanceof TextNode ? 'text' : 'block' ) + ' ' + ( op.node instanceof TextNode ? op.node.char : op.node.type ) + '<br />';
+					element.innerHTML += ' ' + ( op.node instanceof OT.TextNode ? 'text' : 'block' ) + ' ' + ( op.node instanceof OT.TextNode ? op.node.char : op.node.type ) + '<br />';
 				}
 			}
 		}
