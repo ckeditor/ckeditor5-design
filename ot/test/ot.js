@@ -146,8 +146,8 @@ describe( 'OT', function() {
 
 				// address A (0) is a prefix of address B (1)
 				prefix: [
-					OT.createAddress( docRoot, [ 0, 1, 1 ], 2 ),
-					OT.createAddress( docRoot, [ 0, 1, 1, 3 ], 1 )
+					OT.createAddress( docRoot, [ 0, 1, 1 ], 1 ),
+					OT.createAddress( docRoot, [ 0, 1, 1, 3 ], 2 )
 				],
 
 				// address A (0) is exactly same as B (1)
@@ -354,9 +354,9 @@ describe( 'OT', function() {
 				} );
 			} );
 
-			it( 'should update address if one of nodes on the address path was removed', function() {
+			it( 'should become do-nothing operation if insertion is in removed part of tree', function() {
 				var adr = addressPair.prefix;
-				var newAdr = OT.createAddress( nodeA, [ ], adr[ 1 ].site );
+				var newAdr = OT.copyAddress( adr[ 1 ] );
 
 				var transOp = getTransformedOp( 'remove', 'insert', {
 					address: adr,
@@ -365,10 +365,10 @@ describe( 'OT', function() {
 				} );
 
 				expectOperation( transOp, {
-					type: 'insert',
+					type: 'change',
 					address: newAdr,
-					offset: 2,
-					node: nodeB
+					attr: '',
+					value: ''
 				} );
 			} );
 		} );
@@ -562,9 +562,9 @@ describe( 'OT', function() {
 				} );
 			} );
 
-			it( 'should update address if one of nodes on the address path was removed', function() {
+			it( 'should become do-nothing operation if one of nodes on the address path was removed', function() {
 				var adr = addressPair.prefix;
-				var newAdr = OT.createAddress( nodeA, [ ], adr[ 1 ].site );
+				var newAdr = OT.copyAddress( adr[ 1 ] );
 
 				var transOp = getTransformedOp( 'remove', 'remove', {
 					address: adr,
@@ -573,10 +573,10 @@ describe( 'OT', function() {
 				} );
 
 				expectOperation( transOp, {
-					type: 'remove',
+					type: 'change',
 					address: newAdr,
-					offset: 2,
-					node: nodeB
+					attr: '',
+					value: ''
 				} );
 			} );
 
@@ -826,14 +826,14 @@ describe( 'OT', function() {
 				} );
 			} );
 
-			it( 'should update address if one of nodes on the address path was removed', function() {
+			it( 'should become do-nothing operation if one of nodes on the address path was removed', function() {
 				var adr = addressPair.prefix;
 
 				// Add "offset" to the address instead because change operation
 				// does not take offset parameter, expecting only and address to changed node.
 				adr[ 1 ].path = adr[ 1 ].path.concat( 0 );
 
-				var newAdr = OT.createAddress( nodeA, [ 0 ], adr[ 1 ].site );
+				var newAdr = OT.copyAddress( adr[ 1 ] );
 
 				var transOp = getTransformedOp( 'remove', 'change', {
 					address: adr,
@@ -846,8 +846,8 @@ describe( 'OT', function() {
 				expectOperation( transOp, {
 					type: 'change',
 					address: newAdr,
-					attr: 'foo',
-					value: 'bar'
+					attr: '',
+					value: ''
 				} );
 			} );
 		} );

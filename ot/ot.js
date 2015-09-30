@@ -1,6 +1,6 @@
 'use strict';
 
-// Implementation of http://www.collide.info/Lehre/SeminarWS0405/DavisSunLu02.pdf
+// Implementation of http://www.collide.info/Lehre/SeminarWS0405/DavisSunLu02.pdf with own modifications.
 
 // Some global constants.
 var SAME = 1,
@@ -244,8 +244,7 @@ var IT = {
 
 				// elif (nb = Na[i])
 				else if ( b.offset == a.address.path[ i ] ) {
-					// N'a <- (Mb, Na[i + 1 :])
-					a.address = createAddress( b.node, a.address.path.slice( i + 1 ), a.address.site );
+					return getNoOp( a );
 				}
 			}
 
@@ -321,8 +320,7 @@ var IT = {
 
 					// elif (nb = Na[i])
 				} else if ( b.offset == a.address.path[ i ] ) {
-					// N'a <- (Mb, Na[i + 1 :])
-					a.address = createAddress( b.node, a.address.path.slice( i + 1 ), a.address.site );
+					return getNoOp( a );
 				}
 			}
 
@@ -335,7 +333,6 @@ var IT = {
 
 			// return delete(Na, n, M)
 			return copyOperation( a );
-			;
 		}
 	},
 	change: {
@@ -376,10 +373,13 @@ var IT = {
 					// N'a[i] <- N'a[i] ? 1
 					a.address.path[ i ]--;
 
-					// elif (n = Na[i])
+				// elif (n = Na[i])
 				} else if ( b.offset == a.address.path[ i ] ) {
-					// N'a <- (M, Na[i + 1 :])
-					a.address = createAddress( b.node, a.address.path.slice( i + 1 ), a.address.site );
+					return getNoOp( a );
+				}
+			} else if ( compare( a.address, b.address ) == SAME ) {
+				if ( b.offset == a.offset ) {
+					return getNoOp( a );
 				}
 			}
 
