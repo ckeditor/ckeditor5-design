@@ -1,0 +1,30 @@
+{
+  "name": "ckeditor5-design",
+  "version": "0.0.1-0.dev",
+  "description": "CKEditor UI Design",
+  "dependencies": {
+    "ckeditor5-core": "ckeditor/ckeditor5-core",
+    "ckeditor5": "ckeditor/ckeditor5",
+    "requirejs": "~2.1"
+  },
+  "keywords": [
+    "CKEditor"
+  ],
+  "devDependencies": {
+    "grunt": "^0",
+    "grunt-jscs": "^2.0.0",
+    "grunt-contrib-jshint": "^0",
+    "grunt-githooks": "^0",
+    "shelljs": "^0",
+    "lodash-cli": "^3",
+    "grunt-lodash": "^0.4.0"
+  },
+  "author": "CKSource (http://cksource.com/)",
+  "license": "See LICENSE.md",
+  "homepage": "https://github.com/ckeditor/ckeditor5-design",
+  "bugs": "https://github.com/ckeditor/ckeditor5-design/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ckeditor/ckeditor5-design.git"
+  }
+}
