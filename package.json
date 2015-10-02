@@ -3,7 +3,6 @@
   "version": "0.0.1-0.dev",
   "description": "CKEditor UI Design",
   "dependencies": {
-    "ckeditor5-core": "ckeditor/ckeditor5-core",
     "ckeditor5": "ckeditor/ckeditor5",
     "requirejs": "~2.1"
   },
