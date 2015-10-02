@@ -15,16 +15,14 @@ var editor;
 		// In this development example, we use RequireJS to load CKEditor. In release the editor API will be also
 		// available through the global CKEDITOR namespace.
 		require( [
-			'ckeditor',
-			'../../../../../core/src/ui/ui',
-			'../../../../../ui-library/src/library'
-		], function ( CKEDITOR, UI, Library ) {
+			'ckeditor'
+		], function ( CKEDITOR ) {
 			CKEDITOR
-				.create( document.getElementById( 'contents' ), {} )
+				.create( document.getElementById( 'contents' ), {
+					plugins: 'creator'
+				} )
 				.then( function ( createdEditor ) {
 					editor = createdEditor;
-
-					editor.ui = new UI( createdEditor, Library );
 				} );
 		} );
 	}
