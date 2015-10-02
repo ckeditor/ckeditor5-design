@@ -37,6 +37,12 @@ CKEDITOR.define( [ 'Collection', 'Model' ], function( Collection, Model ) {
 		addRegion( region ) {
 			this.el.appendChild( region.el );
 		}
+
+		bindModel( name, listener ) {
+			this.model.on( 'change:' + name, ( evt, value ) => listener( value ) );
+
+			listener( this.model[ name ] );
+		}
 	}
 
 	return View;

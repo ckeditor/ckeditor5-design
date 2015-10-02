@@ -8,20 +8,14 @@
 CKEDITOR.define( [ '../../../core/src/ui/view' ], function( View ) {
 	class Button extends View {
 		constructor( model ) {
-			super();
+			super( model );
 
 			this.template = '<input class="ck-button" type="button" value="" />';
 
-			this.listeners = {
-				value: value => this.el.setAttribute( 'value', value ),
-				disabled: disabled => this.el[ disabled ? 'setAttribute' : 'removeAttribute' ]( 'disabled', 1 )
-			};
-
-			this.model.on( 'change', function( evt, name, value ) {
-				this.listeners[ name ] && this.listeners[ name ]( value );
-			}, this );
-
-			this.model.set( model );
+			this.bindModel( 'value',
+				v => this.el.setAttribute( 'value', v ) );
+			this.bindModel( 'disabled',
+				d => this.el[ ( d ? 'set' : 'remove' ) + 'Attribute' ]( 'disabled', 'disabled' ) );
 		};
 	}
 
