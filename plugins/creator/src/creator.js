@@ -12,8 +12,9 @@ CKEDITOR.define( 'plugin!creator', [
 	'promise',
 	'../../../../../core/src/ui/region',						// 'ui/region'
 	'../../../../../ui-library/src/components/appchrome',		// 'ui!appchorme'
-	'../../../../../ui-library/src/components/button'			// 'ui!button'
-], function( Plugin, Promise, Region, AppChrome, Button ) {
+	'../../../../../ui-library/src/components/button',			// 'ui!button'
+	'../../../../../plugins/creator/src/editorchrome'
+], function( Plugin, Promise, Region, AppChrome, Button, EditorChrome ) {
 	class ClassicCreator {
 		constructor( editor ) {
 			this.editor = editor;
@@ -34,28 +35,23 @@ CKEDITOR.define( 'plugin!creator', [
 			}
 
 			function injectChrome() {
-				var mainRegion = new Region( 'main' );
-				var appChrome = new AppChrome();
-				mainRegion.views.add( appChrome );
+				var editorChrome = new EditorChrome(),
+					mainRegion = new Region( 'main' );
 
-				var topRegion = new Region( 'top' );
-				var editableRegion = new Region( 'editable' );
-				appChrome.regions.add( topRegion );
-				appChrome.regions.add( editableRegion );
+				mainRegion.views.add( editorChrome );
 
 				var boldButton = new Button( {
 					value: 'Bold button',
 					disabled: false
 				} );
 
-				topRegion.views.add( boldButton );
+				editorChrome.regions.get( 0 ).views.add( boldButton );
 
 				editor.regions = {
 					main: mainRegion
 				};
 
-				document.body.appendChild( appChrome.el );
-
+				document.body.appendChild( editorChrome.el );
 			}
 		}
 
@@ -69,7 +65,6 @@ CKEDITOR.define( 'plugin!creator', [
 		}
 
 		init() {
-			console.log( this );
 			var creator = new ClassicCreator( this.editor );
 
 			this.editor.on( 'destroy', function() {

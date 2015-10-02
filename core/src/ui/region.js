@@ -25,18 +25,14 @@ CKEDITOR.define( [ 'Collection', 'Model' ], function( Collection, Model ) {
 			/**
 			 * The element of the region.
 			 */
-			this.el = el || ( function() {
-				el = document.createElement( 'div' );
-				el.className = 'ck-region';
-				return el;
-			} )();
+			this.el = el;
 
 			/**
 			 * Views which belong to the region.
 			 */
 			this.views = new Collection();
 
-			this.views.on( 'add', ( evt, view ) => this.el.appendChild( view.el ) );
+			this.views.on( 'add', ( evt, view ) => this.el && this.el.appendChild( view.el ) );
 		};
 
 		destroy() {};

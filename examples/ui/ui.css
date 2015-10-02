@@ -16,13 +16,13 @@ For licensing, see LICENSE.md.
 	left: 1px;
 }
 
-.ck-app-chrome {
+.ck-editor-chrome {
 	outline: 1px solid red;
 	background: rgba( 255,0,0, .2 );
 	padding: 1em;
 }
 
-.ck-region {
+.ck-editor-chrome > * {
 	outline: 1px solid green;
 	background: rgba( 0,255,0, .2 );
 	padding: 1em;

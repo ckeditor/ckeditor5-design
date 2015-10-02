@@ -17,7 +17,7 @@ CKEDITOR.define( [ './chrome' ], function( Chrome ) {
 			super( model );
 
 			/**
-			 * The template of this button.
+			 * The template of this AppChrome.
 			 */
 			this.template = '<div class="ck-chrome ck-app-chrome"></div>';
 		};
