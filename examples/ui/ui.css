@@ -27,3 +27,7 @@ For licensing, see LICENSE.md.
 	background: rgba( 0,255,0, .2 );
 	padding: 1em;
 }
+
+.ck-framededitable {
+	background: #fff;
+}

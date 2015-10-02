@@ -13,8 +13,9 @@ CKEDITOR.define( 'plugin!creator', [
 	'../../../../../core/src/ui/region',						// 'ui/region'
 	'../../../../../ui-library/src/components/appchrome',		// 'ui!appchorme'
 	'../../../../../ui-library/src/components/button',			// 'ui!button'
-	'../../../../../plugins/creator/src/editorchrome'
-], function( Plugin, Promise, Region, AppChrome, Button, EditorChrome ) {
+	'../../../../../ui-library/src/components/framededitable',	// 'ui!framededitable'
+	'../../../../../plugins/creator/src/editorchrome'			// 'plugin!creator/editorchrome'
+], function( Plugin, Promise, Region, AppChrome, Button, FramedEditable, EditorChrome ) {
 	class ClassicCreator {
 		constructor( editor ) {
 			this.editor = editor;
@@ -24,11 +25,12 @@ CKEDITOR.define( 'plugin!creator', [
 			var that = this;
 			var editor = this.editor;
 			var element = editor.element;
-			var editorElement;
+			var framedEditable;
 
 			return Promise.resolve()
 				.then( hideElement )
-				.then( injectChrome );
+				.then( injectChrome )
+				.then( initEditable );
 
 			function hideElement() {
 				element.style.display = 'none';
@@ -45,13 +47,23 @@ CKEDITOR.define( 'plugin!creator', [
 					disabled: false
 				} );
 
+				framedEditable = new FramedEditable();
+
 				editorChrome.regions.get( 0 ).views.add( boldButton );
+				editorChrome.regions.get( 1 ).views.add( framedEditable );
 
 				editor.regions = {
 					main: mainRegion
 				};
 
 				document.body.appendChild( editorChrome.el );
+			}
+
+			function initEditable() {
+				// This is totally wrong. It is not supposed to be the way to initialize the editable.
+				var iframe = framedEditable.el;
+				var body = iframe.contentDocument.body;
+				body.contentEditable = true;
 			}
 		}
 
