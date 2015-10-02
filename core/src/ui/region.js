@@ -7,35 +7,39 @@
 
 CKEDITOR.define( [ 'Collection', 'Model' ], function( Collection, Model ) {
 	class Region extends Model {
+		/**
+		 * Creates an instance of the {@link Region} class.
+		 *
+		 * @param {String} name The name of the Region.
+		 * @param {HTMLElement} [el] The element used for this region.
+		 * @constructor
+		 */
 		constructor( name, el ) {
 			super();
 
-			// Regions are named.
+			/**
+			 * The name of the region.
+			 */
 			this.name = name;
 
-			// Regions may be virtual, to keep multiple views together
-			// as a (somehow connected) group.
-			if ( !el ) {
+			/**
+			 * The element of the region.
+			 */
+			this.el = el || ( function() {
 				el = document.createElement( 'div' );
 				el.className = 'ck-region';
-			}
+				return el;
+			} )();
 
-			this.set( 'el', el );
-
-			// Regions collect views.
+			/**
+			 * Views which belong to the region.
+			 */
 			this.views = new Collection();
 
-			this.views.on( 'add', ( evt, model ) => this.addView( model ) );
+			this.views.on( 'add', ( evt, view ) => this.el.appendChild( view.el ) );
 		};
 
-		destroy() {
-			// for each view in this.views
-			// 	destroy the view
-		};
-
-		addView( view ) {
-			this.el.appendChild( view.el );
-		}
+		destroy() {};
 	}
 
 	return Region;

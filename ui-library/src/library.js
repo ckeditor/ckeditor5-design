@@ -10,7 +10,15 @@ CKEDITOR.define( [
 	'./components/Button'
 ], function( AppChrome, Button ) {
 	class UiLibrary {
+		/**
+		 * Creates an instance of the {@link UiLibrary} class.
+		 *
+		 * @constructor
+		 */
 		constructor() {
+			/**
+			 * Components registered in this {@link UiLibrary}.
+			 */
 			this.components = {
 				AppChrome: AppChrome,
 				Button: Button

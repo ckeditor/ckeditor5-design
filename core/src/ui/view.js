@@ -7,18 +7,33 @@
 
 CKEDITOR.define( [ 'Collection', 'Model' ], function( Collection, Model ) {
 	class View extends Model {
+		/**
+		 * Creates an instance of the {@link View} class.
+		 *
+		 * @param {Model} mode (View)Model of this View.
+		 * @constructor
+		 */
 		constructor( model ) {
 			super();
 
-			// View observes a plain model object and reacts to model changes.
+			/**
+			 * Model of this view.
+			 */
 			this.model = new Model( model );
 
-			// View may have a number of regions.
+			/**
+			 * Regions which belong to this view.
+			 */
 			this.regions = new Collection();
 
-			this.regions.on( 'add', ( evt, model ) => this.addRegion( model ) );
+			this.regions.on( 'add', ( evt, region ) => this.el.appendChild( region.el ) );
 		};
 
+		/**
+		 * Element of this view.
+		 *
+		 * @property el
+		 */
 		get el() {
 			if ( this._el ) {
 				return this._el;
@@ -29,20 +44,23 @@ CKEDITOR.define( [ 'Collection', 'Model' ], function( Collection, Model ) {
 			return this._el = el.firstChild;
 		};
 
-		destroy() {
-			// for each region in this.regions
-			// 	destroy the region
-		};
-
-		addRegion( region ) {
-			this.el.appendChild( region.el );
-		}
-
+		/**
+		 * Binds a property of the model to a specific listener that
+		 * updates the view when the property changes.
+		 *
+		 * @param {String} name Property name in the model.
+		 * @param {Function} listener A listener bound the model's property.
+		 * @constructor
+		 */
 		bindModel( name, listener ) {
+			// Execute listener when the property changes.
 			this.model.on( 'change:' + name, ( evt, value ) => listener( value ) );
 
+			// Set the initial state of the view.
 			listener( this.model[ name ] );
-		}
+		};
+
+		destroy() {};
 	}
 
 	return View;

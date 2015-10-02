@@ -10,9 +10,27 @@ CKEDITOR.define( [
 	'./View',
 ], function( Region, View ) {
 	class UI {
+		/**
+		 * Creates an instance of the {@link UI} class.
+		 *
+		 * @param {Editor} name Editor of this UI.
+		 * @param {Library} [library] UI Library of this UI.
+		 * @constructor
+		 */
 		constructor( editor, library ) {
+			/**
+			 * Editor of this UI.
+			 */
 			this.editor = editor;
+
+			/**
+			 * UI Library used for this UI.
+			 */
 			this.library = new library();
+
+			/**
+			 * UI Library components available for this UI.
+			 */
 			this.components = this.library.components;
 
 			var mainRegion = new Region( 'main' );
@@ -38,9 +56,7 @@ CKEDITOR.define( [
 			document.body.appendChild( appChrome.el );
 		};
 
-		destroy() {
-
-		};
+		destroy() {};
 	}
 
 	return UI;
