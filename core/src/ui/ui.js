@@ -7,27 +7,40 @@
 
 CKEDITOR.define( [
 	'./Region',
-	'./View'
+	'./View',
 ], function( Region, View ) {
 	class UI {
 		constructor( editor, library ) {
 			this.editor = editor;
-
 			this.library = new library();
+			this.components = this.library.components;
 
-			var mainRegion = new Region( 'main', document.getElementById( 'region-main' ) );
+			var mainRegion = new Region( 'main' );
+			var appChrome = new this.components.AppChrome();
+			mainRegion.views.add( appChrome );
 
-			var boldButton = new this.library.components.button( {
+			var topRegion = new Region( 'top' );
+			var editableRegion = new Region( 'editable' );
+			appChrome.regions.add( topRegion );
+			appChrome.regions.add( editableRegion );
+
+			var boldButton = new this.components.Button( {
 				value: 'Bold button',
 				disabled: false
 			} );
 
-			mainRegion.addView( boldButton );
+			topRegion.views.add( boldButton );
 
 			this.editor.regions = {
 				main: mainRegion
 			};
-		}
+
+			document.body.appendChild( appChrome.el );
+		};
+
+		destroy() {
+
+		};
 	}
 
 	return UI;

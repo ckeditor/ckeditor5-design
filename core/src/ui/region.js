@@ -15,12 +15,17 @@ CKEDITOR.define( [ 'Collection', 'Model' ], function( Collection, Model ) {
 
 			// Regions may be virtual, to keep multiple views together
 			// as a (somehow connected) group.
-			if ( el ) {
-				this.set( 'el', el );
+			if ( !el ) {
+				el = document.createElement( 'div' );
+				el.className = 'ck-region';
 			}
 
+			this.set( 'el', el );
+
 			// Regions collect views.
-			this.views = [];
+			this.views = new Collection();
+
+			this.views.on( 'add', ( evt, model ) => this.addView( model ) );
 		};
 
 		destroy() {
@@ -29,7 +34,7 @@ CKEDITOR.define( [ 'Collection', 'Model' ], function( Collection, Model ) {
 		};
 
 		addView( view ) {
-			this.views.push( view );
+			this.el.appendChild( view.el );
 		}
 	}
 

@@ -15,12 +15,28 @@ CKEDITOR.define( [ 'Collection', 'Model' ], function( Collection, Model ) {
 
 			// View may have a number of regions.
 			this.regions = new Collection();
+
+			this.regions.on( 'add', ( evt, model ) => this.addRegion( model ) );
+		};
+
+		get el() {
+			if ( this._el ) {
+				return this._el;
+			}
+
+			var el = document.createElement( 'div' );
+			el.innerHTML = this.template;
+			return this._el = el.firstChild;
 		};
 
 		destroy() {
 			// for each region in this.regions
 			// 	destroy the region
 		};
+
+		addRegion( region ) {
+			this.el.appendChild( region.el );
+		}
 	}
 
 	return View;

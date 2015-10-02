@@ -6,12 +6,14 @@
 'use strict';
 
 CKEDITOR.define( [
+	'./components/AppChrome',
 	'./components/Button'
-], function( Button ) {
+], function( AppChrome, Button ) {
 	class UiLibrary {
 		constructor() {
 			this.components = {
-				button: Button
+				AppChrome: AppChrome,
+				Button: Button
 			}
 		};
 	}
