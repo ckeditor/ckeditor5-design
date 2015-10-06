@@ -146,7 +146,23 @@ function copyAddress( address ) {
 
 function copyOperation( op ) {
 	var type = op.type;
-	op.address = copyAddress( op.address );
+	var params = {};
+
+	for ( var i in op ) {
+		if ( op.hasOwnProperty( i ) ) {
+			params[ i ] == op[ i ];
+		}
+	}
+
+	if ( op.address ) {
+		params.address = copyAddress( op.address );
+	}
+	if ( op.fromAddress ) {
+		params.fromAddress = copyAddress( op.fromAddress );
+	}
+	if ( op.toAddress ) {
+		params.toAddress = copyAddress( op.toAddress );
+	}
 
 	return createOperation( type, op );
 }
@@ -171,25 +187,42 @@ function getNoOp( op ) {
 	} );
 }
 
+function isNoOp( op ) {
+	return op.type == 'change' && op.attr == '' && op.value == '';
+}
+
 var OP = {
-	insert: function ( address, offset, node ) {
+	insert: function( address, offset, node ) {
 		var parent = getNode( address );
 		parent.addChild( offset, node );
 	},
-	remove: function ( address, offset ) {
+	remove: function( address, offset ) {
 		var parent = getNode( address );
 		parent.removeChild( offset );
 	},
-	change: function ( address, attr, value ) {
+	change: function( address, attr, value ) {
 		var node = getNode( address );
 		node.changeAttr( attr, value );
+	},
+	move: function( fromAddress, fromOffset, node, toAddress, toOffset ) {
+		var toNode = getNode( toAddress );
+		while ( toNode != null ) {
+			if ( toNode == node ) {
+				throw Error( 'Trying to move a node into itself or it\'s descendant.' );
+			}
+
+			toNode = toNode.parent;
+		}
+
+		OP.remove( fromAddress, fromOffset );
+		OP.insert( toAddress, toOffset, node );
 	}
 };
 
 var IT = {
 	insert: {
 		// IT(insert(Na, na, Ma, Ta), insert(Nb, nb, Mb, Tb))
-		insert: function ( a, b ) {
+		insert: function( a, b ) {
 			a = copyOperation( a );
 
 			// if (<Na> = Mb)
@@ -221,7 +254,7 @@ var IT = {
 		},
 
 		// IT(insert(Na, na, Ma, T), delete(Nb, nb, Mb))
-		remove: function ( a, b ) {
+		remove: function( a, b ) {
 			a = copyOperation( a );
 
 			// if (compare(Na, Nb) = SAME)
@@ -253,15 +286,56 @@ var IT = {
 		},
 
 		// IT(insert(Na, n, M, T), change(Nb, k, f))
-		change: function ( a, b ) {
+		change: function( a, b ) {
 
 			// return insert(Na, n, M, T)
 			return copyOperation( a );
+		},
+
+		// IT(insert(Na, n, M, T), move(Nb1, nb1, Nb2, nb2))
+		move: function( a, b ) {
+			a = copyOperation( a );
+
+			var b1 = createOperation( 'remove', {
+				address: copyAddress( b.fromAddress ),
+				offset: b.fromOffset
+			} );
+
+			var b2 = createOperation( 'insert', {
+				address: copyAddress( b.toAddress ),
+				node: b.node,
+				offset: b.toOffset
+			} );
+			b2 = IT.insert.remove( b2, b1 );
+
+			var a1 = IT.insert.remove( a, b1 );
+
+			if ( isNoOp( a1 ) ) {
+				// If the operation got changed to no-op it means that the insert was in moved sub-tree.
+				// We need to fix that special case.
+
+				var i = b.fromAddress.path.length;
+				var newPath = b.toAddress.path.slice().concat( b.toOffset ).concat( a.address.path.slice( i + 1 ) );
+
+				if ( b.fromOffset < newPath[ i ] ) {
+					newPath[ i ]--;
+				}
+
+				return createOperation( 'insert', {
+					address: createAddress( b.toAddress.root, newPath, a.address.site ),
+					offset: a.offset,
+					node: a.node
+				} )
+			} else {
+				a1 = IT.insert.insert( a1, b2 );
+			}
+
+			return a1;
 		}
 	},
 	remove: {
 		// IT(delete(Na, na, Ma), insert(Nb, nb, Mb, Tb))
-		insert: function ( a, b ) {
+		insert: function( a, b ) {
 			a = copyOperation( a );
 
 			// if (compare(Na, Nb) = PREFIX(i))
@@ -289,7 +363,7 @@ var IT = {
 		},
 
 		// IT(delete(Na, na, Ma), delete(Nb, nb, Mb))
-		remove: function ( a, b ) {
+		remove: function( a, b ) {
 			a = copyOperation( a );
 
 			// if (compare(Na, Nb) = SAME)
@@ -329,15 +403,60 @@ var IT = {
 		},
 
 		// IT(delete(Na, n, M), change(Nb, k, f))
-		change: function ( a, b ) {
+		change: function( a, b ) {
 
 			// return delete(Na, n, M)
 			return copyOperation( a );
+		},
+
+		move: function( a, b ) {
+			a = copyOperation( a );
+
+			var b1 = createOperation( 'remove', {
+				address: copyAddress( b.fromAddress ),
+				offset: b.fromOffset
+			} );
+
+			var b2 = createOperation( 'insert', {
+				address: copyAddress( b.toAddress ),
+				node: b.node,
+				offset: b.toOffset
+			} );
+			b2 = IT.insert.remove( b2, b1 );
+
+			var a1 = IT.remove.remove( a, b1 );
+
+			if ( isNoOp( a1 ) ) {
+				// If the operation got changed to no-op it means that the remove was in the moved sub-tree.
+				// We need to fix that special case.
+
+				var i = b.fromAddress.path.length;
+
+				if ( a.address.path.length > i ) {
+					var newPath = b.toAddress.path.slice().concat( b.toOffset ).concat( a.address.path.slice( i + 1 ) );
+				} else {
+					var newPath = b.toAddress.path.slice();
+				}
+
+				if ( b.fromOffset < newPath[ i ] ) {
+					newPath[ i ]--;
+				}
+
+				return createOperation( 'remove', {
+					address: createAddress( b.toAddress.root, newPath, a.address.site ),
+					offset: a.offset,
+					node: a.node
+				} );
+			} else {
+				a1 = IT.remove.insert( a1, b2 );
+			}
+
+			return a1;
 		}
 	},
 	change: {
 		// IT(change(Na, k, f), insert(Nb, n, M, T))
-		insert: function ( a, b ) {
+		insert: function( a, b ) {
 			a = copyOperation( a );
 
 			// if (<Na> = M)
@@ -361,7 +480,7 @@ var IT = {
 		},
 
 		// IT(change(Na, k, f), delete(Nb, n, M))
-		remove: function ( a, b ) {
+		remove: function( a, b ) {
 			a = copyOperation( a );
 
 			// if (compare(Na, Nb) = PREFIX(i))
@@ -386,7 +505,7 @@ var IT = {
 			// return change(N'a, k, f)
 			return a;
 		},
-		change: function ( a, b ) {
+		change: function( a, b ) {
 			a = copyOperation( a );
 
 			// If we change same node and same attr, one of operations have to get on top of the another.
@@ -396,6 +515,222 @@ var IT = {
 			}
 
 			return a;
+		},
+		move: function( a, b ) {
+			a = copyOperation( a );
+
+			var b1 = createOperation( 'remove', {
+				address: copyAddress( b.fromAddress ),
+				offset: b.fromOffset
+			} );
+
+			var b2 = createOperation( 'insert', {
+				address: copyAddress( b.toAddress ),
+				node: b.node,
+				offset: b.toOffset
+			} );
+			b2 = IT.insert.remove( b2, b1 );
+
+			var a1 = IT.insert.remove( a, b1 );
+
+			if ( isNoOp( a1 ) ) {
+				// If the operation got changed to no-op it means that the insert was in moved sub-tree.
+				// We need to fix that special case.
+
+				var i = b.fromAddress.path.length;
+				var newPath = b.toAddress.path.slice().concat( b.toOffset ).concat( a.address.path.slice( i + 1 ) );
+
+				if ( b.fromOffset < newPath[ i ] ) {
+					newPath[ i ]--;
+				}
+
+				return createOperation( 'change', {
+					address: createAddress( b.toAddress.root, newPath, a.address.site ),
+					offset: a.offset,
+					attr: a.attr,
+					value: a.value
+				} )
+			} else {
+				a1 = IT.insert.insert( a1, b2 );
+			}
+
+			return a1;
+		}
+	},
+	move: {
+		// IT(move(Na1, na1, Na2, na2), insert(Nb, nb, M, T))
+		insert: function( a, b ) {
+			var a1 = createOperation( 'remove', {
+				address: copyAddress( a.fromAddress ),
+				offset: a.fromOffset
+			} );
+
+			var a2 = createOperation( 'insert', {
+				address: copyAddress( a.toAddress ),
+				node: a.node,
+				offset: a.toOffset
+			} );
+			a2 = IT.remove.insert( a2, a1 );
+
+			a1 = IT.remove.insert( a1, b );
+			a2 = IT.insert.insert( a2, b );
+
+			return createOperation( 'move', {
+				fromAddress: a1.address,
+				fromOffset: a1.offset,
+				node: a.node,
+				toAddress: a2.address,
+				toOffset: a2.offset
+			} );
+		},
+
+		// IT(move(Na1, na1, Na2, na2), delete(Nb, nb, M))
+		remove: function( a, b ) {
+			var a1 = createOperation( 'remove', {
+				address: copyAddress( a.fromAddress ),
+				offset: a.fromOffset
+			} );
+
+			var a2 = createOperation( 'insert', {
+				address: copyAddress( a.toAddress ),
+				node: a.node,
+				offset: a.toOffset
+			} );
+			a2 = IT.insert.remove( a2, a1 );
+
+			a1 = IT.remove.remove( a1, b );
+
+			if ( isNoOp( a1 ) ) {
+				return a2;
+			}
+
+			a2 = IT.insert.remove( a2, b );
+
+			if ( isNoOp( a2 ) ) {
+				return a2;
+			}
+
+			return createOperation( 'move', {
+				fromAddress: a1.address,
+				fromOffset: a1.offset,
+				node: a.node,
+				toAddress: a2.address,
+				toOffset: a2.offset
+			} );
+		},
+
+		change: function( a, b ) {
+			return copyOperation( a );
+		},
+
+		move: function( a, b ) {
+			var a = copyOperation( a );
+
+			if (
+				(
+					// Both move operations destinations are inside nodes that are also move operations origins.
+					// So in other words, we move sub-trees into each others
+					( compare( a.toAddress, b.fromAddress ) == PREFIX && a.toAddress.path[ b.fromAddress.path.length ] == b.fromOffset ) &&
+					( compare( b.toAddress, a.fromAddress ) == PREFIX && b.toAddress.path[ a.fromAddress.path.length ] == a.toOffset )
+				)
+				|| ( compare( a.fromAddress, b.fromAddress ) == SAME && a.fromOffset == b.fromOffset )
+			) {
+				if ( a.toAddress.site < b.toAddress.site ) {
+					//return getNoOp( a );
+					return createOperation( 'change', {
+						address: a.fromAddress,
+						attr: '',
+						value: ''
+					} );
+				} else {
+					return a;
+				}
+			}
+
+			var remA = createOperation( 'remove', {
+				address: copyAddress( a.fromAddress ),
+				offset: a.fromOffset
+			} );
+
+			var insA = createOperation( 'insert', {
+				address: copyAddress( a.toAddress ),
+				offset: a.toOffset
+			} );
+			insA = IT.insert.remove( insA, remA );
+
+			var remB = createOperation( 'remove', {
+				address: copyAddress( b.fromAddress ),
+				offset: b.fromOffset
+			} );
+
+			var insB = createOperation( 'insert', {
+				address: copyAddress( b.toAddress ),
+				offset: b.toOffset
+			} );
+			insB = IT.insert.remove( insB, remB );
+
+			var remAP = IT.remove.remove( remA, remB );
+			var remBP = IT.remove.remove( remB, remA );
+
+			var insAP = IT.insert.remove( insA, remBP );
+			var insBP = IT.insert.remove( insB, remAP );
+
+			var insAPP = IT.insert.insert( insAP, insBP );
+			var remAPP = IT.remove.insert( remAP, insB );
+
+			if ( isNoOp( remAP ) ) {
+				// Incoming move operation is from already moved tree.
+
+				var i = b.fromAddress.path.length;
+
+				if ( a.fromAddress.path.length > i ) {
+					var newPath = b.toAddress.path.slice().concat( b.toOffset ).concat( a.fromAddress.path.slice( i + 1 ) );
+				} else {
+					var newPath = b.toAddress.path.slice();
+				}
+
+				if ( b.fromOffset < newPath[ i ] ) {
+					newPath[ i ]--;
+				}
+
+				return createOperation( 'move', {
+					fromAddress: createAddress( a.fromAddress.root, newPath, a.fromAddress.site ),
+					fromOffset: a.fromOffset,
+					node: a.node,
+					toAddress: insAPP.address,
+					toOffset: insAPP.offset
+				} );
+			} else if ( isNoOp( insAP ) ) {
+				// Incoming move is into already moved tree.
+
+				var i = b.toAddress.path.length;
+
+				if ( a.toAddress.path.length > i ) {
+					var newPath = b.toAddress.path.slice().concat( b.toOffset ).concat( a.toAddress.path.slice( i + 1 ) );
+				} else {
+					var newPath = b.toAddress.path.slice();
+				}
+
+				if ( b.toOffset < newPath[ i ] ) {
+					newPath[ i ]--;
+				}
+
+				return createOperation( 'move', {
+					fromAddress: remAPP.address,
+					fromOffset: remAPP.offset,
+					node: a.node,
+					toAddress: createAddress( a.toAddress.root, newPath, a.fromAddress.site ),
+					toOffset: a.toOffset
+				} );
+			} else {
+				return createOperation( 'move', {
+					fromAddress: remAPP.address,
+					fromOffset: remAPP.offset,
+					node: a.node,
+					toAddress: insAPP.address,
+					toOffset: insAPP.offset
+				} );
+			}
 		}
 	}
 };
