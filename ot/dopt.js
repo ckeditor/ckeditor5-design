@@ -101,10 +101,12 @@ function createOpFromTextLine( line, siteId ) {
 
 			break;
 		case 'change':
+			offset = path.pop();
 			address = OT.createAddress( docRoot, path );
 
 			op.props = {
 				address: address,
+				offset: offset,
 				attr: args[ 2 ],
 				value: args[ 3 ]
 			};

@@ -191,8 +191,8 @@ var OP = {
 		var parent = getNode( address );
 		parent.removeChild( offset );
 	},
-	change: function( address, attr, value ) {
-		var node = getNode( address );
+	change: function( address, offset, attr, value ) {
+		var node = getNode( address ).getChild( offset );
 		node.changeAttr( attr, value );
 	},
 	move: function( fromAddress, fromOffset, node, toAddress, toOffset ) {
@@ -332,7 +332,7 @@ var IT = {
 				var i = b.address.path.length;
 
 				// if (n < Na[i]) or (n = Na[i] and site(Na) < site(Nb))
-				if ( b.offset <= a.address.path[ i ] || ( b.offset == a.address.path[ i ] && a.site < b.site ) ) {
+				if ( b.offset <= a.address.path[ i ] ) {
 					// N'a[i] <- Na[i] + 1
 					a.address.path[ i ]++;
 				}
@@ -461,6 +461,12 @@ var IT = {
 				}
 			}
 
+			else if ( compare( a.address, b.address ) == SAME ) {
+				if ( b.offset <= a.offset ) {
+					a.offset++;
+				}
+			}
+
 			// return change(N'a, k, f)
 			return a;
 		},
@@ -483,7 +489,9 @@ var IT = {
 					return getNoOp();
 				}
 			} else if ( compare( a.address, b.address ) == SAME ) {
-				if ( b.offset == a.offset ) {
+				if ( b.offset < a.offset ) {
+					a.offset--;
+				} else if ( b.offset == a.offset ) {
 					return getNoOp();
 				}
 			}
