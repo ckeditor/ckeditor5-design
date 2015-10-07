@@ -178,16 +178,8 @@ function applyOperation( op ) {
 	OP[ op.type ].apply( this, params );
 }
 
-function getNoOp( op ) {
-	return createOperation( 'change', {
-		address: copyAddress( op.address ),
-		attr: '',
-		value: ''
-	} );
-}
-
-function isNoOp( op ) {
-	return op.type == 'change' && op.attr == '' && op.value == '';
+function getNoOp() {
+	return createOperation( 'noop' );
 }
 
 var OP = {
@@ -215,7 +207,8 @@ var OP = {
 
 		OP.remove( fromAddress, fromOffset );
 		OP.insert( toAddress, toOffset, node );
-	}
+	},
+	noop: function() {}
 };
 
 var IT = {
@@ -276,7 +269,7 @@ var IT = {
 
 				// elif (nb = Na[i])
 				else if ( b.offset == a.address.path[ i ] ) {
-					return getNoOp( a );
+					return getNoOp();
 				}
 			}
 
@@ -285,11 +278,7 @@ var IT = {
 		},
 
 		// IT(insert(Na, n, M, T), change(Nb, k, f))
-		change: function( a, b ) {
-
-			// return insert(Na, n, M, T)
-			return copyOperation( a );
-		},
+		change: copyOperation,
 
 		// IT(insert(Na, n, M, T), move(Nb1, nb1, Nb2, nb2))
 		move: function( a, b ) {
@@ -309,7 +298,7 @@ var IT = {
 
 			var a1 = IT.insert.remove( a, b1 );
 
-			if ( isNoOp( a1 ) ) {
+			if ( a1.type == 'noop' ) {
 				// If the operation got changed to no-op it means that the insert was in moved sub-tree.
 				// We need to fix that special case.
 
@@ -330,7 +319,8 @@ var IT = {
 			}
 
 			return a1;
-		}
+		},
+		noop: copyOperation
 	},
 	remove: {
 		// IT(delete(Na, na, Ma), insert(Nb, nb, Mb, Tb))
@@ -378,7 +368,7 @@ var IT = {
 				// ** this is removing the same element, so each time when this happens, the incoming operation should be skipped
 				else if ( b.offset == a.offset ) {
 					//return change(Na, children, identity)
-					return getNoOp( a );
+					return getNoOp();
 				}
 			}
 
@@ -393,7 +383,7 @@ var IT = {
 
 					// elif (nb = Na[i])
 				} else if ( b.offset == a.address.path[ i ] ) {
-					return getNoOp( a );
+					return getNoOp();
 				}
 			}
 
@@ -402,11 +392,7 @@ var IT = {
 		},
 
 		// IT(delete(Na, n, M), change(Nb, k, f))
-		change: function( a, b ) {
-
-			// return delete(Na, n, M)
-			return copyOperation( a );
-		},
+		change: copyOperation,
 
 		move: function( a, b ) {
 			a = copyOperation( a );
@@ -425,7 +411,7 @@ var IT = {
 
 			var a1 = IT.remove.remove( a, b1 );
 
-			if ( isNoOp( a1 ) ) {
+			if ( a1.type == 'noop' ) {
 				// If the operation got changed to no-op it means that the remove was in the moved sub-tree.
 				// We need to fix that special case.
 
@@ -451,7 +437,8 @@ var IT = {
 			}
 
 			return a1;
-		}
+		},
+		noop: copyOperation
 	},
 	change: {
 		// IT(change(Na, k, f), insert(Nb, n, M, T))
@@ -493,11 +480,11 @@ var IT = {
 
 				// elif (n = Na[i])
 				} else if ( b.offset == a.address.path[ i ] ) {
-					return getNoOp( a );
+					return getNoOp();
 				}
 			} else if ( compare( a.address, b.address ) == SAME ) {
 				if ( b.offset == a.offset ) {
-					return getNoOp( a );
+					return getNoOp();
 				}
 			}
 
@@ -510,7 +497,7 @@ var IT = {
 			// If we change same node and same attr, one of operations have to get on top of the another.
 			// So if this happens and a.site < b.site, we skip this operation.
 			if ( compare( a.address, b.address ) == SAME && a.offset == b.offset && a.attr == b.attr && a.site < b.site ) {
-				return getNoOp( a );
+				return getNoOp();
 			}
 
 			return a;
@@ -532,7 +519,7 @@ var IT = {
 
 			var a1 = IT.insert.remove( a, b1 );
 
-			if ( isNoOp( a1 ) ) {
+			if ( a1.type == 'noop' ) {
 				// If the operation got changed to no-op it means that the insert was in moved sub-tree.
 				// We need to fix that special case.
 
@@ -554,7 +541,8 @@ var IT = {
 			}
 
 			return a1;
-		}
+		},
+		noop: copyOperation
 	},
 	move: {
 		// IT(move(Na1, na1, Na2, na2), insert(Nb, nb, M, T))
@@ -604,13 +592,13 @@ var IT = {
 
 			a1 = IT.remove.remove( a1, b );
 
-			if ( isNoOp( a1 ) ) {
+			if ( a1.type == 'noop' ) {
 				return a2;
 			}
 
 			a2 = IT.insert.remove( a2, b );
 
-			if ( isNoOp( a2 ) ) {
+			if ( a2.type == 'noop' ) {
 				return a2;
 			}
 
@@ -624,9 +612,7 @@ var IT = {
 			} );
 		},
 
-		change: function( a, b ) {
-			return copyOperation( a );
-		},
+		change: copyOperation,
 
 		move: function( a, b ) {
 			var a = copyOperation( a );
@@ -641,13 +627,7 @@ var IT = {
 				|| ( compare( a.fromAddress, b.fromAddress ) == SAME && a.fromOffset == b.fromOffset )
 			) {
 				if ( a.site < b.site ) {
-					//return getNoOp( a );
-					return createOperation( 'change', {
-						address: a.fromAddress,
-						attr: '',
-						value: '',
-						site: a.site
-					} );
+					return getNoOp();
 				} else {
 					return a;
 				}
@@ -679,16 +659,16 @@ var IT = {
 			} );
 			insB = IT.insert.remove( insB, remB );
 
-			var remAP = IT.remove.remove( remA, remB );
-			var remBP = IT.remove.remove( remB, remA );
+			var remAP = IT[ remA.type ][ remB.type ]( remA, remB );
+			var remBP = IT[ remB.type ][ remA.type ]( remB, remA );
 
-			var insAP = IT.insert.remove( insA, remBP );
-			var insBP = IT.insert.remove( insB, remAP );
+			var insAP = IT[ insA.type ][ remBP.type ]( insA, remBP );
+			var insBP = IT[ insB.type ][ remAP.type ]( insB, remAP );
 
-			var insAPP = IT.insert.insert( insAP, insBP );
-			var remAPP = IT.remove.insert( remAP, insB );
+			var insAPP = IT[ insAP.type ][ insBP.type ]( insAP, insBP );
+			var remAPP = IT[ remAP.type ][ insB.type ]( remAP, insB );
 
-			if ( isNoOp( remAP ) ) {
+			if ( remAP.type == 'noop' ) {
 				// Incoming move operation is from already moved tree.
 
 				var i = b.fromAddress.path.length;
@@ -710,7 +690,7 @@ var IT = {
 					toAddress: insAPP.address,
 					toOffset: insAPP.offset
 				} );
-			} else if ( isNoOp( insAP ) ) {
+			} else if ( insAP.type == 'noop' ) {
 				// Incoming move is into already moved tree.
 
 				var i = b.toAddress.path.length;
@@ -741,7 +721,15 @@ var IT = {
 					toOffset: insAPP.offset
 				} );
 			}
-		}
+		},
+		noop: copyOperation
+	},
+	noop: {
+		insert: getNoOp,
+		remove: getNoOp,
+		change: getNoOp,
+		move: getNoOp,
+		noop: getNoOp
 	}
 };
 

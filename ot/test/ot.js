@@ -393,7 +393,6 @@ describe( 'OT', function() {
 
 			it( 'should become do-nothing operation if insertion is in removed part of tree', function() {
 				var adr = addressPair.prefix;
-				var newAdr = OT.copyAddress( adr[ 1 ] );
 
 				var transOp = getTransformedOp( 'remove', 'insert', {
 					address: adr,
@@ -402,10 +401,7 @@ describe( 'OT', function() {
 				} );
 
 				expectOperation( transOp, {
-					type: 'change',
-					address: newAdr,
-					attr: '',
-					value: ''
+					type: 'noop'
 				} );
 			} );
 		} );
@@ -792,7 +788,6 @@ describe( 'OT', function() {
 
 			it( 'should become do-nothing operation if one of nodes on the address path was removed', function() {
 				var adr = addressPair.prefix;
-				var newAdr = OT.copyAddress( adr[ 1 ] );
 
 				var transOp = getTransformedOp( 'remove', 'remove', {
 					address: adr,
@@ -801,16 +796,12 @@ describe( 'OT', function() {
 				} );
 
 				expectOperation( transOp, {
-					type: 'change',
-					address: newAdr,
-					attr: '',
-					value: ''
+					type: 'noop'
 				} );
 			} );
 
 			it( 'should become do-nothing operation if the other remove operations is exactly the same', function() {
 				var adr = addressPair.same;
-				var newAdr = OT.copyAddress( adr[ 1 ] );
 
 				var transOp = getTransformedOp( 'remove', 'remove', {
 					address: adr,
@@ -819,10 +810,7 @@ describe( 'OT', function() {
 				} );
 
 				expectOperation( transOp, {
-					type: 'change',
-					address: newAdr,
-					attr: '',
-					value: ''
+					type: 'noop'
 				} );
 			} );
 		} );
@@ -1268,8 +1256,6 @@ describe( 'OT', function() {
 				// does not take offset parameter, expecting only and address to changed node.
 				adr[ 1 ].path = adr[ 1 ].path.concat( 0 );
 
-				var newAdr = OT.copyAddress( adr[ 1 ] );
-
 				var transOp = getTransformedOp( 'remove', 'change', {
 					address: adr,
 					offset: [ 3, null ],
@@ -1279,10 +1265,7 @@ describe( 'OT', function() {
 				} );
 
 				expectOperation( transOp, {
-					type: 'change',
-					address: newAdr,
-					attr: '',
-					value: ''
+					type: 'noop'
 				} );
 			} );
 		} );
@@ -1328,7 +1311,6 @@ describe( 'OT', function() {
 			it( 'should become do-nothing operation if address and attribute is same but value is different and address site is lower', function() {
 				var adr = addressPair.same;
 				adr[ 1 ].site = 0;
-				var newAdr = OT.copyAddress( adr[ 1 ] );
 
 				var transOp = getTransformedOp( 'change', 'change', {
 					address: adr,
@@ -1337,10 +1319,7 @@ describe( 'OT', function() {
 				} );
 
 				expectOperation( transOp, {
-					type: 'change',
-					address: newAdr,
-					attr: '',
-					value: ''
+					type: 'noop'
 				} );
 			} );
 		} );
@@ -1987,15 +1966,10 @@ describe( 'OT', function() {
 					site: 2
 				} );
 
-				newToAddress.path[ 1 ] = 1;
-
 				var transOp = OT.IT.move.remove( inOp, siOp );
 
 				expectOperation( transOp, {
-					type: 'change',
-					address: toAddress,
-					attr: '',
-					value: ''
+					type: 'noop'
 				} );
 			} );
 		} );
@@ -2457,10 +2431,7 @@ describe( 'OT', function() {
 					var transOp = OT.IT.move.move( inOp, siOp );
 
 					expectOperation( transOp, {
-						type: 'change',
-						address: newFromAddress,
-						attr: '',
-						value: ''
+						type: 'noop'
 					} );
 				} );
 
@@ -2500,10 +2471,7 @@ describe( 'OT', function() {
 					var transOp = OT.IT.move.move( inOp, siOp );
 
 					expectOperation( transOp, {
-						type: 'change',
-						address: newFromAddress,
-						attr: '',
-						value: ''
+						type: 'noop'
 					} );
 				} );
 
