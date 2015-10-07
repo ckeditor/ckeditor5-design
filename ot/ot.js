@@ -132,16 +132,15 @@ function createOperation( type, props ) {
 
 createOperation.ID = 0;
 
-function createAddress( root, path, site ) {
+function createAddress( root, path ) {
 	return {
 		root: root,
-		path: path,
-		site: site
+		path: path
 	};
 }
 
 function copyAddress( address ) {
-	return createAddress( address.root, address.path.slice(), address.site );
+	return createAddress( address.root, address.path.slice() );
 }
 
 function copyOperation( op ) {
@@ -228,14 +227,14 @@ var IT = {
 			// if (<Na> = Mb)
 			if ( a.address.root == b.node ) {
 				// N'a <- (<Nb>, Nb[:] + [nb] + Na[:])
-				a.address = createAddress( b.address.root, b.address.path.concat( b.offset, a.address.path ), a.address.site );
+				a.address = createAddress( b.address.root, b.address.path.concat( b.offset, a.address.path ) );
 
 				// elif (compare(Na, Nb) = PREFIX(i))
 			} else if ( compare( a.address, b.address ) == PREFIX ) {
 				var i = b.address.path.length;
 
 				// if (nb < Na[i]) or (nb = Na[i] and site(Na) < site(Nb))
-				if ( b.offset < a.address.path[ i ] || ( b.offset == a.address.path[ i ] && a.address.site < b.address.site ) ) {
+				if ( b.offset < a.address.path[ i ] || ( b.offset == a.address.path[ i ] && a.site < b.site ) ) {
 					// N'a[i] <- Na[i] + 1
 					a.address.path[ i ]++;
 				}
@@ -243,7 +242,7 @@ var IT = {
 				// elif (compare(Na, Nb) = SAME)
 			} else if ( compare( a.address, b.address ) == SAME ) {
 				// if (nb < na) or (nb = na and site(Na) < site(Nb))
-				if ( b.offset < a.offset || ( b.offset == a.offset && a.address.site < b.address.site ) ) {
+				if ( b.offset < a.offset || ( b.offset == a.offset && a.site < b.site ) ) {
 					// n'a <- na + 1
 					a.offset++;
 				}
@@ -322,7 +321,7 @@ var IT = {
 				}
 
 				return createOperation( 'insert', {
-					address: createAddress( b.toAddress.root, newPath, a.address.site ),
+					address: createAddress( b.toAddress.root, newPath ),
 					offset: a.offset,
 					node: a.node
 				} )
@@ -343,7 +342,7 @@ var IT = {
 				var i = b.address.path.length;
 
 				// if (n < Na[i]) or (n = Na[i] and site(Na) < site(Nb))
-				if ( b.offset <= a.address.path[ i ] || ( b.offset == a.address.path[ i ] && a.address.site < b.address.site ) ) {
+				if ( b.offset <= a.address.path[ i ] || ( b.offset == a.address.path[ i ] && a.site < b.site ) ) {
 					// N'a[i] <- Na[i] + 1
 					a.address.path[ i ]++;
 				}
@@ -443,7 +442,7 @@ var IT = {
 				}
 
 				return createOperation( 'remove', {
-					address: createAddress( b.toAddress.root, newPath, a.address.site ),
+					address: createAddress( b.toAddress.root, newPath ),
 					offset: a.offset,
 					node: a.node
 				} );
@@ -462,7 +461,7 @@ var IT = {
 			// if (<Na> = M)
 			if ( a.address.root == b.node ) {
 				// N'a <- (<Nb>, Nb[:] + [n] + Na[:])
-				a.address = createAddress( b.address.root, b.address.path.concat( b.offset, a.address.path ), a.address.site );
+				a.address = createAddress( b.address.root, b.address.path.concat( b.offset, a.address.path ) );
 			}
 
 			// elif (compare(Na, Nb) = PREFIX(i)) and (n <= Na[i])
@@ -509,8 +508,8 @@ var IT = {
 			a = copyOperation( a );
 
 			// If we change same node and same attr, one of operations have to get on top of the another.
-			// So if this happens and a.address.site < b.address.site, we skip this operation.
-			if ( compare( a.address, b.address ) == SAME && a.offset == b.offset && a.attr == b.attr && a.address.site < b.address.site ) {
+			// So if this happens and a.site < b.site, we skip this operation.
+			if ( compare( a.address, b.address ) == SAME && a.offset == b.offset && a.attr == b.attr && a.site < b.site ) {
 				return getNoOp( a );
 			}
 
@@ -545,7 +544,7 @@ var IT = {
 				}
 
 				return createOperation( 'change', {
-					address: createAddress( b.toAddress.root, newPath, a.address.site ),
+					address: createAddress( b.toAddress.root, newPath ),
 					offset: a.offset,
 					attr: a.attr,
 					value: a.value
@@ -562,13 +561,15 @@ var IT = {
 		insert: function( a, b ) {
 			var a1 = createOperation( 'remove', {
 				address: copyAddress( a.fromAddress ),
-				offset: a.fromOffset
+				offset: a.fromOffset,
+				site: a.site
 			} );
 
 			var a2 = createOperation( 'insert', {
 				address: copyAddress( a.toAddress ),
 				node: a.node,
-				offset: a.toOffset
+				offset: a.toOffset,
+				site: a.site
 			} );
 			a2 = IT.remove.insert( a2, a1 );
 
@@ -580,7 +581,8 @@ var IT = {
 				fromOffset: a1.offset,
 				node: a.node,
 				toAddress: a2.address,
-				toOffset: a2.offset
+				toOffset: a2.offset,
+				site: a.site
 			} );
 		},
 
@@ -588,13 +590,15 @@ var IT = {
 		remove: function( a, b ) {
 			var a1 = createOperation( 'remove', {
 				address: copyAddress( a.fromAddress ),
-				offset: a.fromOffset
+				offset: a.fromOffset,
+				site: a.site
 			} );
 
 			var a2 = createOperation( 'insert', {
 				address: copyAddress( a.toAddress ),
 				node: a.node,
-				offset: a.toOffset
+				offset: a.toOffset,
+				site: a.site
 			} );
 			a2 = IT.insert.remove( a2, a1 );
 
@@ -615,7 +619,8 @@ var IT = {
 				fromOffset: a1.offset,
 				node: a.node,
 				toAddress: a2.address,
-				toOffset: a2.offset
+				toOffset: a2.offset,
+				site: a.site
 			} );
 		},
 
@@ -635,12 +640,13 @@ var IT = {
 				)
 				|| ( compare( a.fromAddress, b.fromAddress ) == SAME && a.fromOffset == b.fromOffset )
 			) {
-				if ( a.toAddress.site < b.toAddress.site ) {
+				if ( a.site < b.site ) {
 					//return getNoOp( a );
 					return createOperation( 'change', {
 						address: a.fromAddress,
 						attr: '',
-						value: ''
+						value: '',
+						site: a.site
 					} );
 				} else {
 					return a;
@@ -649,23 +655,27 @@ var IT = {
 
 			var remA = createOperation( 'remove', {
 				address: copyAddress( a.fromAddress ),
-				offset: a.fromOffset
+				offset: a.fromOffset,
+				site: a.site
 			} );
 
 			var insA = createOperation( 'insert', {
 				address: copyAddress( a.toAddress ),
-				offset: a.toOffset
+				offset: a.toOffset,
+				site: a.site
 			} );
 			insA = IT.insert.remove( insA, remA );
 
 			var remB = createOperation( 'remove', {
 				address: copyAddress( b.fromAddress ),
-				offset: b.fromOffset
+				offset: b.fromOffset,
+				site: b.site
 			} );
 
 			var insB = createOperation( 'insert', {
 				address: copyAddress( b.toAddress ),
-				offset: b.toOffset
+				offset: b.toOffset,
+				site: b.site
 			} );
 			insB = IT.insert.remove( insB, remB );
 
@@ -694,7 +704,7 @@ var IT = {
 				}
 
 				return createOperation( 'move', {
-					fromAddress: createAddress( a.fromAddress.root, newPath, a.fromAddress.site ),
+					fromAddress: createAddress( a.fromAddress.root, newPath ),
 					fromOffset: a.fromOffset,
 					node: a.node,
 					toAddress: insAPP.address,
@@ -719,7 +729,7 @@ var IT = {
 					fromAddress: remAPP.address,
 					fromOffset: remAPP.offset,
 					node: a.node,
-					toAddress: createAddress( a.toAddress.root, newPath, a.fromAddress.site ),
+					toAddress: createAddress( a.toAddress.root, newPath ),
 					toOffset: a.toOffset
 				} );
 			} else {

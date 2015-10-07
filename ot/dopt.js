@@ -69,7 +69,7 @@ function createOpFromTextLine( line, siteId ) {
 	switch ( op.type ) {
 		case 'insert':
 			offset = path.pop();
-			address = OT.createAddress( docRoot, path, siteId );
+			address = OT.createAddress( docRoot, path );
 
 			op.props = {
 				address: address,
@@ -83,7 +83,7 @@ function createOpFromTextLine( line, siteId ) {
 			} else if ( args[ 2 ] == 'block' ) {
 				node = new OT.BlockNode( args[ 3 ] );
 			} else if ( args[ 2 ] == 'node' ) {
-				node = OT.getNode( OT.createAddress( docRoot, args[ 3 ].split( ',' ), siteId ) );
+				node = OT.getNode( OT.createAddress( docRoot, args[ 3 ].split( ',' ) ) );
 			}
 
 			op.props.node = node;
@@ -91,7 +91,7 @@ function createOpFromTextLine( line, siteId ) {
 			break;
 		case 'remove':
 			offset = path.pop();
-			address = OT.createAddress( docRoot, path, siteId );
+			address = OT.createAddress( docRoot, path );
 
 			op.props = {
 				address: address,
@@ -101,7 +101,7 @@ function createOpFromTextLine( line, siteId ) {
 
 			break;
 		case 'change':
-			address = OT.createAddress( docRoot, path, siteId );
+			address = OT.createAddress( docRoot, path );
 
 			op.props = {
 				address: address,
@@ -113,6 +113,8 @@ function createOpFromTextLine( line, siteId ) {
 		default:
 			return null;
 	}
+
+	op.props.site = siteId;
 
 	return OT.createOperation( op.type, op.props );
 }
