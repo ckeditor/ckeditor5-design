@@ -54,15 +54,25 @@ CKEDITOR.define( [ 'Collection', 'Model' ], function( Collection, Model ) {
 		bind( model, property, callback ) {
 			return function( el, attr ) {
 				// TODO: Use ES6 default arguments syntax.
-				callback = callback || function( el, value ) {
+				var changeCallback = callback || setAttribute;
+
+				function setAttribute( el, value ) {
 					el.setAttribute( attr, value );
-				};
+				}
+
+				function executeCallback( el, value ) {
+					var result = changeCallback( el, value );
+
+					if ( typeof result != 'undefined' ) {
+						setAttribute( el, result );
+					}
+				}
 
 				// Execute callback when the property changes.
-				model.on( 'change:' + property, ( evt, value ) => callback( el, value ) );
+				model.on( 'change:' + property, ( evt, value ) => executeCallback( el, value ) );
 
 				// Set the initial state of the view.
-				callback( el, model[ property ] );
+				executeCallback( el, model[ property ] );
 			};
 		};
 
@@ -76,8 +86,17 @@ CKEDITOR.define( [ 'Collection', 'Model' ], function( Collection, Model ) {
 			// TODO: Use ES6 default arguments syntax.
 			template = template || this.template;
 
+			if ( !template ) {
+				return null;
+			}
+
 			var el = document.createElement( template.tag ),
 				attr, value;
+
+			// Set the text first.
+			if ( template.text ) {
+				el.innerHTML = template.text;
+			}
 
 			// Set attributes.
 			for ( attr in template.attributes ) {
@@ -97,12 +116,12 @@ CKEDITOR.define( [ 'Collection', 'Model' ], function( Collection, Model ) {
 
 					el.setAttribute( attr, value );
 				}
+			}
 
-				// Invoke children recursively.
-				if ( template.children ) {
-					for ( let child of template.children ) {
-						el.appendChild( this.render( child ) );
-					}
+			// Invoke children recursively.
+			if ( template.children ) {
+				for ( let child of template.children ) {
+					el.appendChild( this.render( child ) );
 				}
 			}
 
