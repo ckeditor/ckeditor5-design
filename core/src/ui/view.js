@@ -39,26 +39,75 @@ CKEDITOR.define( [ 'Collection', 'Model' ], function( Collection, Model ) {
 				return this._el;
 			}
 
-			var el = document.createElement( 'div' );
-			el.innerHTML = this.template;
-			return this._el = el.firstChild;
+			return this._el = this.render();
 		};
 
 		/**
 		 * Binds a property of the model to a specific listener that
 		 * updates the view when the property changes.
 		 *
-		 * @param {String} name Property name in the model.
-		 * @param {Function} listener A listener bound the model's property.
+		 * @param {Model} model Model to which the property is bound to.
+		 * @param {String} property Property name in the model.
+		 * @param {Function} [callback] Callback function executed on property change in model.
 		 * @constructor
 		 */
-		bindModel( name, listener ) {
-			// Execute listener when the property changes.
-			this.model.on( 'change:' + name, ( evt, value ) => listener( value ) );
+		bind( model, property, callback ) {
+			return function( el, attr ) {
+				// TODO: Use ES6 default arguments syntax.
+				callback = callback || function( el, value ) {
+					el.setAttribute( attr, value );
+				};
 
-			// Set the initial state of the view.
-			listener( this.model[ name ] );
+				// Execute callback when the property changes.
+				model.on( 'change:' + property, ( evt, value ) => callback( el, value ) );
+
+				// Set the initial state of the view.
+				callback( el, model[ property ] );
+			};
 		};
+
+		/**
+		 * Renders {@link el} using {@link template}.
+		 *
+		 * @param {Object} [def] Template definition to be rendered.
+		 * @returns HTMLElement {@link el} ready to be injected into DOM.
+		 */
+		render( template ) {
+			// TODO: Use ES6 default arguments syntax.
+			template = template || this.template;
+
+			var el = document.createElement( template.tag ),
+				attr, value;
+
+			// Set attributes.
+			for ( attr in template.attributes ) {
+				value = template.attributes[ attr ];
+
+				// Attribute bound directly to the model.
+				if ( typeof value == 'function' ) {
+					value( el, attr );
+				}
+
+				// Explicit attribute definition (string).
+				else {
+					// Attribute can be an array, i.e. classes.
+					if ( Array.isArray( value ) ) {
+						value = value.join( ' ' );
+					}
+
+					el.setAttribute( attr, value );
+				}
+
+				// Invoke children recursively.
+				if ( template.children ) {
+					for ( let child of template.children ) {
+						el.appendChild( this.render( child ) );
+					}
+				}
+			}
+
+			return el;
+		}
 
 		destroy() {};
 	}

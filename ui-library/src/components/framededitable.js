@@ -10,7 +10,13 @@ CKEDITOR.define( [ '../../../core/src/ui/view' ], function( View ) {
 		constructor( model ) {
 			super( model );
 
-			this.template = '<iframe class="ck-framededitable" sandbox="allow-same-origin"></iframe>';
+			this.template = {
+				tag: 'iframe',
+				attributes: {
+					'class': [ 'ck-framededitable' ],
+					sandbox: 'allow-same-origin'
+				}
+			};
 		};
 	}
 

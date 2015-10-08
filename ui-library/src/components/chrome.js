@@ -19,7 +19,12 @@ CKEDITOR.define( [ '../../../core/src/ui/view' ], function( View ) {
 			/**
 			 * The template of this button.
 			 */
-			this.template = '<div class="ck-chrome"></div>';
+			this.template = {
+				tag: 'div',
+				attributes: {
+					'class': [ 'ck-chrome' ]
+				}
+			};
 		};
 	}
 

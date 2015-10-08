@@ -19,15 +19,16 @@ CKEDITOR.define( [ '../../../core/src/ui/view' ], function( View ) {
 			/**
 			 * The template of this button.
 			 */
-			this.template = '<input class="ck-button" type="button" value="" />';
-
-			// Bind model's "value" property to the DOM "value" attribute.
-			this.bindModel( 'value',
-				v => this.el.setAttribute( 'value', v ) );
-
-			// Bind model's "disabled" property to the DOM "disabled" attribute.
-			this.bindModel( 'disabled',
-				d => this.el[ ( d ? 'set' : 'remove' ) + 'Attribute' ]( 'disabled', 'disabled' ) );
+			this.template = {
+				tag: 'input',
+				attributes: {
+					'class': [ 'ck-button' ],
+					type: 'button',
+					value: this.bind( this.model, 'value' ),
+					disabled: this.bind( this.model, 'disabled', ( el, value ) =>
+						el[ ( value ? 'set' : 'remove' ) + 'Attribute' ]( 'disabled', 'disabled' ) )
+				}
+			};
 		};
 	}
 
