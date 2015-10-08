@@ -124,7 +124,9 @@ function createOperation( type, props ) {
 	};
 
 	for ( var i in props ) {
-		op[ i ] = props[ i ];
+		if ( props.hasOwnProperty( i ) ) {
+			op[ i ] = props[ i ];
+		}
 	}
 
 	return op;
@@ -149,7 +151,7 @@ function copyOperation( op ) {
 
 	for ( var i in op ) {
 		if ( op.hasOwnProperty( i ) ) {
-			params[ i ] == op[ i ];
+			params[ i ] = op[ i ];
 		}
 	}
 
@@ -192,7 +194,12 @@ var OP = {
 		parent.removeChild( offset );
 	},
 	change: function( address, offset, attr, value ) {
-		var node = getNode( address ).getChild( offset );
+		var node = getNode( address );
+
+		if ( offset != -1 ) {
+			node = node.getChild( offset );
+		}
+
 		node.changeAttr( attr, value );
 	},
 	move: function( fromAddress, fromOffset, node, toAddress, toOffset ) {
@@ -210,6 +217,10 @@ var OP = {
 	},
 	noop: function() {}
 };
+
+function transform( a, b ) {
+	return IT[ a.type ][ b.type ]( a, b );
+}
 
 var IT = {
 	insert: {
@@ -263,13 +274,14 @@ var IT = {
 
 				// if (nb < Na[i])
 				if ( b.offset < a.address.path[ i ] ) {
-					// N'a[i] <- Na[i] ? 1
+					// N'a[i] <- Na[i] - 1
 					a.address.path[ i ]--;
 				}
 
 				// elif (nb = Na[i])
 				else if ( b.offset == a.address.path[ i ] ) {
-					return getNoOp();
+					// N'a <- (Mb, Na[i + 1 :])
+					a.address = createAddress( b.node, a.address.path.slice( i + 1 ) );
 				}
 			}
 
@@ -286,37 +298,19 @@ var IT = {
 
 			var b1 = createOperation( 'remove', {
 				address: copyAddress( b.fromAddress ),
-				offset: b.fromOffset
+				offset: b.fromOffset,
+				node: b.node
 			} );
 
 			var b2 = createOperation( 'insert', {
 				address: copyAddress( b.toAddress ),
-				node: b.node,
-				offset: b.toOffset
+				offset: b.toOffset,
+				node: b.node
 			} );
-			b2 = IT.insert.remove( b2, b1 );
+			b2 = transform( b2, b1 );
 
-			var a1 = IT.insert.remove( a, b1 );
-
-			if ( a1.type == 'noop' ) {
-				// If the operation got changed to no-op it means that the insert was in moved sub-tree.
-				// We need to fix that special case.
-
-				var i = b.fromAddress.path.length;
-				var newPath = b.toAddress.path.slice().concat( b.toOffset ).concat( a.address.path.slice( i + 1 ) );
-
-				if ( b.fromOffset < newPath[ i ] ) {
-					newPath[ i ]--;
-				}
-
-				return createOperation( 'insert', {
-					address: createAddress( b.toAddress.root, newPath ),
-					offset: a.offset,
-					node: a.node
-				} )
-			} else {
-				a1 = IT.insert.insert( a1, b2 );
-			}
+			var a1 = transform( a, b1 );
+			a1 = transform( a1, b2 );
 
 			return a1;
 		},
@@ -327,8 +321,13 @@ var IT = {
 		insert: function( a, b ) {
 			a = copyOperation( a );
 
-			// if (compare(Na, Nb) = PREFIX(i))
-			if ( compare( a.address, b.address ) == PREFIX ) {
+			if ( a.address.root == b.node ) {
+				// N'a <- (<Nb>, Nb[:] + [nb] + Na[:])
+				a.address = createAddress( b.address.root, b.address.path.concat( b.offset, a.address.path ) );
+			}
+
+			// elif (compare(Na, Nb) = PREFIX(i))
+			else if ( compare( a.address, b.address ) == PREFIX ) {
 				var i = b.address.path.length;
 
 				// if (n < Na[i]) or (n = Na[i] and site(Na) < site(Nb))
@@ -383,7 +382,8 @@ var IT = {
 
 					// elif (nb = Na[i])
 				} else if ( b.offset == a.address.path[ i ] ) {
-					return getNoOp();
+					// N'a <- (Mb, Na[i + 1 :])
+					a.address = createAddress( b.node, a.address.path.slice( i + 1 ) );
 				}
 			}
 
@@ -399,42 +399,19 @@ var IT = {
 
 			var b1 = createOperation( 'remove', {
 				address: copyAddress( b.fromAddress ),
-				offset: b.fromOffset
+				offset: b.fromOffset,
+				node: b.node
 			} );
 
 			var b2 = createOperation( 'insert', {
 				address: copyAddress( b.toAddress ),
-				node: b.node,
-				offset: b.toOffset
+				offset: b.toOffset,
+				node: b.node
 			} );
-			b2 = IT.insert.remove( b2, b1 );
+			b2 = transform( b2, b1 );
 
-			var a1 = IT.remove.remove( a, b1 );
-
-			if ( a1.type == 'noop' ) {
-				// If the operation got changed to no-op it means that the remove was in the moved sub-tree.
-				// We need to fix that special case.
-
-				var i = b.fromAddress.path.length;
-
-				if ( a.address.path.length > i ) {
-					var newPath = b.toAddress.path.slice().concat( b.toOffset ).concat( a.address.path.slice( i + 1 ) );
-				} else {
-					var newPath = b.toAddress.path.slice();
-				}
-
-				if ( b.fromOffset < newPath[ i ] ) {
-					newPath[ i ]--;
-				}
-
-				return createOperation( 'remove', {
-					address: createAddress( b.toAddress.root, newPath ),
-					offset: a.offset,
-					node: a.node
-				} );
-			} else {
-				a1 = IT.remove.insert( a1, b2 );
-			}
+			var a1 = transform( a, b1 );
+			a1 = transform( a1, b2 );
 
 			return a1;
 		},
@@ -486,13 +463,16 @@ var IT = {
 
 				// elif (n = Na[i])
 				} else if ( b.offset == a.address.path[ i ] ) {
-					return getNoOp();
+					// N'a <- (M, Na[i + 1 :])
+					a.address = createAddress( b.node, a.address.path.slice( i + 1 ) );
 				}
 			} else if ( compare( a.address, b.address ) == SAME ) {
 				if ( b.offset < a.offset ) {
 					a.offset--;
 				} else if ( b.offset == a.offset ) {
-					return getNoOp();
+					// N'a <- (M, Na[i + 1 :])
+					a.address = createAddress( b.node, [ ] );
+					a.offset = -1;
 				}
 			}
 
@@ -515,38 +495,19 @@ var IT = {
 
 			var b1 = createOperation( 'remove', {
 				address: copyAddress( b.fromAddress ),
-				offset: b.fromOffset
+				offset: b.fromOffset,
+				node: b.node
 			} );
 
 			var b2 = createOperation( 'insert', {
 				address: copyAddress( b.toAddress ),
-				node: b.node,
-				offset: b.toOffset
+				offset: b.toOffset,
+				node: b.node
 			} );
-			b2 = IT.insert.remove( b2, b1 );
+			b2 = transform( b2, b1 );
 
-			var a1 = IT.insert.remove( a, b1 );
-
-			if ( a1.type == 'noop' ) {
-				// If the operation got changed to no-op it means that the insert was in moved sub-tree.
-				// We need to fix that special case.
-
-				var i = b.fromAddress.path.length;
-				var newPath = b.toAddress.path.slice().concat( b.toOffset ).concat( a.address.path.slice( i + 1 ) );
-
-				if ( b.fromOffset < newPath[ i ] ) {
-					newPath[ i ]--;
-				}
-
-				return createOperation( 'change', {
-					address: createAddress( b.toAddress.root, newPath ),
-					offset: a.offset,
-					attr: a.attr,
-					value: a.value
-				} )
-			} else {
-				a1 = IT.insert.insert( a1, b2 );
-			}
+			var a1 = transform( a, b1 );
+			a1 = transform( a1, b2 );
 
 			return a1;
 		},
@@ -567,10 +528,10 @@ var IT = {
 				offset: a.toOffset,
 				site: a.site
 			} );
-			a2 = IT.remove.insert( a2, a1 );
+			a2 = transform( a2, a1 );
 
-			a1 = IT.remove.insert( a1, b );
-			a2 = IT.insert.insert( a2, b );
+			a1 = transform( a1, b );
+			a2 = transform( a2, b );
 
 			return createOperation( 'move', {
 				fromAddress: a1.address,
@@ -596,19 +557,15 @@ var IT = {
 				offset: a.toOffset,
 				site: a.site
 			} );
-			a2 = IT.insert.remove( a2, a1 );
+			a2 = transform( a2, a1 );
 
-			a1 = IT.remove.remove( a1, b );
+			a1 = transform( a1, b );
 
 			if ( a1.type == 'noop' ) {
 				return a2;
 			}
 
-			a2 = IT.insert.remove( a2, b );
-
-			if ( a2.type == 'noop' ) {
-				return a2;
-			}
+			a2 = transform( a2, b );
 
 			return createOperation( 'move', {
 				fromAddress: a1.address,
@@ -623,15 +580,17 @@ var IT = {
 		change: copyOperation,
 
 		move: function( a, b ) {
-			var a = copyOperation( a );
+			a = copyOperation( a );
 
+			// Conflicting scenarios:
 			if (
 				(
 					// Both move operations destinations are inside nodes that are also move operations origins.
-					// So in other words, we move sub-trees into each others
+					// So in other words, we move sub-trees into each others.
 					( compare( a.toAddress, b.fromAddress ) == PREFIX && a.toAddress.path[ b.fromAddress.path.length ] == b.fromOffset ) &&
 					( compare( b.toAddress, a.fromAddress ) == PREFIX && b.toAddress.path[ a.fromAddress.path.length ] == a.toOffset )
 				)
+					// Both operations try to move the same node.
 				|| ( compare( a.fromAddress, b.fromAddress ) == SAME && a.fromOffset == b.fromOffset )
 			) {
 				if ( a.site < b.site ) {
@@ -641,94 +600,22 @@ var IT = {
 				}
 			}
 
-			var remA = createOperation( 'remove', {
-				address: copyAddress( a.fromAddress ),
-				offset: a.fromOffset,
-				site: a.site
-			} );
-
-			var insA = createOperation( 'insert', {
-				address: copyAddress( a.toAddress ),
-				offset: a.toOffset,
-				site: a.site
-			} );
-			insA = IT.insert.remove( insA, remA );
-
-			var remB = createOperation( 'remove', {
+			var b1 = createOperation( 'remove', {
 				address: copyAddress( b.fromAddress ),
 				offset: b.fromOffset,
 				site: b.site
 			} );
 
-			var insB = createOperation( 'insert', {
+			var b2 = createOperation( 'insert', {
 				address: copyAddress( b.toAddress ),
 				offset: b.toOffset,
 				site: b.site
 			} );
-			insB = IT.insert.remove( insB, remB );
+			b2 = transform( b2, b1 );
 
-			var remAP = IT[ remA.type ][ remB.type ]( remA, remB );
-			var remBP = IT[ remB.type ][ remA.type ]( remB, remA );
-
-			var insAP = IT[ insA.type ][ remBP.type ]( insA, remBP );
-			var insBP = IT[ insB.type ][ remAP.type ]( insB, remAP );
-
-			var insAPP = IT[ insAP.type ][ insBP.type ]( insAP, insBP );
-			var remAPP = IT[ remAP.type ][ insB.type ]( remAP, insB );
-
-			if ( remAP.type == 'noop' ) {
-				// Incoming move operation is from already moved tree.
-
-				var i = b.fromAddress.path.length;
-
-				if ( a.fromAddress.path.length > i ) {
-					var newPath = b.toAddress.path.slice().concat( b.toOffset ).concat( a.fromAddress.path.slice( i + 1 ) );
-				} else {
-					var newPath = b.toAddress.path.slice();
-				}
-
-				if ( b.fromOffset < newPath[ i ] ) {
-					newPath[ i ]--;
-				}
-
-				return createOperation( 'move', {
-					fromAddress: createAddress( a.fromAddress.root, newPath ),
-					fromOffset: a.fromOffset,
-					node: a.node,
-					toAddress: insAPP.address,
-					toOffset: insAPP.offset
-				} );
-			} else if ( insAP.type == 'noop' ) {
-				// Incoming move is into already moved tree.
-
-				var i = b.toAddress.path.length;
-
-				if ( a.toAddress.path.length > i ) {
-					var newPath = b.toAddress.path.slice().concat( b.toOffset ).concat( a.toAddress.path.slice( i + 1 ) );
-				} else {
-					var newPath = b.toAddress.path.slice();
-				}
-
-				if ( b.toOffset < newPath[ i ] ) {
-					newPath[ i ]--;
-				}
-
-				return createOperation( 'move', {
-					fromAddress: remAPP.address,
-					fromOffset: remAPP.offset,
-					node: a.node,
-					toAddress: createAddress( a.toAddress.root, newPath ),
-					toOffset: a.toOffset
-				} );
-			} else {
-				return createOperation( 'move', {
-					fromAddress: remAPP.address,
-					fromOffset: remAPP.offset,
-					node: a.node,
-					toAddress: insAPP.address,
-					toOffset: insAPP.offset
-				} );
-			}
+			var a1 = transform( a, b1 );
+			a1 = transform( a1, b2 );
+			return a1;
 		},
 		noop: copyOperation
 	},

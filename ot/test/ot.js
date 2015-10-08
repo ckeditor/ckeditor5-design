@@ -1,3 +1,5 @@
+/* global describe, it, beforeEach */
+
 var assert = require( 'assert' );
 var OT = require( '../ot.js' );
 
@@ -391,7 +393,7 @@ describe( 'OT', function() {
 				} );
 			} );
 
-			it( 'should become do-nothing operation if insertion is in removed part of tree', function() {
+			it( 'should have it\'s root and path updated if insertion is in removed part of tree', function() {
 				var adr = addressPair.prefix;
 
 				var transOp = getTransformedOp( 'remove', 'insert', {
@@ -401,7 +403,10 @@ describe( 'OT', function() {
 				} );
 
 				expectOperation( transOp, {
-					type: 'noop'
+					type: 'insert',
+					address: OT.createAddress( nodeA, [ ] ),
+					offset: 2,
+					node: nodeB
 				} );
 			} );
 		} );
@@ -465,8 +470,8 @@ describe( 'OT', function() {
 			} );
 
 			it( 'should have it\'s address merged with destination address if insert was inside moved node sub-tree', function() {
-				var opAddress = OT.createAddress( docRoot, [ 0, 2, 0, 3 ] );
-				var newAddress = OT.createAddress( docRoot, [ 1, 1, 0, 0, 3 ] );
+				var opAddress = OT.createAddress( docRoot, [ 0, 2, 0, 1 ] );
+				var newAddress = OT.createAddress( docRoot, [ 1, 1, 1, 0, 1 ] );
 
 				var inOp = OT.createOperation( 'insert', {
 					address: opAddress,
@@ -786,7 +791,7 @@ describe( 'OT', function() {
 				} );
 			} );
 
-			it( 'should become do-nothing operation if one of nodes on the address path was removed', function() {
+			it( 'should have it\'s root and path updated if one of nodes on the address path was removed', function() {
 				var adr = addressPair.prefix;
 
 				var transOp = getTransformedOp( 'remove', 'remove', {
@@ -796,7 +801,10 @@ describe( 'OT', function() {
 				} );
 
 				expectOperation( transOp, {
-					type: 'noop'
+					type: 'remove',
+					address: OT.createAddress( nodeA, [ ] ),
+					offset: 2,
+					node: nodeB
 				} );
 			} );
 
@@ -899,13 +907,13 @@ describe( 'OT', function() {
 				} );
 			} );
 
-			it( 'should have it\'s address updated if remove target was move origin target', function() {
+			it( 'should become do-nothing operation if remove target was move origin target', function() {
 				var opAddress = OT.createAddress( docRoot, [ ] );
-				var newAddress = OT.createAddress( docRoot, [ 0 ] );
 
 				var inOp = OT.createOperation( 'remove', {
 					address: opAddress,
 					offset: 0,
+					node: nodeB,
 					site: 1
 				} );
 
@@ -921,9 +929,7 @@ describe( 'OT', function() {
 				var transOp = OT.IT.remove.move( inOp, siOp );
 
 				expectOperation( transOp, {
-					type: 'remove',
-					address: newAddress,
-					offset: 0
+					type: 'noop'
 				} );
 			} );
 
@@ -1215,7 +1221,7 @@ describe( 'OT', function() {
 				} );
 			} );
 
-			it( 'should become do-nothing operation if one of nodes on the address path was removed', function() {
+			it( 'should have it\'s root and path updated if one of nodes on the address path was removed', function() {
 				var adr = addressPair.prefix;
 				var transOp = getTransformedOp( 'remove', 'change', {
 					address: adr,
@@ -1226,7 +1232,11 @@ describe( 'OT', function() {
 				} );
 
 				expectOperation( transOp, {
-					type: 'noop'
+					type: 'change',
+					address: OT.createAddress( nodeA, [ ] ),
+					offset: 0,
+					attr: 'foo',
+					value: 'bar'
 				} );
 			} );
 		} );
@@ -1893,7 +1903,7 @@ describe( 'OT', function() {
 			} );
 
 			// origin removed
-			it( 'should become insert operation if one of nodes on origin path got removed', function() {
+			it( 'should have it\'s root and path updated if one of nodes on origin path got removed', function() {
 				var opAddress = OT.createAddress( docRoot, [ 1 ] );
 
 				var inOp = OT.createOperation( 'move', {
@@ -1908,22 +1918,56 @@ describe( 'OT', function() {
 				var siOp = OT.createOperation( 'remove', {
 					address: opAddress,
 					offset: 1,
+					node: nodeB,
 					site: 2
 				} );
 
 				var transOp = OT.IT.move.remove( inOp, siOp );
 
 				expectOperation( transOp, {
-					type: 'insert',
-					address: toAddress,
+					type: 'move',
+					fromAddress: OT.createAddress( nodeB, [ ] ),
+					fromOffset: 2,
 					node: nodeA,
-					offset: 0
+					toAddress: toAddress,
+					toOffset: 0
 				} );
 			} );
 
 			// destination removed
-			it( 'should become do-nothing operation if one of nodes on destination path got removed', function() {
+			it( 'should have it\'s root and path updated if one of nodes on destination path got removed', function() {
 				var opAddress = OT.createAddress( docRoot, [ 0 ] );
+
+				var inOp = OT.createOperation( 'move', {
+					fromAddress: fromAddress,
+					fromOffset: 2,
+					node: nodeA,
+					toAddress: toAddress,
+					toOffset: 0,
+					site: 1
+				} );
+
+				var siOp = OT.createOperation( 'remove', {
+					address: opAddress,
+					offset: 2,
+					node: nodeB,
+					site: 2
+				} );
+
+				var transOp = OT.IT.move.remove( inOp, siOp );
+
+				expectOperation( transOp, {
+					type: 'move',
+					fromAddress: fromAddress,
+					fromOffset: 2,
+					node: nodeA,
+					toAddress: OT.createAddress( nodeB, [ 0 ] ),
+					toOffset: 0
+				} );
+			} );
+
+			it( 'should become insert operation if origin node got removed', function() {
+				var opAddress = OT.copyAddress( fromAddress );
 
 				var inOp = OT.createOperation( 'move', {
 					fromAddress: fromAddress,
@@ -1944,7 +1988,10 @@ describe( 'OT', function() {
 				var transOp = OT.IT.move.remove( inOp, siOp );
 
 				expectOperation( transOp, {
-					type: 'noop'
+					type: 'insert',
+					address: toAddress,
+					offset: 0,
+					node: nodeA
 				} );
 			} );
 		} );
