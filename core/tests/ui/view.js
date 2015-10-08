@@ -66,6 +66,10 @@ describe( 'rich view', function() {
 								attributes: {
 									z: this.bind( this.model, 'custom', function( el, value ) {
 										el.innerHTML = value;
+
+										if ( value == 'foo' ) {
+											return value;
+										}
  									} )
 								}
 							}
@@ -99,7 +103,7 @@ describe( 'rich view', function() {
 		expect( getOuterHtml( view.el ) ).to.be.equal( '<p class="a" x="x">b<b y="negative">c</b><i>moo</i></p>' );
 
 		view.model.custom = 'foo';
-		expect( getOuterHtml( view.el ) ).to.be.equal( '<p class="a" x="x">b<b y="negative">c</b><i>foo</i></p>' );
+		expect( getOuterHtml( view.el ) ).to.be.equal( '<p class="a" x="x">b<b y="negative">c</b><i z="foo">foo</i></p>' );
 	} );
 } );
 
