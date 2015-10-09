@@ -5,7 +5,7 @@
 
 'use strict';
 
-CKEDITOR.define( [ '../../../core/src/ui/view' ], function( View ) {
+CKEDITOR.define( [ 'ui/view' ], function( View ) {
 	class FramedEditable extends View {
 		constructor( model ) {
 			super( model );

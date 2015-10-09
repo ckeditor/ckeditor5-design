@@ -10,11 +10,11 @@
 CKEDITOR.define( 'plugin!creator', [
 	'plugin',
 	'promise',
-	'../../../../../core/src/ui/region',						// 'ui/region'
-	'../../../../../ui-library/src/components/appchrome',		// 'ui!appchorme'
-	'../../../../../ui-library/src/components/button',			// 'ui!button'
-	'../../../../../ui-library/src/components/framededitable',	// 'ui!framededitable'
-	'../../../../../plugins/creator/src/editorchrome'			// 'plugin!creator/editorchrome'
+	'ui/region',
+	'component!appchrome',
+	'component!button',
+	'component!framededitable',
+	'component!editorchrome' 				// 'plugin!creator/editorchrome'
 ], function( Plugin, Promise, Region, AppChrome, Button, FramedEditable, EditorChrome ) {
 	class ClassicCreator {
 		constructor( editor ) {
