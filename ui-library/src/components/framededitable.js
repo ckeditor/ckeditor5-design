@@ -17,7 +17,7 @@ CKEDITOR.define( [ 'ui/view' ], function( View ) {
 					sandbox: 'allow-same-origin'
 				}
 			};
-		};
+		}
 	}
 
 	return FramedEditable;

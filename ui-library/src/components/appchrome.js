@@ -20,7 +20,7 @@ CKEDITOR.define( 'component!appchrome', [ 'component!chrome' ], function( Chrome
 			 * The template of this AppChrome.
 			 */
 			this.template.attributes.class.push( 'ck-app-chrome' );
-		};
+		}
 	}
 
 	return AppChrome;

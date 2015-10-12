@@ -29,7 +29,7 @@ CKEDITOR.define( [ 'ui/view' ], function( View ) {
 						el[ ( value ? 'set' : 'remove' ) + 'Attribute' ]( 'disabled', 'disabled' ) )
 				}
 			};
-		};
+		}
 	}
 
 	return Button;

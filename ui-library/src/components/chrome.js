@@ -25,7 +25,7 @@ CKEDITOR.define( [ 'ui/view' ], function( View ) {
 					'class': [ 'ck-chrome' ]
 				}
 			};
-		};
+		}
 	}
 
 	return Chrome;

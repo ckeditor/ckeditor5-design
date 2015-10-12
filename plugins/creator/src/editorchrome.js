@@ -19,7 +19,7 @@ CKEDITOR.define( 'component!editorchrome', [ 'component!appchrome', 'ui/region' 
 			/**
 			 * The template of this EditorChrome.
 			 */
-			this.template.attributes[ 'class' ].push( 'ck-editor-chrome' );
+			this.template.attributes.class.push( 'ck-editor-chrome' );
 			this.template.children = [
 				{
 					tag: 'div',
@@ -35,12 +35,12 @@ CKEDITOR.define( 'component!editorchrome', [ 'component!appchrome', 'ui/region' 
 				}
 			];
 
-			var topRegion = new Region( 'top', this.el.firstChild ),
-				editableRegion = new Region( 'editable', this.el.lastChild );
+			var topRegion = new Region( 'top', this.el.firstChild );
+			var editableRegion = new Region( 'editable', this.el.lastChild );
 
 			this.regions.add( topRegion );
 			this.regions.add( editableRegion );
-		};
+		}
 	}
 
 	return EditorChrome;
