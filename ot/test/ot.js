@@ -84,7 +84,7 @@ describe( 'OT', function() {
 			var address;
 
 			beforeEach( function() {
-				address = OT.createAddress( docRoot, [ ] );
+				address = OT.createAddress( docRoot, [ 1 ] );
 
 				insertNodes( docRoot, [
 					new OT.TextNode( 'a' ), new OT.TextNode( 'b' )
@@ -92,33 +92,33 @@ describe( 'OT', function() {
 			} );
 
 			it( 'should change attribute of the node specified by an address', function() {
-				OT.OP.change( address, 1, 'foo', 'bar' );
+				OT.OP.change( address, 'foo', 'bar' );
 
 				assert.equal( docRoot.getChild( 1 ).getAttrValue( 'foo' ), 'bar' );
 			} );
 
 			it( 'should remove attribute if value was not specified or it was an empty string', function() {
-				OT.OP.change( address, 1, 'foo', 'bar' );
-				OT.OP.change( address, 1, 'foo' );
+				OT.OP.change( address, 'foo', 'bar' );
+				OT.OP.change( address, 'foo' );
 
 				assert.equal( docRoot.getChild( 1 ).getAttrValue( 'foo' ), null );
 
-				OT.OP.change( address, 1, 'foo', 'bar' );
-				OT.OP.change( address, 1, 'foo', '' );
+				OT.OP.change( address, 'foo', 'bar' );
+				OT.OP.change( address, 'foo', '' );
 
 				assert.equal( docRoot.getChild( 1 ).getAttrValue( 'foo' ), null );
 			} );
 
 			it( 'should overwrite the attribute\'s value if it was already set', function() {
-				OT.OP.change( address, 1, 'foo', 'bar' );
-				OT.OP.change( address, 1, 'foo', 'xyz' );
+				OT.OP.change( address, 'foo', 'bar' );
+				OT.OP.change( address, 'foo', 'xyz' );
 
 				assert.equal( docRoot.getChild( 1 ).getAttrValue( 'foo' ), 'xyz' );
 			} );
 
 			it( 'should support adding multiple attributes to one node', function() {
-				OT.OP.change( address, 1, 'foo', 'bar' );
-				OT.OP.change( address, 1, 'abc', 'xyz' );
+				OT.OP.change( address, 'foo', 'bar' );
+				OT.OP.change( address, 'abc', 'xyz' );
 
 				assert.equal( docRoot.getChild( 1 ).getAttrValue( 'foo' ), 'bar' );
 				assert.equal( docRoot.getChild( 1 ).getAttrValue( 'abc' ), 'xyz' );
@@ -142,13 +142,13 @@ describe( 'OT', function() {
 			} );
 
 			it( 'should remove a node from specified address and offset', function() {
-				OT.OP.move( fromAddress, 0, node, toAddress, 1 );
+				OT.OP.move( fromAddress, 0, toAddress, 1 );
 
 				assert.equal( docRoot.getChild( 0 ).getChildCount(), 0 );
 			} );
 
 			it( 'should add a node to at specified address and offset', function() {
-				OT.OP.move( fromAddress, 0, node, toAddress, 1 );
+				OT.OP.move( fromAddress, 0, toAddress, 1 );
 
 				assert.equal( docRoot.getChild( 1 ).getChildCount(), 2 );
 				assert.equal( docRoot.getChild( 1 ).getChild( 1 ), node );
@@ -453,7 +453,7 @@ describe( 'OT', function() {
 				var siOp = OT.createOperation( 'move', {
 					fromAddress: fromAddress,
 					fromOffset: 2,
-					node: nodeA,
+					node: nodeB,
 					toAddress: toAddress,
 					toOffset: 0,
 					site: 2
@@ -483,7 +483,7 @@ describe( 'OT', function() {
 				var siOp = OT.createOperation( 'move', {
 					fromAddress: OT.createAddress( docRoot, [ 0, 2 ], 2 ),
 					fromOffset: 0,
-					node: nodeA,
+					node: nodeB,
 					toAddress: OT.createAddress( docRoot, [ 1, 1, 1 ], 2 ),
 					toOffset: 0,
 					site: 2
@@ -513,7 +513,7 @@ describe( 'OT', function() {
 				var siOp = OT.createOperation( 'move', {
 					fromAddress: fromAddress,
 					fromOffset: 0,
-					node: nodeA,
+					node: nodeB,
 					toAddress: toAddress,
 					toOffset: 0,
 					site: 2
@@ -543,7 +543,7 @@ describe( 'OT', function() {
 				var siOp = OT.createOperation( 'move', {
 					fromAddress: fromAddress,
 					fromOffset: 0,
-					node: nodeA,
+					node: nodeB,
 					toAddress: toAddress,
 					toOffset: 0,
 					site: 2
@@ -574,7 +574,7 @@ describe( 'OT', function() {
 				var siOp = OT.createOperation( 'move', {
 					fromAddress: fromAddress,
 					fromOffset: 0,
-					node: nodeA,
+					node: nodeB,
 					toAddress: toAddress,
 					toOffset: 0,
 					site: 2
@@ -605,7 +605,7 @@ describe( 'OT', function() {
 				var siOp = OT.createOperation( 'move', {
 					fromAddress: fromAddress,
 					fromOffset: 0,
-					node: nodeA,
+					node: nodeB,
 					toAddress: toAddress,
 					toOffset: 0,
 					site: 2
@@ -630,14 +630,13 @@ describe( 'OT', function() {
 				var transOp = getTransformedOp( 'insert', 'remove', {
 					address: adr,
 					offset: [ 0, 2 ],
-					node: [ nodeA, nodeB ]
+					node: [ nodeA, null ]
 				} );
 
 				expectOperation( transOp, {
 					type: 'remove',
 					address: newAdr,
-					offset: 2,
-					node: nodeB
+					offset: 2
 				} );
 			} );
 
@@ -648,14 +647,13 @@ describe( 'OT', function() {
 				var transOp = getTransformedOp( 'insert', 'remove', {
 					address: adr,
 					offset: [ 0, 2 ],
-					node: [ nodeA, nodeB ]
+					node: [ nodeA, null ]
 				} );
 
 				expectOperation( transOp, {
 					type: 'remove',
 					address: newAdr,
-					offset: 3,
-					node: nodeB
+					offset: 3
 				} );
 			} );
 
@@ -666,14 +664,13 @@ describe( 'OT', function() {
 				var transOp = getTransformedOp( 'insert', 'remove', {
 					address: adr,
 					offset: [ 2, 2 ],
-					node: [ nodeA, nodeB ]
+					node: [ nodeA, null ]
 				} );
 
 				expectOperation( transOp, {
 					type: 'remove',
 					address: newAdr,
-					offset: 3,
-					node: nodeB
+					offset: 3
 				} );
 			} );
 
@@ -684,14 +681,13 @@ describe( 'OT', function() {
 				var transOp = getTransformedOp( 'insert', 'remove', {
 					address: adr,
 					offset: [ 2, 0 ],
-					node: [ nodeA, nodeB ]
+					node: [ nodeA, null ]
 				} );
 
 				expectOperation( transOp, {
 					type: 'remove',
 					address: newAdr,
-					offset: 0,
-					node: nodeB
+					offset: 0
 				} );
 			} );
 
@@ -702,7 +698,7 @@ describe( 'OT', function() {
 				var transOp = getTransformedOp( 'insert', 'remove', {
 					address: adr,
 					offset: [ 0, 2 ],
-					node: [ nodeA, nodeB ]
+					node: [ nodeA, null ]
 				} );
 
 				newAdr.path[ 3 ] = 4;
@@ -710,8 +706,7 @@ describe( 'OT', function() {
 				expectOperation( transOp, {
 					type: 'remove',
 					address: newAdr,
-					offset: 2,
-					node: nodeB
+					offset: 2
 				} );
 			} );
 		} );
@@ -724,14 +719,13 @@ describe( 'OT', function() {
 				var transOp = getTransformedOp( 'remove', 'remove', {
 					address: adr,
 					offset: [ 0, 2 ],
-					node: [ nodeA, nodeB ]
+					node: [ nodeA, null ]
 				} );
 
 				expectOperation( transOp, {
 					type: 'remove',
 					address: newAdr,
-					offset: 2,
-					node: nodeB
+					offset: 2
 				} );
 			} );
 
@@ -742,14 +736,13 @@ describe( 'OT', function() {
 				var transOp = getTransformedOp( 'remove', 'remove', {
 					address: adr,
 					offset: [ 0, 2 ],
-					node: [ nodeA, nodeB ]
+					node: [ nodeA, null ]
 				} );
 
 				expectOperation( transOp, {
 					type: 'remove',
 					address: newAdr,
-					offset: 1,
-					node: nodeB
+					offset: 1
 				} );
 			} );
 
@@ -760,14 +753,13 @@ describe( 'OT', function() {
 				var transOp = getTransformedOp( 'remove', 'remove', {
 					address: adr,
 					offset: [ 2, 0 ],
-					node: [ nodeA, nodeB ]
+					node: [ nodeA, null ]
 				} );
 
 				expectOperation( transOp, {
 					type: 'remove',
 					address: newAdr,
-					offset: 0,
-					node: nodeB
+					offset: 0
 				} );
 			} );
 
@@ -778,7 +770,7 @@ describe( 'OT', function() {
 				var transOp = getTransformedOp( 'remove', 'remove', {
 					address: adr,
 					offset: [ 0, 2 ],
-					node: [ nodeA, nodeB ]
+					node: [ nodeA, null ]
 				} );
 
 				newAdr.path[ 3 ] = 2;
@@ -786,8 +778,7 @@ describe( 'OT', function() {
 				expectOperation( transOp, {
 					type: 'remove',
 					address: newAdr,
-					offset: 2,
-					node: nodeB
+					offset: 2
 				} );
 			} );
 
@@ -797,14 +788,13 @@ describe( 'OT', function() {
 				var transOp = getTransformedOp( 'remove', 'remove', {
 					address: adr,
 					offset: [ 3, 2 ],
-					node: [ nodeA, nodeB ]
+					node: [ nodeA, null ]
 				} );
 
 				expectOperation( transOp, {
 					type: 'remove',
 					address: OT.createAddress( nodeA, [ ] ),
-					offset: 2,
-					node: nodeB
+					offset: 2
 				} );
 			} );
 
@@ -814,7 +804,7 @@ describe( 'OT', function() {
 				var transOp = getTransformedOp( 'remove', 'remove', {
 					address: adr,
 					offset: [ 1, 1 ],
-					node: [ nodeA, nodeB ]
+					node: [ nodeA, null ]
 				} );
 
 				expectOperation( transOp, {
@@ -864,7 +854,7 @@ describe( 'OT', function() {
 				var siOp = OT.createOperation( 'move', {
 					fromAddress: fromAddress,
 					fromOffset: 2,
-					node: nodeA,
+					node: nodeB,
 					toAddress: toAddress,
 					toOffset: 0,
 					site: 2
@@ -892,7 +882,7 @@ describe( 'OT', function() {
 				var siOp = OT.createOperation( 'move', {
 					fromAddress: OT.createAddress( docRoot, [ ], 2 ),
 					fromOffset: 0,
-					node: nodeA,
+					node: nodeB,
 					toAddress: OT.createAddress( docRoot, [ 1 ], 2 ),
 					toOffset: 0,
 					site: 2
@@ -913,14 +903,13 @@ describe( 'OT', function() {
 				var inOp = OT.createOperation( 'remove', {
 					address: opAddress,
 					offset: 0,
-					node: nodeB,
 					site: 1
 				} );
 
 				var siOp = OT.createOperation( 'move', {
 					fromAddress: OT.createAddress( docRoot, [ ], 2 ),
 					fromOffset: 0,
-					node: nodeA,
+					node: nodeB,
 					toAddress: OT.createAddress( docRoot, [ 1 ], 2 ),
 					toOffset: 0,
 					site: 2
@@ -946,7 +935,7 @@ describe( 'OT', function() {
 				var siOp = OT.createOperation( 'move', {
 					fromAddress: fromAddress,
 					fromOffset: 0,
-					node: nodeA,
+					node: nodeB,
 					toAddress: toAddress,
 					toOffset: 0,
 					site: 2
@@ -974,7 +963,7 @@ describe( 'OT', function() {
 				var siOp = OT.createOperation( 'move', {
 					fromAddress: fromAddress,
 					fromOffset: 0,
-					node: nodeA,
+					node: nodeB,
 					toAddress: toAddress,
 					toOffset: 0,
 					site: 2
@@ -1003,7 +992,7 @@ describe( 'OT', function() {
 				var siOp = OT.createOperation( 'move', {
 					fromAddress: fromAddress,
 					fromOffset: 0,
-					node: nodeA,
+					node: nodeB,
 					toAddress: toAddress,
 					toOffset: 0,
 					site: 2
@@ -1032,7 +1021,7 @@ describe( 'OT', function() {
 				var siOp = OT.createOperation( 'move', {
 					fromAddress: fromAddress,
 					fromOffset: 0,
-					node: nodeA,
+					node: nodeB,
 					toAddress: toAddress,
 					toOffset: 0,
 					site: 2
@@ -1051,11 +1040,16 @@ describe( 'OT', function() {
 		describe( 'chn x ins', function() {
 			it( 'should not change when addresses are different', function() {
 				var adr = addressPair.diff;
+
+				// Add "offset" to the address instead because change operation
+				// does not take offset parameter, expecting only and address to changed node.
+				adr[ 1 ].path = adr[ 1 ].path.concat( 2 );
+
 				var newAdr = OT.copyAddress( adr[ 1 ] );
 
 				var transOp = getTransformedOp( 'insert', 'change', {
 					address: adr,
-					offset: [ 0, 2 ],
+					offset: [ 0, null ],
 					node: [ nodeA, null ],
 					attr: [ null, 'foo' ],
 					value: [ null, 'bar' ]
@@ -1064,19 +1058,24 @@ describe( 'OT', function() {
 				expectOperation( transOp, {
 					type: 'change',
 					address: newAdr,
-					offset: 2,
 					attr: 'foo',
 					value: 'bar'
 				} );
 			} );
 
-			it( 'should increment offset if insert offset was before changed node', function() {
+			it( 'should update address if insert offset was before changed node', function() {
 				var adr = addressPair.same;
+
+				// Add "offset" to the address instead because change operation
+				// does not take offset parameter, expecting only and address to changed node.
+				adr[ 1 ].path = adr[ 1 ].path.concat( 2 );
+
 				var newAdr = OT.copyAddress( adr[ 1 ] );
+				newAdr.path[ 3 ] = 3;
 
 				var transOp = getTransformedOp( 'insert', 'change', {
 					address: adr,
-					offset: [ 0, 2 ],
+					offset: [ 0, null ],
 					node: [ nodeA, null ],
 					attr: [ null, 'foo' ],
 					value: [ null, 'bar' ]
@@ -1085,19 +1084,23 @@ describe( 'OT', function() {
 				expectOperation( transOp, {
 					type: 'change',
 					address: newAdr,
-					offset: 3,
 					attr: 'foo',
 					value: 'bar'
 				} );
 			} );
 
-			it( 'should not change if insert offset was after changed node', function() {
+			it( 'should not update address if insert offset was after changed node', function() {
 				var adr = addressPair.same;
+
+				// Add "offset" to the address instead because change operation
+				// does not take offset parameter, expecting only and address to changed node.
+				adr[ 1 ].path = adr[ 1 ].path.concat( 0 );
+
 				var newAdr = OT.copyAddress( adr[ 1 ] );
 
 				var transOp = getTransformedOp( 'insert', 'change', {
 					address: adr,
-					offset: [ 2, 0 ],
+					offset: [ 2, null ],
 					node: [ nodeA, null ],
 					attr: [ null, 'foo' ],
 					value: [ null, 'bar' ]
@@ -1106,7 +1109,6 @@ describe( 'OT', function() {
 				expectOperation( transOp, {
 					type: 'change',
 					address: newAdr,
-					offset: 0,
 					attr: 'foo',
 					value: 'bar'
 				} );
@@ -1114,12 +1116,17 @@ describe( 'OT', function() {
 
 			it( 'should update address at node(i) if applied operation\'s address was a prefix and its offset is before node(i)', function() {
 				var adr = addressPair.prefix;
+
+				// Add "offset" to the address instead because change operation
+				// does not take offset parameter, expecting only and address to changed node.
+				adr[ 1 ].path = adr[ 1 ].path.concat( 0 );
+
 				var newAdr = OT.copyAddress( adr[ 1 ] );
 				newAdr.path[ 3 ] = 4;
 
 				var transOp = getTransformedOp( 'insert', 'change', {
 					address: adr,
-					offset: [ 0, 0 ],
+					offset: [ 0, null ],
 					node: [ nodeA, null ],
 					attr: [ null, 'foo' ],
 					value: [ null, 'bar' ]
@@ -1128,7 +1135,6 @@ describe( 'OT', function() {
 				expectOperation( transOp, {
 					type: 'change',
 					address: newAdr,
-					offset: 0,
 					attr: 'foo',
 					value: 'bar'
 				} );
@@ -1138,11 +1144,16 @@ describe( 'OT', function() {
 		describe( 'chn x rmv', function() {
 			it( 'should not change when addresses are different', function() {
 				var adr = addressPair.diff;
+
+				// Add "offset" to the address instead because change operation
+				// does not take offset parameter, expecting only and address to changed node.
+				adr[ 1 ].path = adr[ 1 ].path.concat( 2 );
+
 				var newAdr = OT.copyAddress( adr[ 1 ] );
 
 				var transOp = getTransformedOp( 'remove', 'change', {
 					address: adr,
-					offset: [ 0, 2 ],
+					offset: [ 0, null ],
 					node: [ nodeA, null ],
 					attr: [ null, 'foo' ],
 					value: [ null, 'bar' ]
@@ -1151,19 +1162,24 @@ describe( 'OT', function() {
 				expectOperation( transOp, {
 					type: 'change',
 					address: newAdr,
-					offset: 2,
 					attr: 'foo',
 					value: 'bar'
 				} );
 			} );
 
-			it( 'should decrement offset if remove offset was before changed node', function() {
+			it( 'should update address if remove offset was before changed node', function() {
 				var adr = addressPair.same;
+
+				// Add "offset" to the address instead because change operation
+				// does not take offset parameter, expecting only and address to changed node.
+				adr[ 1 ].path = adr[ 1 ].path.concat( 2 );
+
 				var newAdr = OT.copyAddress( adr[ 1 ] );
+				newAdr.path[ 3 ] = 1;
 
 				var transOp = getTransformedOp( 'remove', 'change', {
 					address: adr,
-					offset: [ 0, 2 ],
+					offset: [ 0, null ],
 					node: [ nodeA, null ],
 					attr: [ null, 'foo' ],
 					value: [ null, 'bar' ]
@@ -1172,19 +1188,23 @@ describe( 'OT', function() {
 				expectOperation( transOp, {
 					type: 'change',
 					address: newAdr,
-					offset: 1,
 					attr: 'foo',
 					value: 'bar'
 				} );
 			} );
 
-			it( 'should not change if remove offset was after changed node', function() {
+			it( 'should not update address if remove offset was after changed node', function() {
 				var adr = addressPair.same;
+
+				// Add "offset" to the address instead because change operation
+				// does not take offset parameter, expecting only and address to changed node.
+				adr[ 1 ].path = adr[ 1 ].path.concat( 0 );
+
 				var newAdr = OT.copyAddress( adr[ 1 ] );
 
 				var transOp = getTransformedOp( 'remove', 'change', {
 					address: adr,
-					offset: [ 2, 0 ],
+					offset: [ 2, null ],
 					node: [ nodeA, null ],
 					attr: [ null, 'foo' ],
 					value: [ null, 'bar' ]
@@ -1193,7 +1213,6 @@ describe( 'OT', function() {
 				expectOperation( transOp, {
 					type: 'change',
 					address: newAdr,
-					offset: 0,
 					attr: 'foo',
 					value: 'bar'
 				} );
@@ -1201,12 +1220,17 @@ describe( 'OT', function() {
 
 			it( 'should update address at node(i) if applied operation\'s address was a prefix and its offset is before node(i)', function() {
 				var adr = addressPair.prefix;
+
+				// Add "offset" to the address instead because change operation
+				// does not take offset parameter, expecting only and address to changed node.
+				adr[ 1 ].path = adr[ 1 ].path.concat( 0 );
+
 				var newAdr = OT.copyAddress( adr[ 1 ] );
 				newAdr.path[ 3 ] = 2;
 
 				var transOp = getTransformedOp( 'remove', 'change', {
 					address: adr,
-					offset: [ 0, 0 ],
+					offset: [ 0, null ],
 					node: [ nodeA, null ],
 					attr: [ null, 'foo' ],
 					value: [ null, 'bar' ]
@@ -1215,7 +1239,6 @@ describe( 'OT', function() {
 				expectOperation( transOp, {
 					type: 'change',
 					address: newAdr,
-					offset: 0,
 					attr: 'foo',
 					value: 'bar'
 				} );
@@ -1223,9 +1246,14 @@ describe( 'OT', function() {
 
 			it( 'should have it\'s root and path updated if one of nodes on the address path was removed', function() {
 				var adr = addressPair.prefix;
+
+				// Add "offset" to the address instead because change operation
+				// does not take offset parameter, expecting only and address to changed node.
+				adr[ 1 ].path = adr[ 1 ].path.concat( 0 );
+
 				var transOp = getTransformedOp( 'remove', 'change', {
 					address: adr,
-					offset: [ 3, 0 ],
+					offset: [ 3, null ],
 					node: [ nodeA, null ],
 					attr: [ null, 'foo' ],
 					value: [ null, 'bar' ]
@@ -1233,8 +1261,7 @@ describe( 'OT', function() {
 
 				expectOperation( transOp, {
 					type: 'change',
-					address: OT.createAddress( nodeA, [ ] ),
-					offset: 0,
+					address: OT.createAddress( nodeA, [ 0 ] ),
 					attr: 'foo',
 					value: 'bar'
 				} );
@@ -1248,7 +1275,6 @@ describe( 'OT', function() {
 
 				var transOp = getTransformedOp( 'change', 'change', {
 					address: adr,
-					offset: [ 0, 0 ],
 					attr: [ 'abc', 'foo' ],
 					value: [ 'xyz', 'bar' ]
 				} );
@@ -1256,7 +1282,6 @@ describe( 'OT', function() {
 				expectOperation( transOp, {
 					type: 'change',
 					address: newAdr,
-					offset: 0,
 					attr: 'foo',
 					value: 'bar'
 				} );
@@ -1268,7 +1293,6 @@ describe( 'OT', function() {
 
 				var transOp = getTransformedOp( 'change', 'change', {
 					address: adr,
-					offset: [ 0, 0 ],
 					attr: [ 'foo', 'foo' ],
 					value: [ 'bar', 'xyz' ],
 					site: [ 1, 2 ]
@@ -1277,7 +1301,6 @@ describe( 'OT', function() {
 				expectOperation( transOp, {
 					type: 'change',
 					address: newAdr,
-					offset: 0,
 					attr: 'foo',
 					value: 'xyz'
 				} );
@@ -1288,7 +1311,6 @@ describe( 'OT', function() {
 
 				var transOp = getTransformedOp( 'change', 'change', {
 					address: adr,
-					offset: [ 0, 0 ],
 					attr: [ 'foo', 'foo' ],
 					value: [ 'bar', 'xyz' ]
 				} );
@@ -1308,12 +1330,11 @@ describe( 'OT', function() {
 			} );
 
 			it( 'should not change if change target is in different path than move origin and destination', function() {
-				var opAddress = OT.createAddress( docRoot, [ 0, 3 ] );
+				var opAddress = OT.createAddress( docRoot, [ 0, 3, 0 ] );
 				var newAddress = OT.copyAddress( opAddress );
 
 				var inOp = OT.createOperation( 'change', {
 					address: opAddress,
-					offset: 0,
 					attr: 'foo',
 					value: 'bar',
 					site: 1
@@ -1322,7 +1343,7 @@ describe( 'OT', function() {
 				var siOp = OT.createOperation( 'move', {
 					fromAddress: fromAddress,
 					fromOffset: 2,
-					node: nodeA,
+					node: nodeB,
 					toAddress: toAddress,
 					toOffset: 0,
 					site: 2
@@ -1333,19 +1354,17 @@ describe( 'OT', function() {
 				expectOperation( transOp, {
 					type: 'change',
 					address: newAddress,
-					offset: 0,
 					attr: 'foo',
 					value: 'bar'
 				} );
 			} );
 
 			it( 'should have it\'s address merged with destination address if change was inside moved node sub-tree', function() {
-				var opAddress = OT.createAddress( docRoot, [ 0, 1, 0 ] );
-				var newAddress = OT.createAddress( docRoot, [ 1, 1, 1, 0 ] );
+				var opAddress = OT.createAddress( docRoot, [ 0, 1, 0, 2 ] );
+				var newAddress = OT.createAddress( docRoot, [ 1, 1, 1, 0, 2 ] );
 
 				var inOp = OT.createOperation( 'change', {
 					address: opAddress,
-					offset: 2,
 					attr: 'foo',
 					value: 'bar',
 					site: 1
@@ -1354,7 +1373,7 @@ describe( 'OT', function() {
 				var siOp = OT.createOperation( 'move', {
 					fromAddress: OT.createAddress( docRoot, [ 0 ] ),
 					fromOffset: 1,
-					node: nodeA,
+					node: nodeB,
 					toAddress: OT.createAddress( docRoot, [ 1, 1 ] ),
 					toOffset: 1,
 					site: 2
@@ -1365,19 +1384,18 @@ describe( 'OT', function() {
 				expectOperation( transOp, {
 					type: 'change',
 					address: newAddress,
-					offset: 2,
 					attr: 'foo',
 					value: 'bar'
 				} );
 			} );
 
 			it( 'should decrement offset if address is same as move origin and change offset is after moved node offset', function() {
-				var opAddress = OT.createAddress( docRoot, [ 1, 1 ] );
+				var opAddress = OT.createAddress( docRoot, [ 1, 1, 2 ] );
 				var newAddress = OT.copyAddress( opAddress );
+				newAddress.path[ 2 ] = 1;
 
 				var inOp = OT.createOperation( 'change', {
 					address: opAddress,
-					offset: 2,
 					attr: 'foo',
 					value: 'bar',
 					site: 1
@@ -1386,7 +1404,7 @@ describe( 'OT', function() {
 				var siOp = OT.createOperation( 'move', {
 					fromAddress: fromAddress,
 					fromOffset: 0,
-					node: nodeA,
+					node: nodeB,
 					toAddress: toAddress,
 					toOffset: 0,
 					site: 2
@@ -1397,85 +1415,18 @@ describe( 'OT', function() {
 				expectOperation( transOp, {
 					type: 'change',
 					address: newAddress,
-					offset: 1,
 					attr: 'foo',
 					value: 'bar'
 				} );
 			} );
 
 			it( 'should increment offset if address is same as move destination and change offset is after move-to offset', function() {
-				var opAddress = OT.createAddress( docRoot, [ 0, 2, 0 ] );
-				var newAddress = OT.copyAddress( opAddress );
-
-				var inOp = OT.createOperation( 'change', {
-					address: opAddress,
-					offset: 1,
-					attr: 'foo',
-					value: 'bar',
-					site: 1
-				} );
-
-				var siOp = OT.createOperation( 'move', {
-					fromAddress: fromAddress,
-					fromOffset: 0,
-					node: nodeA,
-					toAddress: toAddress,
-					toOffset: 0,
-					site: 2
-				} );
-
-				var transOp = OT.IT.change.move( inOp, siOp );
-
-				expectOperation( transOp, {
-					type: 'change',
-					address: newAddress,
-					offset: 2,
-					attr: 'foo',
-					value: 'bar'
-				} );
-			} );
-
-			it( 'should update address if moved node is next to a node from insert path', function() {
-				var opAddress = OT.createAddress( docRoot, [ 1, 1, 1 ] );
-				var newAddress = OT.copyAddress( opAddress );
-				newAddress.path[ 2 ] = 0;
-
-				var inOp = OT.createOperation( 'change', {
-					address: opAddress,
-					offset: 0,
-					attr: 'foo',
-					value: 'bar',
-					site: 1
-				} );
-
-				var siOp = OT.createOperation( 'move', {
-					fromAddress: fromAddress,
-					fromOffset: 0,
-					node: nodeA,
-					toAddress: toAddress,
-					toOffset: 0,
-					site: 2
-				} );
-
-				var transOp = OT.IT.change.move( inOp, siOp );
-
-				expectOperation( transOp, {
-					type: 'change',
-					address: newAddress,
-					offset: 0,
-					attr: 'foo',
-					value: 'bar'
-				} );
-			} );
-
-			it( 'should update address if move-in destination is next to a node from insert path', function() {
 				var opAddress = OT.createAddress( docRoot, [ 0, 2, 0, 1 ] );
 				var newAddress = OT.copyAddress( opAddress );
 				newAddress.path[ 3 ] = 2;
 
 				var inOp = OT.createOperation( 'change', {
 					address: opAddress,
-					offset: 0,
 					attr: 'foo',
 					value: 'bar',
 					site: 1
@@ -1484,7 +1435,7 @@ describe( 'OT', function() {
 				var siOp = OT.createOperation( 'move', {
 					fromAddress: fromAddress,
 					fromOffset: 0,
-					node: nodeA,
+					node: nodeB,
 					toAddress: toAddress,
 					toOffset: 0,
 					site: 2
@@ -1495,7 +1446,68 @@ describe( 'OT', function() {
 				expectOperation( transOp, {
 					type: 'change',
 					address: newAddress,
-					offset: 0,
+					attr: 'foo',
+					value: 'bar'
+				} );
+			} );
+
+			it( 'should update address if moved node is next to a node from insert path', function() {
+				var opAddress = OT.createAddress( docRoot, [ 1, 1, 1, 0 ] );
+				var newAddress = OT.copyAddress( opAddress );
+				newAddress.path[ 2 ] = 0;
+
+				var inOp = OT.createOperation( 'change', {
+					address: opAddress,
+					attr: 'foo',
+					value: 'bar',
+					site: 1
+				} );
+
+				var siOp = OT.createOperation( 'move', {
+					fromAddress: fromAddress,
+					fromOffset: 0,
+					node: nodeB,
+					toAddress: toAddress,
+					toOffset: 0,
+					site: 2
+				} );
+
+				var transOp = OT.IT.change.move( inOp, siOp );
+
+				expectOperation( transOp, {
+					type: 'change',
+					address: newAddress,
+					attr: 'foo',
+					value: 'bar'
+				} );
+			} );
+
+			it( 'should update address if move-in destination is next to a node from insert path', function() {
+				var opAddress = OT.createAddress( docRoot, [ 0, 2, 0, 1, 0 ] );
+				var newAddress = OT.copyAddress( opAddress );
+				newAddress.path[ 3 ] = 2;
+
+				var inOp = OT.createOperation( 'change', {
+					address: opAddress,
+					attr: 'foo',
+					value: 'bar',
+					site: 1
+				} );
+
+				var siOp = OT.createOperation( 'move', {
+					fromAddress: fromAddress,
+					fromOffset: 0,
+					node: nodeB,
+					toAddress: toAddress,
+					toOffset: 0,
+					site: 2
+				} );
+
+				var transOp = OT.IT.change.move( inOp, siOp );
+
+				expectOperation( transOp, {
+					type: 'change',
+					address: newAddress,
 					attr: 'foo',
 					value: 'bar'
 				} );
@@ -1514,7 +1526,6 @@ describe( 'OT', function() {
 				inOp = OT.createOperation( 'move', {
 					fromAddress: fromAddress,
 					fromOffset: 2,
-					node: nodeA,
 					toAddress: toAddress,
 					toOffset: 0,
 					site: 1
@@ -1669,7 +1680,6 @@ describe( 'OT', function() {
 				inOp = OT.createOperation( 'move', {
 					fromAddress: fromAddress,
 					fromOffset: 2,
-					node: nodeA,
 					toAddress: toAddress,
 					toOffset: 0,
 					site: 1
@@ -1831,7 +1841,6 @@ describe( 'OT', function() {
 					type: 'move',
 					fromAddress: OT.createAddress( nodeB, [ ] ),
 					fromOffset: 2,
-					node: nodeA,
 					toAddress: toAddress,
 					toOffset: 0
 				} );
@@ -1854,7 +1863,6 @@ describe( 'OT', function() {
 					type: 'move',
 					fromAddress: fromAddress,
 					fromOffset: 2,
-					node: nodeA,
 					toAddress: OT.createAddress( nodeB, [ 0 ] ),
 					toOffset: 0
 				} );
@@ -1887,7 +1895,6 @@ describe( 'OT', function() {
 				var inOp = OT.createOperation( 'move', {
 					fromAddress: OT.createAddress( docRoot, [ 0, 1 ], 1 ),
 					fromOffset: 0,
-					node: nodeA,
 					toAddress: OT.createAddress( docRoot, [ 0, 3 ], 1 ),
 					toOffset: 0,
 					site: 1
@@ -1928,7 +1935,6 @@ describe( 'OT', function() {
 				inOp = OT.createOperation( 'move', {
 					fromAddress: fromAddress,
 					fromOffset: fromOffset,
-					node: nodeA,
 					toAddress: toAddress,
 					toOffset: toOffset,
 					site: 1
@@ -2343,7 +2349,7 @@ describe( 'OT', function() {
 					var siOp = OT.createOperation( 'move', {
 						fromAddress: OT.createAddress( docRoot, [ ], 0 ),
 						fromOffset: 2,
-						node: nodeA,
+						node: nodeB,
 						toAddress: OT.createAddress( docRoot, [ 1, 1, 1 ], 0 ),
 						toOffset: 0,
 						site: 0

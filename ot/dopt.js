@@ -11,69 +11,85 @@ var docRoot = new OT.BlockNode( 'body' );
 
 function applyOperations( operations ) {
 	for ( var i = 0; i < operations.length; i++ ) {
-		OT.applyOperation( operations[ i ] );
+		var operationNode = OT.applyOperation( operations[ i ] );
+		operations[ i ].node = operationNode;
 	}
 }
 
-function dopt( siteOperations, incomingOperations ) {
-	applyOperations( siteOperations );
+function dopt( siteOps, inOps ) {
+	if ( siteOps.length == 0 ) {
+		applyOperations( inOps );
+		return {
+			transformedIncoming: inOps,
+			ITsDone: 0
+		};
+	}
 
-	var transformedIncoming = [];
-	var ITsDone = 0;
+	applyOperations( siteOps );
 
-	for ( var i = 0; i < incomingOperations.length; i++ ) {
-		var transformedSite = [];
-		var inOp = incomingOperations[ i ];
-		var transInOp = OT.copyOperation( inOp );
+	var transOps, newSiteOps, applyOps = [];
 
-		for ( var j = 0; j < siteOperations.length; j++ ) {
-			var siOp = siteOperations[ j ];
-			var newTransInOp;
+	for ( var i = 0; i < inOps.length; i++ ) {
+		transOps = [];
+		newSiteOps = [];
 
-			newTransInOp = OT.IT[ transInOp.type ][ siOp.type ]( transInOp, siOp );
-			siOp = OT.IT[ siOp.type ][ transInOp.type ]( siOp, transInOp );
+		var op = inOps[ i ];
 
-			ITsDone += 2;
+		for ( var j = 0; j < siteOps.length; j++ ) {
+			transOps.push( op );
 
-			transformedSite.push( siOp );
-
-			transInOp = newTransInOp;
+			op = OT.IT[ op.type ][ siteOps[ j ].type ]( op, siteOps[ j ] );
 		}
 
-		OT.applyOperation( transInOp );
-		transformedIncoming.push( transInOp );
+		var node = OT.applyOperation( op );
 
-		siteOperations = transformedSite;
+		for ( var j = 0; j < siteOps.length; j++ ) {
+			transOps[ j ].node = node;
+			op = OT.IT[ siteOps[ j ].type ][ transOps[ j ].type ]( siteOps[ j ], transOps[ j ] );
+
+			newSiteOps.push( op );
+		}
+
+		applyOps.push( op );
+
+		siteOps = newSiteOps;
 	}
 
 	return {
-		transformedIncoming: transformedIncoming,
-		ITsDone: ITsDone
+		transformedIncoming: applyOps,
+		ITsDone: inOps.length * siteOps.length * 2
 	};
 }
 
-function createOpFromTextLine( line, siteId ) {
-	var args = line.split( ' ', 4 );
-	var path = args[ 1 ].split( ',' );
+function getPath( pathString ) {
+	var path = pathString.split( ',' );
 
 	for ( var i = 0; i < path.length; i++ ) {
 		path[ i ] = Number( path[ i ] );
 	}
 
+	return path
+}
+
+function createOpFromTextLine( line, siteId ) {
+	var args = line.split( ' ', 4 );
+
 	var op = {
 		type: args[ 0 ]
 	};
 
-	var offset, address;
+	var offset, address, path;
 
 	switch ( op.type ) {
 		case 'insert':
+			path = getPath( args[ 1 ] );
 			offset = path.pop();
 			address = OT.createAddress( docRoot, path );
 
 			op.props = {
 				address: address,
-				offset: offset
+				offset: offset,
+				node: null
 			};
 
 			var node = null;
@@ -82,33 +98,47 @@ function createOpFromTextLine( line, siteId ) {
 				node = new OT.TextNode( args[ 3 ] );
 			} else if ( args[ 2 ] == 'block' ) {
 				node = new OT.BlockNode( args[ 3 ] );
-			} else if ( args[ 2 ] == 'node' ) {
-				node = OT.getNode( OT.createAddress( docRoot, args[ 3 ].split( ',' ) ) );
 			}
 
 			op.props.node = node;
 
 			break;
 		case 'remove':
+			path = getPath( args[ 1 ] );
 			offset = path.pop();
 			address = OT.createAddress( docRoot, path );
 
 			op.props = {
 				address: address,
 				offset: offset,
-				node: OT.getNode( address )
+				node: null
 			};
 
 			break;
 		case 'change':
-			offset = path.pop();
+			path = getPath( args[ 1 ] );
 			address = OT.createAddress( docRoot, path );
 
 			op.props = {
 				address: address,
-				offset: offset,
 				attr: args[ 2 ],
 				value: args[ 3 ]
+			};
+
+			break;
+		case 'move':
+			var	pathFrom = getPath( args[ 1 ] );
+			var	pathTo = getPath( args[ 2 ] );
+			var fromOffset = pathFrom.pop();
+			var toOffset = pathTo.pop();
+			var fromAddress = OT.createAddress( docRoot, pathFrom );
+			var toAddress = OT.createAddress( docRoot, pathTo );
+
+			op.props = {
+				fromAddress: fromAddress,
+				fromOffset: fromOffset,
+				toAddress: toAddress,
+				toOffset: toOffset
 			};
 
 			break;

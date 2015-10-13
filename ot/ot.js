@@ -177,45 +177,83 @@ function applyOperation( op ) {
 		}
 	}
 
-	OP[ op.type ].apply( this, params );
+	return OP[ op.type ].apply( this, params );
 }
 
-function getNoOp() {
-	return createOperation( 'noop' );
+function getNoOp( a ) {
+	var address;
+
+	switch ( a.type ) {
+		case 'move':
+			address = copyAddress( a.fromAddress );
+			address.path.push( a.fromOffset );
+			break;
+
+		case 'change':
+		case 'noop':
+			address = copyAddress( a.address );
+			break;
+
+		default:
+			address = copyAddress( a.address );
+			address.path.push( a.offset );
+			break;
+	}
+
+	return createOperation( 'noop', {
+		address: address
+	} );
 }
 
 var OP = {
 	insert: function( address, offset, node ) {
+		if ( node.parent !== null ) {
+			throw Error( 'Trying to insert a node that is already inserted.' );
+		}
+
 		var parent = getNode( address );
 		parent.addChild( offset, node );
+
+		return node;
 	},
 	remove: function( address, offset ) {
 		var parent = getNode( address );
-		parent.removeChild( offset );
+		return parent.removeChild( offset );
 	},
-	change: function( address, offset, attr, value ) {
+	change: function( address, attr, value ) {
 		var node = getNode( address );
-
-		if ( offset != -1 ) {
-			node = node.getChild( offset );
-		}
-
 		node.changeAttr( attr, value );
+
+		return node;
 	},
-	move: function( fromAddress, fromOffset, node, toAddress, toOffset ) {
-		var toNode = getNode( toAddress );
-		while ( toNode != null ) {
-			if ( toNode == node ) {
+	move: function( fromAddress, fromOffset, toAddress, toOffset ) {
+		var destinationNode = getNode( toAddress );
+		var movedNode = getNode( fromAddress ).getChild( fromOffset );
+
+		var node = destinationNode;
+		while ( node != null ) {
+			if ( node == movedNode ) {
 				throw Error( 'Trying to move a node into itself or it\'s descendant.' );
 			}
 
-			toNode = toNode.parent;
+			node = node.parent;
 		}
 
-		OP.remove( fromAddress, fromOffset );
-		OP.insert( toAddress, toOffset, node );
+		var originNode = movedNode.parent;
+
+		originNode.removeChild( fromOffset );
+
+		if ( originNode == destinationNode && fromOffset < toOffset ) {
+			toOffset--;
+		}
+
+		destinationNode.addChild( toOffset, movedNode );
+
+		return movedNode;
 	},
-	noop: function() {}
+	noop: function( address ) {
+		return getNode( address );
+	}
 };
 
 function transform( a, b ) {
@@ -237,8 +275,8 @@ var IT = {
 			} else if ( compare( a.address, b.address ) == PREFIX ) {
 				var i = b.address.path.length;
 
-				// if (nb < Na[i]) or (nb = Na[i] and site(Na) < site(Nb))
-				if ( b.offset < a.address.path[ i ] || ( b.offset == a.address.path[ i ] && a.site < b.site ) ) {
+				// if (nb <= Na[i])
+				if ( b.offset <= a.address.path[ i ] ) {
 					// N'a[i] <- Na[i] + 1
 					a.address.path[ i ]++;
 				}
@@ -299,13 +337,15 @@ var IT = {
 			var b1 = createOperation( 'remove', {
 				address: copyAddress( b.fromAddress ),
 				offset: b.fromOffset,
-				node: b.node
+				node: b.node,
+				site: b.site
 			} );
 
 			var b2 = createOperation( 'insert', {
 				address: copyAddress( b.toAddress ),
 				offset: b.toOffset,
-				node: b.node
+				node: b.node,
+				site: b.site
 			} );
 			b2 = transform( b2, b1 );
 
@@ -367,7 +407,7 @@ var IT = {
 				// ** this is removing the same element, so each time when this happens, the incoming operation should be skipped
 				else if ( b.offset == a.offset ) {
 					//return change(Na, children, identity)
-					return getNoOp();
+					return getNoOp( a );
 				}
 			}
 
@@ -400,13 +440,15 @@ var IT = {
 			var b1 = createOperation( 'remove', {
 				address: copyAddress( b.fromAddress ),
 				offset: b.fromOffset,
-				node: b.node
+				node: b.node,
+				site: b.site
 			} );
 
 			var b2 = createOperation( 'insert', {
 				address: copyAddress( b.toAddress ),
 				offset: b.toOffset,
-				node: b.node
+				node: b.node,
+				site: b.site
 			} );
 			b2 = transform( b2, b1 );
 
@@ -438,12 +480,6 @@ var IT = {
 				}
 			}
 
-			else if ( compare( a.address, b.address ) == SAME ) {
-				if ( b.offset <= a.offset ) {
-					a.offset++;
-				}
-			}
-
 			// return change(N'a, k, f)
 			return a;
 		},
@@ -466,14 +502,6 @@ var IT = {
 					// N'a <- (M, Na[i + 1 :])
 					a.address = createAddress( b.node, a.address.path.slice( i + 1 ) );
 				}
-			} else if ( compare( a.address, b.address ) == SAME ) {
-				if ( b.offset < a.offset ) {
-					a.offset--;
-				} else if ( b.offset == a.offset ) {
-					// N'a <- (M, Na[i + 1 :])
-					a.address = createAddress( b.node, [ ] );
-					a.offset = -1;
-				}
 			}
 
 			// return change(N'a, k, f)
@@ -484,8 +512,8 @@ var IT = {
 
 			// If we change same node and same attr, one of operations have to get on top of the another.
 			// So if this happens and a.site < b.site, we skip this operation.
-			if ( compare( a.address, b.address ) == SAME && a.offset == b.offset && a.attr == b.attr && a.site < b.site ) {
-				return getNoOp();
+			if ( compare( a.address, b.address ) == SAME && a.attr == b.attr && a.site < b.site ) {
+				return getNoOp( a );
 			}
 
 			return a;
@@ -496,13 +524,15 @@ var IT = {
 			var b1 = createOperation( 'remove', {
 				address: copyAddress( b.fromAddress ),
 				offset: b.fromOffset,
-				node: b.node
+				node: b.node,
+				site: b.site
 			} );
 
 			var b2 = createOperation( 'insert', {
 				address: copyAddress( b.toAddress ),
 				offset: b.toOffset,
-				node: b.node
+				node: b.node,
+				site: b.site
 			} );
 			b2 = transform( b2, b1 );
 
@@ -519,16 +549,16 @@ var IT = {
 			var a1 = createOperation( 'remove', {
 				address: copyAddress( a.fromAddress ),
 				offset: a.fromOffset,
+				node: null,
 				site: a.site
 			} );
 
 			var a2 = createOperation( 'insert', {
 				address: copyAddress( a.toAddress ),
-				node: a.node,
 				offset: a.toOffset,
+				node: null,
 				site: a.site
 			} );
-			a2 = transform( a2, a1 );
 
 			a1 = transform( a1, b );
 			a2 = transform( a2, b );
@@ -536,9 +566,9 @@ var IT = {
 			return createOperation( 'move', {
 				fromAddress: a1.address,
 				fromOffset: a1.offset,
-				node: a.node,
 				toAddress: a2.address,
 				toOffset: a2.offset,
+				node: null,
 				site: a.site
 			} );
 		},
@@ -548,21 +578,22 @@ var IT = {
 			var a1 = createOperation( 'remove', {
 				address: copyAddress( a.fromAddress ),
 				offset: a.fromOffset,
+				node: null,
 				site: a.site
 			} );
 
 			var a2 = createOperation( 'insert', {
 				address: copyAddress( a.toAddress ),
-				node: a.node,
 				offset: a.toOffset,
+				node: null,
 				site: a.site
 			} );
-			a2 = transform( a2, a1 );
 
 			a1 = transform( a1, b );
 
 			if ( a1.type == 'noop' ) {
-				return a2;
+				a2.node = b.node;
+				return transform( a2, b );
 			}
 
 			a2 = transform( a2, b );
@@ -570,9 +601,9 @@ var IT = {
 			return createOperation( 'move', {
 				fromAddress: a1.address,
 				fromOffset: a1.offset,
-				node: a.node,
 				toAddress: a2.address,
 				toOffset: a2.offset,
+				node: null,
 				site: a.site
 			} );
 		},
@@ -594,7 +625,7 @@ var IT = {
 				|| ( compare( a.fromAddress, b.fromAddress ) == SAME && a.fromOffset == b.fromOffset )
 			) {
 				if ( a.site < b.site ) {
-					return getNoOp();
+					return getNoOp( a );
 				} else {
 					return a;
 				}
@@ -603,12 +634,14 @@ var IT = {
 			var b1 = createOperation( 'remove', {
 				address: copyAddress( b.fromAddress ),
 				offset: b.fromOffset,
+				node: b.node,
 				site: b.site
 			} );
 
 			var b2 = createOperation( 'insert', {
 				address: copyAddress( b.toAddress ),
 				offset: b.toOffset,
+				node: b.node,
 				site: b.site
 			} );
 			b2 = transform( b2, b1 );
