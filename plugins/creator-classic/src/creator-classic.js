@@ -7,7 +7,7 @@
 
 'use strict';
 
-CKEDITOR.define( 'plugin!creator', [
+CKEDITOR.define( 'plugin!creator-classic', [
 	'plugin',
 	'promise',
 	'ui/region',
