@@ -5,7 +5,7 @@
 
 'use strict';
 
-CKEDITOR.define( 'component!appchrome', [ 'component!chrome' ], function( Chrome ) {
+CKEDITOR.define( 'cmpt!appchrome', [ 'cmpt!chrome' ], function( Chrome ) {
 	/**
 	 * Creates an instance of the {@link AppChrome} class.
 	 *
