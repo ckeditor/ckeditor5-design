@@ -20,15 +20,18 @@ CKEDITOR.define( [ 'ui/view' ], function( View ) {
 			 * The template of this button.
 			 */
 			this.template = {
-				tag: 'input',
+				tag: 'span',
+				text: this.bindModel( 'count', function( el, value ) {
+					return model.label + ' (' + value + ')';
+				} ),
 				attributes: {
-					'class': [ 'ck-button' ],
-					type: 'button',
-					value: this.bind( this.model, 'value' ),
-					disabled: this.bind( this.model, 'disabled', ( el, value ) =>
-						el[ ( value ? 'set' : 'remove' ) + 'Attribute' ]( 'disabled', 'disabled' ) )
+					'class': this.bindModel( 'state', function( el, value ) {
+						return 'ck-button ' + 'ck-button-' + value;
+					} )
 				}
 			};
+
+			this.el.addEventListener( 'click', this.fire.bind( this, 'click' ) );
 		}
 	}
 

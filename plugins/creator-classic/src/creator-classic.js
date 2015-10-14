@@ -14,7 +14,8 @@ CKEDITOR.define( 'plugin!creator-classic', [
 	'plugin!ui-library/appchrome',
 	'plugin!ui-library/button',
 	'plugin!ui-library/framededitable',
-	'plugin!creator-classic/editorchrome'
+	'plugin!creator-classic/editorchrome',
+	'plugin!toolbar'
 ], function( Plugin, Promise, Region, AppChrome, Button, FramedEditable, EditorChrome ) {
 	class ClassicCreator {
 		constructor( editor ) {
@@ -37,20 +38,15 @@ CKEDITOR.define( 'plugin!creator-classic', [
 
 			function injectChrome() {
 				var editorChrome = new EditorChrome();
-				var mainRegion = new Region( 'main' );
 
-				mainRegion.views.add( editorChrome );
-
-				var boldButton = new Button( {
-					value: 'Bold button',
-					disabled: false
-				} );
+				var toolbar = editor.plugins.get( 'toolbar' );
+				editorChrome.regions.get( 0 ).views.add( toolbar.getView() );
 
 				framedEditable = new FramedEditable();
-
-				editorChrome.regions.get( 0 ).views.add( boldButton );
 				editorChrome.regions.get( 1 ).views.add( framedEditable );
 
+				var mainRegion = new Region( 'main' );
+				mainRegion.views.add( editorChrome );
 				editor.regions = {
 					main: mainRegion
 				};
