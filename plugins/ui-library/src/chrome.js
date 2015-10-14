@@ -6,13 +6,13 @@
 'use strict';
 
 CKEDITOR.define( [ 'ui/view' ], function( View ) {
-	/**
-	 * Creates an instance of the {@link Chrome} class.
-	 *
-	 * @param {Model} mode (View)Model of this Chrome.
-	 * @constructor
-	 */
 	class Chrome extends View {
+		/**
+		 * Creates an instance of the {@link Chrome} class.
+		 *
+		 * @param {Model} mode (View)Model of this Chrome.
+		 * @constructor
+		 */
 		constructor( model ) {
 			super( model );
 

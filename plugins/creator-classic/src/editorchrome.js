@@ -5,7 +5,7 @@
 
 'use strict';
 
-CKEDITOR.define( 'cmpt!editorchrome', [ 'cmpt!appchrome', 'ui/region' ], function( AppChrome, Region ) {
+CKEDITOR.define( 'plugin!creator-classic/editorchrome', [ 'plugin!ui-library/appchrome', 'ui/region' ], function( AppChrome, Region ) {
 	/**
 	 * Creates an instance of the {@link EditorChrome} class.
 	 *

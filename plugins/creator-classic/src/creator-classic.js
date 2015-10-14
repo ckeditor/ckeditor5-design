@@ -11,10 +11,10 @@ CKEDITOR.define( 'plugin!creator-classic', [
 	'plugin',
 	'promise',
 	'ui/region',
-	'cmpt!appchrome',
-	'cmpt!button',
-	'cmpt!framededitable',
-	'cmpt!editorchrome'				// 'plugin!creator/editorchrome'
+	'plugin!ui-library/appchrome',
+	'plugin!ui-library/button',
+	'plugin!ui-library/framededitable',
+	'plugin!creator-classic/editorchrome'
 ], function( Plugin, Promise, Region, AppChrome, Button, FramedEditable, EditorChrome ) {
 	class ClassicCreator {
 		constructor( editor ) {

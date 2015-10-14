@@ -5,14 +5,14 @@
 
 'use strict';
 
-CKEDITOR.define( 'cmpt!appchrome', [ 'cmpt!chrome' ], function( Chrome ) {
-	/**
-	 * Creates an instance of the {@link AppChrome} class.
-	 *
-	 * @param {Model} mode (View)Model of this AppChrome.
-	 * @constructor
-	 */
+CKEDITOR.define( [ './chrome' ], function( Chrome ) {
 	class AppChrome extends Chrome {
+		/**
+		 * Creates an instance of the {@link AppChrome} class.
+		 *
+		 * @param {Model} mode (View)Model of this AppChrome.
+		 * @constructor
+		 */
 		constructor( model ) {
 			super( model );
 
