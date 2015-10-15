@@ -5,6 +5,13 @@
 
 'use strict';
 
+/**
+ * UI Library App Chrome Component.
+ *
+ * @class AppChrome
+ * @extends Chrome
+ */
+
 CKEDITOR.define( 'plugin!ui-library/appchrome', [ 'plugin!ui-library/chrome' ], function( Chrome ) {
 	class AppChrome extends Chrome {
 		/**

@@ -5,6 +5,13 @@
 
 'use strict';
 
+/**
+ * UI Library Plugin.
+ *
+ * @class UiLibrary
+ * @extends Plugin
+ */
+
 CKEDITOR.define( 'plugin!ui-library', [ 'plugin' ], function( Plugin ) {
 	class UiLibrary extends Plugin {
 		constructor( editor ) {

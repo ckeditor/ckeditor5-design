@@ -5,6 +5,13 @@
 
 'use strict';
 
+/**
+ * EditorToolbar UI component for Toolbar Plugin.
+ *
+ * @class EditorToolbar
+ * @extends Toolbar
+ */
+
 CKEDITOR.define( 'plugin!toolbar/editortoolbar', [ 'plugin!ui-library/toolbar', 'ui/region' ], function( Toolbar, Region ) {
 	/**
 	 * Creates an instance of the {@link AppChrome} class.

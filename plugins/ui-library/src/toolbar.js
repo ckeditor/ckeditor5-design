@@ -5,6 +5,13 @@
 
 'use strict';
 
+/**
+ * UI Library Toolbar Component.
+ *
+ * @class Toolbar
+ * @extends View
+ */
+
 CKEDITOR.define( 'plugin!ui-library/toolbar', [ 'ui/view' ], function( View ) {
 	class Toolbar extends View {
 		/**

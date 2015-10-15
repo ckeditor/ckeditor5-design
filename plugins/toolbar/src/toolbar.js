@@ -5,6 +5,13 @@
 
 'use strict';
 
+/**
+ * Basic Toolbar Plugin.
+ *
+ * @class Toolbar
+ * @extends Plugin
+ */
+
 CKEDITOR.define( 'plugin!toolbar', [
 	'plugin',
 	'promise',
@@ -12,7 +19,7 @@ CKEDITOR.define( 'plugin!toolbar', [
 	'plugin!toolbar/editortoolbar',
 	'plugin!ui-library/button'
 ], function( Plugin, Promise, Region, EditorToolbar, Button ) {
-	class ToolbarPlugin extends Plugin {
+	class Toolbar extends Plugin {
 		constructor( editor ) {
 			super( editor );
 		}
@@ -55,5 +62,5 @@ CKEDITOR.define( 'plugin!toolbar', [
 		}
 	}
 
-	return ToolbarPlugin;
+	return Toolbar;
 } );

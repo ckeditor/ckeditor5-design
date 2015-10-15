@@ -5,6 +5,13 @@
 
 'use strict';
 
+/**
+ * UI Library Button Component.
+ *
+ * @class Button
+ * @extends View
+ */
+
 CKEDITOR.define( 'plugin!ui-library/button', [ 'ui/view' ], function( View ) {
 	class Button extends View {
 		/**

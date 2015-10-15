@@ -5,6 +5,13 @@
 
 'use strict';
 
+/**
+ * UI Library Framed Editable Component.
+ *
+ * @class FramedEditable
+ * @extends View
+ */
+
 CKEDITOR.define( 'plugin!ui-library/framededitable', [ 'ui/view' ], function( View ) {
 	class FramedEditable extends View {
 		constructor( model ) {

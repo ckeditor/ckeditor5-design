@@ -5,6 +5,13 @@
 
 'use strict';
 
+/**
+ * UI Library Chrome Component.
+ *
+ * @class Chrome
+ * @extends View
+ */
+
 CKEDITOR.define( 'plugin!ui-library/chrome', [ 'ui/view' ], function( View ) {
 	class Chrome extends View {
 		/**
