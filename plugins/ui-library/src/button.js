@@ -21,10 +21,10 @@ CKEDITOR.define( 'plugin!ui-library/button', [ 'ui/view' ], function( View ) {
 			 */
 			this.template = {
 				tag: 'span',
-				text: this.bindModel( 'count',
+				text: this.bind( 'count',
 					( el, value ) => model.label + ' (' + value + ')' ),
 				attributes: {
-					'class': this.bindModel( 'state',
+					'class': this.bind( 'state',
 						( el, value ) => 'ck-button ' + 'ck-button-' + value )
 				}
 			};
