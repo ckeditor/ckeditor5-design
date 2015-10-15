@@ -5,7 +5,7 @@
 
 'use strict';
 
-CKEDITOR.define( [ 'ui/view' ], function( View ) {
+CKEDITOR.define( 'plugin!ui-library/chrome', [ 'ui/view' ], function( View ) {
 	class Chrome extends View {
 		/**
 		 * Creates an instance of the {@link Chrome} class.

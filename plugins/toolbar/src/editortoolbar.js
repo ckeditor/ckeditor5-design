@@ -5,7 +5,7 @@
 
 'use strict';
 
-CKEDITOR.define( [ 'plugin!ui-library/toolbar', 'ui/region' ], function( Toolbar, Region ) {
+CKEDITOR.define( 'plugin!toolbar/editortoolbar', [ 'plugin!ui-library/toolbar', 'ui/region' ], function( Toolbar, Region ) {
 	/**
 	 * Creates an instance of the {@link AppChrome} class.
 	 *

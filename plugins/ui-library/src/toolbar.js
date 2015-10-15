@@ -5,7 +5,7 @@
 
 'use strict';
 
-CKEDITOR.define( [ 'ui/view' ], function( View ) {
+CKEDITOR.define( 'plugin!ui-library/toolbar', [ 'ui/view' ], function( View ) {
 	class Toolbar extends View {
 		/**
 		 * Creates an instance of the {@link Toolbar} class.

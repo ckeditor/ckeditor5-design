@@ -5,7 +5,7 @@
 
 'use strict';
 
-CKEDITOR.define( [ 'ui/view' ], function( View ) {
+CKEDITOR.define( 'plugin!ui-library/button', [ 'ui/view' ], function( View ) {
 	class Button extends View {
 		/**
 		 * Creates an instance of the {@link Button} class.
@@ -21,17 +21,17 @@ CKEDITOR.define( [ 'ui/view' ], function( View ) {
 			 */
 			this.template = {
 				tag: 'span',
-				text: this.bindModel( 'count', function( el, value ) {
-					return model.label + ' (' + value + ')';
-				} ),
+				text: this.bindModel( 'count',
+					( el, value ) => model.label + ' (' + value + ')' ),
 				attributes: {
-					'class': this.bindModel( 'state', function( el, value ) {
-						return 'ck-button ' + 'ck-button-' + value;
-					} )
+					'class': this.bindModel( 'state',
+						( el, value ) => 'ck-button ' + 'ck-button-' + value )
 				}
 			};
 
-			this.el.addEventListener( 'click', this.fire.bind( this, 'click' ) );
+			this.listeners.push(
+				() => this.domListener( this.el, 'click', 'click' )
+			);
 		}
 	}
 
