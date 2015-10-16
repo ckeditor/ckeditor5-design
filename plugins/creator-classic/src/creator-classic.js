@@ -8,7 +8,7 @@
 'use strict';
 
 CKEDITOR.define( 'plugin!creator-classic', [
-	'plugin',
+	'creator',
 	'promise',
 	'ui/region',
 	'plugin!ui-library/appchrome',
@@ -16,25 +16,18 @@ CKEDITOR.define( 'plugin!creator-classic', [
 	'plugin!ui-library/framededitable',
 	'plugin!creator-classic/editorchrome',
 	'plugin!toolbar'
-], function( Plugin, Promise, Region, AppChrome, Button, FramedEditable, EditorChrome ) {
-	class ClassicCreator {
+], function( Creator, Promise, Region, AppChrome, Button, FramedEditable, EditorChrome ) {
+	class ClassicCreatorPlugin extends Creator {
 		constructor( editor ) {
-			this.editor = editor;
+			super( editor );
 		}
 
 		create() {
 			var editor = this.editor;
-			var element = editor.element;
+			var el = editor.element;
 			var framedEditable;
 
-			return Promise.resolve()
-				.then( hideElement )
-				.then( injectChrome )
-				.then( initEditable );
-
-			function hideElement() {
-				element.style.display = 'none';
-			}
+			var hideElement = () => el.style.display = 'none';
 
 			function injectChrome() {
 				var editorChrome = new EditorChrome();
@@ -57,29 +50,16 @@ CKEDITOR.define( 'plugin!creator-classic', [
 			function initEditable() {
 				// This is totally wrong. It is not supposed to be the way to initialize the editable.
 				var iframe = framedEditable.el;
-				var body = iframe.contentDocument.body;
-				body.contentEditable = true;
+				iframe.contentDocument.body.contentEditable = true;
 			}
+
+			return Promise.resolve()
+				.then( hideElement )
+				.then( injectChrome )
+				.then( initEditable );
 		}
 
-		destroy() {
-		}
-	}
-
-	class ClassicCreatorPlugin extends Plugin {
-		constructor( editor ) {
-			super( editor );
-		}
-
-		init() {
-			var creator = new ClassicCreator( this.editor );
-
-			this.editor.on( 'destroy', function() {
-				creator.destroy();
-			} );
-
-			return creator.create();
-		}
+		destroy() {}
 	}
 
 	return ClassicCreatorPlugin;
