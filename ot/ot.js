@@ -613,22 +613,35 @@ var IT = {
 		move: function( a, b ) {
 			a = copyOperation( a );
 
-			// Conflicting scenarios:
-			if (
-				(
-					// Both move operations destinations are inside nodes that are also move operations origins.
-					// So in other words, we move sub-trees into each others.
-					( compare( a.toAddress, b.fromAddress ) == PREFIX && a.toAddress.path[ b.fromAddress.path.length ] == b.fromOffset ) &&
-					( compare( b.toAddress, a.fromAddress ) == PREFIX && b.toAddress.path[ a.fromAddress.path.length ] == a.toOffset )
-				)
-					// Both operations try to move the same node.
-				|| ( compare( a.fromAddress, b.fromAddress ) == SAME && a.fromOffset == b.fromOffset )
-			) {
+			// Both operations try to move the same node.
+			if ( compare( a.fromAddress, b.fromAddress ) == SAME && a.fromOffset == b.fromOffset ) {
 				if ( a.site < b.site ) {
 					return getNoOp( a );
 				} else {
-					return a;
+					return createOperation( 'move', {
+						fromAddress: b.toAddress,
+						fromOffset: b.toOffset,
+						toAddress: a.toAddress,
+						toOffset: a.toOffset,
+						node: b.node,
+						site: a.site
+					} );
 				}
+			}
+
+			// Both move operations destinations are inside nodes that are also move operations origins.
+			// So in other words, we move sub-trees into each others.
+			if ( ( compare( a.toAddress, b.fromAddress ) == PREFIX && a.toAddress.path[ b.fromAddress.path.length ] == b.fromOffset ) &&
+				 ( compare( b.toAddress, a.fromAddress ) == PREFIX && b.toAddress.path[ a.fromAddress.path.length ] == a.toOffset ) ) {
+
+				return createOperation( 'move', {
+					fromAddress: b.toAddress,
+					fromOffset: b.toOffset,
+					toAddress: b.fromAddress,
+					toOffset: b.fromOffset,
+					node: b.node,
+					site: a.site
+				} );
 			}
 
 			var b1 = createOperation( 'remove', {

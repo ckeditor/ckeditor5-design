@@ -157,7 +157,7 @@ describe( 'OT', function() {
 			it( 'should throw when trying to move a node inside itself', function() {
 				assert.throws(
 					function() {
-						OT.OP.move( fromAddress, 0, node, OT.createAddress( docRoot, [ 0, 0 ], 1 ), 0 );
+						OT.OP.move( fromAddress, 0, node, OT.createAddress( docRoot, [ 0, 0 ] ), 0 );
 					},
 					Error
 				);
@@ -181,20 +181,20 @@ describe( 'OT', function() {
 			addressPair = {
 				// address A (0) is different than address B (1)
 				diff: [
-					OT.createAddress( docRoot, [ 0, 2, 1, 3 ], 1 ),
-					OT.createAddress( docRoot, [ 0, 2, 4, 1, 0 ], 2 )
+					OT.createAddress( docRoot, [ 0, 2, 1, 3 ] ),
+					OT.createAddress( docRoot, [ 0, 2, 4, 1, 0 ] )
 				],
 
 				// address A (0) is a prefix of address B (1)
 				prefix: [
-					OT.createAddress( docRoot, [ 0, 1, 1 ], 1 ),
-					OT.createAddress( docRoot, [ 0, 1, 1, 3 ], 2 )
+					OT.createAddress( docRoot, [ 0, 1, 1 ] ),
+					OT.createAddress( docRoot, [ 0, 1, 1, 3 ] )
 				],
 
 				// address A (0) is exactly same as B (1)
 				same: [
-					OT.createAddress( docRoot, [ 0, 2, 3 ], 1 ),
-					OT.createAddress( docRoot, [ 0, 2, 3 ], 2 )
+					OT.createAddress( docRoot, [ 0, 2, 3 ] ),
+					OT.createAddress( docRoot, [ 0, 2, 3 ] )
 				]
 			};
 
@@ -481,10 +481,10 @@ describe( 'OT', function() {
 				} );
 
 				var siOp = OT.createOperation( 'move', {
-					fromAddress: OT.createAddress( docRoot, [ 0, 2 ], 2 ),
+					fromAddress: OT.createAddress( docRoot, [ 0, 2 ] ),
 					fromOffset: 0,
 					node: nodeB,
-					toAddress: OT.createAddress( docRoot, [ 1, 1, 1 ], 2 ),
+					toAddress: OT.createAddress( docRoot, [ 1, 1, 1 ] ),
 					toOffset: 0,
 					site: 2
 				} );
@@ -1893,15 +1893,15 @@ describe( 'OT', function() {
 			// remove in different spots than move op
 			it( 'should not change', function() {
 				var inOp = OT.createOperation( 'move', {
-					fromAddress: OT.createAddress( docRoot, [ 0, 1 ], 1 ),
+					fromAddress: OT.createAddress( docRoot, [ 0, 1 ] ),
 					fromOffset: 0,
-					toAddress: OT.createAddress( docRoot, [ 0, 3 ], 1 ),
+					toAddress: OT.createAddress( docRoot, [ 0, 3 ] ),
 					toOffset: 0,
 					site: 1
 				} );
 
 				var siOp = OT.createOperation( 'change', {
-					address: OT.createAddress( docRoot, [ 0, 1 ], 2 ),
+					address: OT.createAddress( docRoot, [ 0, 1 ] ),
 					offset: 0,
 					attr: 'foo',
 					value: 'bar',
@@ -1912,9 +1912,9 @@ describe( 'OT', function() {
 
 				expectOperation( transOp, {
 					type: 'move',
-					fromAddress: OT.createAddress( docRoot, [ 0, 1 ], 1 ),
+					fromAddress: OT.createAddress( docRoot, [ 0, 1 ] ),
 					fromOffset: 0,
-					toAddress: OT.createAddress( docRoot, [ 0, 3 ], 1 ),
+					toAddress: OT.createAddress( docRoot, [ 0, 3 ] ),
 					toOffset: 0
 				} );
 			} );
@@ -1972,7 +1972,7 @@ describe( 'OT', function() {
 
 				it( 'should decrement origin offset if affected by on-site move-out', function() {
 					var siOp = OT.createOperation( 'move', {
-						fromAddress: OT.createAddress( docRoot, [ 1 ], 2 ),
+						fromAddress: OT.createAddress( docRoot, [ 1 ] ),
 						fromOffset: 0,
 						node: nodeB,
 						toAddress: siteMoveAddress,
@@ -1998,7 +1998,7 @@ describe( 'OT', function() {
 						fromAddress: siteMoveAddress,
 						fromOffset: 0,
 						node: nodeB,
-						toAddress: OT.createAddress( docRoot, [ 1 ], 2 ),
+						toAddress: OT.createAddress( docRoot, [ 1 ] ),
 						toOffset: 1,
 						site: 2
 					} );
@@ -2018,7 +2018,7 @@ describe( 'OT', function() {
 
 				it( 'should update origin and destination path if affected by on-site move-out', function() {
 					var siOp = OT.createOperation( 'move', {
-						fromAddress: OT.createAddress( docRoot, [], 2 ),
+						fromAddress: OT.createAddress( docRoot, [] ),
 						fromOffset: 0,
 						node: nodeB,
 						toAddress: siteMoveAddress,
@@ -2045,7 +2045,7 @@ describe( 'OT', function() {
 						fromAddress: siteMoveAddress,
 						fromOffset: 0,
 						node: nodeB,
-						toAddress: OT.createAddress( docRoot, [], 2 ),
+						toAddress: OT.createAddress( docRoot, [] ),
 						toOffset: 0,
 						site: 2
 					} );
@@ -2066,7 +2066,7 @@ describe( 'OT', function() {
 
 				it( 'should decrement destination offset if affected by on-site move-out', function() {
 					var siOp = OT.createOperation( 'move', {
-						fromAddress: OT.createAddress( docRoot, [ 2 ], 2 ),
+						fromAddress: OT.createAddress( docRoot, [ 2 ] ),
 						fromOffset: 0,
 						node: nodeB,
 						toAddress: siteMoveAddress,
@@ -2092,7 +2092,7 @@ describe( 'OT', function() {
 						fromAddress: siteMoveAddress,
 						fromOffset: 0,
 						node: nodeB,
-						toAddress: OT.createAddress( docRoot, [ 2 ], 2 ),
+						toAddress: OT.createAddress( docRoot, [ 2 ] ),
 						toOffset: 0,
 						site: 2
 					} );
@@ -2118,7 +2118,7 @@ describe( 'OT', function() {
 
 				it( 'should decrement origin offset if affected by on-site move-out', function() {
 					var siOp = OT.createOperation( 'move', {
-						fromAddress: OT.createAddress( docRoot, [ 1 ], 2 ),
+						fromAddress: OT.createAddress( docRoot, [ 1 ] ),
 						fromOffset: 0,
 						node: nodeB,
 						toAddress: siteMoveAddress,
@@ -2144,7 +2144,7 @@ describe( 'OT', function() {
 						fromAddress: siteMoveAddress,
 						fromOffset: 0,
 						node: nodeB,
-						toAddress: OT.createAddress( docRoot, [ 1 ], 2 ),
+						toAddress: OT.createAddress( docRoot, [ 1 ] ),
 						toOffset: 1,
 						site: 2
 					} );
@@ -2164,7 +2164,7 @@ describe( 'OT', function() {
 
 				it( 'should update origin and destination path if affected by on-site move-out', function() {
 					var siOp = OT.createOperation( 'move', {
-						fromAddress: OT.createAddress( docRoot, [], 2 ),
+						fromAddress: OT.createAddress( docRoot, [] ),
 						fromOffset: 0,
 						node: nodeB,
 						toAddress: siteMoveAddress,
@@ -2191,7 +2191,7 @@ describe( 'OT', function() {
 						fromAddress: siteMoveAddress,
 						fromOffset: 0,
 						node: nodeB,
-						toAddress: OT.createAddress( docRoot, [], 2 ),
+						toAddress: OT.createAddress( docRoot, [] ),
 						toOffset: 0,
 						site: 2
 					} );
@@ -2212,7 +2212,7 @@ describe( 'OT', function() {
 
 				it( 'should decrement destination offset if affected by on-site move-out', function() {
 					var siOp = OT.createOperation( 'move', {
-						fromAddress: OT.createAddress( docRoot, [ 2 ], 2 ),
+						fromAddress: OT.createAddress( docRoot, [ 2 ] ),
 						fromOffset: 0,
 						node: nodeB,
 						toAddress: siteMoveAddress,
@@ -2238,7 +2238,7 @@ describe( 'OT', function() {
 						fromAddress: siteMoveAddress,
 						fromOffset: 0,
 						node: nodeB,
-						toAddress: OT.createAddress( docRoot, [ 2 ], 2 ),
+						toAddress: OT.createAddress( docRoot, [ 2 ] ),
 						toOffset: 0,
 						site: 2
 					} );
@@ -2259,10 +2259,10 @@ describe( 'OT', function() {
 
 			it( 'should not change if on-site move is from non-affecting position to inside of moved sub-tree', function() {
 				var siOp = OT.createOperation( 'move', {
-					fromAddress: OT.createAddress( docRoot, [ ], 2 ),
+					fromAddress: OT.createAddress( docRoot, [ ] ),
 					fromOffset: 3,
 					node: nodeB,
-					toAddress: OT.createAddress( docRoot, [ 1, 1 ], 2 ),
+					toAddress: OT.createAddress( docRoot, [ 1, 1 ] ),
 					toOffset: 1,
 					site: 2
 				} );
@@ -2280,10 +2280,10 @@ describe( 'OT', function() {
 
 			it( 'should update origin address if on-site move origin node sub-tree includes incoming move origin node', function() {
 				var siOp = OT.createOperation( 'move', {
-					fromAddress: OT.createAddress( docRoot, [ ], 2 ),
+					fromAddress: OT.createAddress( docRoot, [ ] ),
 					fromOffset: 1,
 					node: nodeB,
-					toAddress: OT.createAddress( docRoot, [ 2 ], 2 ),
+					toAddress: OT.createAddress( docRoot, [ 2 ] ),
 					toOffset: 0,
 					site: 2
 				} );
@@ -2305,10 +2305,10 @@ describe( 'OT', function() {
 
 			it( 'should update destination address if incoming move destination is inside of on-site moved sub-tree', function() {
 				var siOp = OT.createOperation( 'move', {
-					fromAddress: OT.createAddress( docRoot, [ ], 2 ),
+					fromAddress: OT.createAddress( docRoot, [ ] ),
 					fromOffset: 2,
 					node: nodeB,
-					toAddress: OT.createAddress( docRoot, [ ], 2 ),
+					toAddress: OT.createAddress( docRoot, [ ] ),
 					toOffset: 0,
 					site: 2
 				} );
@@ -2328,12 +2328,12 @@ describe( 'OT', function() {
 			} );
 
 			describe( 'when both move operations\' destinations are inside of moved sub-trees', function() {
-				it( 'should be changed to no-op if incoming operation has lower site id', function() {
+				it( 'should be changed to operation reversing site-on move', function() {
 					var siOp = OT.createOperation( 'move', {
-						fromAddress: OT.createAddress( docRoot, [ ], 2 ),
+						fromAddress: OT.createAddress( docRoot, [ ] ),
 						fromOffset: 2,
 						node: nodeB,
-						toAddress: OT.createAddress( docRoot, [ 1, 1, 1 ], 2 ),
+						toAddress: OT.createAddress( docRoot, [ 1, 1, 1 ] ),
 						toOffset: 0,
 						site: 2
 					} );
@@ -2341,28 +2341,11 @@ describe( 'OT', function() {
 					var transOp = OT.IT.move.move( inOp, siOp );
 
 					expectOperation( transOp, {
-						type: 'noop'
-					} );
-				} );
-
-				it( 'should not change if incoming operation has higher site id', function() {
-					var siOp = OT.createOperation( 'move', {
-						fromAddress: OT.createAddress( docRoot, [ ], 0 ),
-						fromOffset: 2,
-						node: nodeB,
-						toAddress: OT.createAddress( docRoot, [ 1, 1, 1 ], 0 ),
-						toOffset: 0,
-						site: 0
-					} );
-
-					var transOp = OT.IT.move.move( inOp, siOp );
-
-					expectOperation( transOp, {
 						type: 'move',
-						fromAddress: newFromAddress,
-						fromOffset: fromOffset,
-						toAddress: newToAddress,
-						toOffset: toOffset
+						fromAddress: OT.createAddress( docRoot, [ 1, 1, 1 ] ),
+						fromOffset: 0,
+						toAddress: OT.createAddress( docRoot, [ ] ),
+						toOffset: 2
 					} );
 				} );
 			} );
@@ -2370,10 +2353,10 @@ describe( 'OT', function() {
 			describe( 'when both move operations have same origin node', function() {
 				it( 'should be changed to no-op if incoming operation has lower site id', function() {
 					var siOp = OT.createOperation( 'move', {
-						fromAddress: OT.createAddress( docRoot, fromAddress.path.slice(), 2 ),
+						fromAddress: OT.copyAddress( fromAddress ),
 						fromOffset: fromOffset,
 						node: nodeB,
-						toAddress: OT.createAddress( docRoot, [ 1, 1, 1 ], 2 ),
+						toAddress: OT.createAddress( docRoot, [ 1, 1, 1 ] ),
 						toOffset: 0,
 						site: 2
 					} );
@@ -2385,12 +2368,12 @@ describe( 'OT', function() {
 					} );
 				} );
 
-				it( 'should not change if incoming operation has higher site id', function() {
+				it( 'should have it\'s origin address changed if incoming operation has higher site id', function() {
 					var siOp = OT.createOperation( 'move', {
-						fromAddress: OT.createAddress( docRoot, fromAddress.path.slice(), 0 ),
+						fromAddress: OT.copyAddress( fromAddress ),
 						fromOffset: fromOffset,
 						node: nodeB,
-						toAddress: OT.createAddress( docRoot, [ 1, 1, 1 ], 0 ),
+						toAddress: OT.createAddress( docRoot, [ 3 ] ),
 						toOffset: 0,
 						site: 0
 					} );
@@ -2399,8 +2382,8 @@ describe( 'OT', function() {
 
 					expectOperation( transOp, {
 						type: 'move',
-						fromAddress: newFromAddress,
-						fromOffset: fromOffset,
+						fromAddress: OT.createAddress( docRoot, [ 3 ] ),
+						fromOffset: 0,
 						toAddress: newToAddress,
 						toOffset: toOffset
 					} );
