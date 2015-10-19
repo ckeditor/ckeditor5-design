@@ -268,6 +268,18 @@ var IT = {
 
 			// if (<Na> = Mb)
 			if ( a.address.root == b.node ) {
+				if ( b.address.root == a.node ) {
+					// This means that we are inserting nodes into each other.
+					// We will revert site operation.
+
+					return createOperation( 'remove', {
+						address: copyAddress( b.address ),
+						offset: b.offset,
+						node: b.node,
+						site: a.site
+					} );
+				}
+
 				// N'a <- (<Nb>, Nb[:] + [nb] + Na[:])
 				a.address = createAddress( b.address.root, b.address.path.concat( b.offset, a.address.path ) );
 
@@ -616,12 +628,14 @@ var IT = {
 			// Both operations try to move the same node.
 			if ( compare( a.fromAddress, b.fromAddress ) == SAME && a.fromOffset == b.fromOffset ) {
 				if ( a.site < b.site ) {
+					// The site with lower id wins and it's document state will be final one.
 					return getNoOp( a );
 				} else {
+					// The site with higher id will move the node to the place specified by the site with lower id.
 					return createOperation( 'move', {
-						fromAddress: b.toAddress,
+						fromAddress: copyAddress( b.toAddress ),
 						fromOffset: b.toOffset,
-						toAddress: a.toAddress,
+						toAddress: copyAddress( a.toAddress ),
 						toOffset: a.toOffset,
 						node: b.node,
 						site: a.site
@@ -634,10 +648,12 @@ var IT = {
 			if ( ( compare( a.toAddress, b.fromAddress ) == PREFIX && a.toAddress.path[ b.fromAddress.path.length ] == b.fromOffset ) &&
 				 ( compare( b.toAddress, a.fromAddress ) == PREFIX && b.toAddress.path[ a.fromAddress.path.length ] == a.toOffset ) ) {
 
+				// Instead of applying incoming operation, we revert site operation.
+				// On the other side same will happen.
 				return createOperation( 'move', {
-					fromAddress: b.toAddress,
+					fromAddress: copyAddress( b.toAddress ),
 					fromOffset: b.toOffset,
-					toAddress: b.fromAddress,
+					toAddress: copyAddress( b.fromAddress ),
 					toOffset: b.fromOffset,
 					node: b.node,
 					site: a.site

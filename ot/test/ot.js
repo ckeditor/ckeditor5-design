@@ -316,6 +316,24 @@ describe( 'OT', function() {
 					node: nodeB
 				} );
 			} );
+
+			it( 'should be transformed to reversed operation if both operations insert nodes into each others', function() {
+				var transOp = getTransformedOp( 'insert', 'insert', {
+					address: [
+						OT.createAddress( nodeB, [ 0, 1 ] ),
+						OT.createAddress( nodeA, [ 2 ] )
+					],
+					offset: [ 1, 0 ],
+					node: [ nodeA, nodeB ]
+				} );
+
+				expectOperation( transOp, {
+					type: 'remove',
+					address: OT.createAddress( nodeB, [ 0, 1 ] ),
+					offset: 1,
+					node: nodeA
+				} );
+			} );
 		} );
 
 		describe( 'ins x rmv', function() {
