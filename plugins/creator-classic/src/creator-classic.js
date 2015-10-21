@@ -3,20 +3,19 @@
  * For licensing, see LICENSE.md.
  */
 
-/* globals document */
+/* globals Promise, document */
 
 'use strict';
 
 CKEDITOR.define( 'plugin!creator-classic', [
 	'creator',
-	'promise',
 	'ui/region',
 	'plugin!ui-library/appchrome',
 	'plugin!ui-library/button',
 	'plugin!ui-library/framededitable',
 	'plugin!creator-classic/editorchrome',
 	'plugin!toolbar'
-], function( Creator, Promise, Region, AppChrome, Button, FramedEditable, EditorChrome ) {
+], function( Creator, Region, AppChrome, Button, FramedEditable, EditorChrome ) {
 	class ClassicCreatorPlugin extends Creator {
 		constructor( editor ) {
 			super( editor );

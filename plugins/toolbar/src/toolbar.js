@@ -14,11 +14,10 @@
 
 CKEDITOR.define( 'plugin!toolbar', [
 	'plugin',
-	'promise',
 	'ui/region',
 	'plugin!toolbar/editortoolbar',
 	'plugin!ui-library/button'
-], function( Plugin, Promise, Region, EditorToolbar, Button ) {
+], function( Plugin, Region, EditorToolbar, Button ) {
 	class Toolbar extends Plugin {
 		constructor( editor ) {
 			super( editor );
