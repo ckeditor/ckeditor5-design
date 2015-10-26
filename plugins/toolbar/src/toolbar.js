@@ -47,7 +47,7 @@ CKEDITOR.define( 'plugin!toolbar', [
 			buttons = buttons.map( b => new Button( b ) );
 
 			for ( let b of buttons ) {
-				this.editorToolbar.regions.get( 0 ).views.add( b );
+				this.editorToolbar.regions.get( 'container' ).views.add( b );
 
 				b.on( 'click', () => {
 					b.model.state = ( b.model.state == 'off' ? 'on' : 'off' );

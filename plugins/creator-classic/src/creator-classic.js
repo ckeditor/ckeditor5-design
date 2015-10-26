@@ -32,10 +32,10 @@ CKEDITOR.define( 'plugin!creator-classic', [
 				var editorChrome = new EditorChrome();
 
 				var toolbar = editor.plugins.get( 'toolbar' );
-				editorChrome.regions.get( 0 ).views.add( toolbar.getView() );
+				editorChrome.regions.get( 'top' ).views.add( toolbar.getView() );
 
 				framedEditable = new FramedEditable();
-				editorChrome.regions.get( 1 ).views.add( framedEditable );
+				editorChrome.regions.get( 'editable' ).views.add( framedEditable );
 
 				var mainRegion = new Region( 'main' );
 				mainRegion.views.add( editorChrome );
