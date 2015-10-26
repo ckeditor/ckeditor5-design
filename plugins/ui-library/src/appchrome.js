@@ -26,7 +26,7 @@ CKEDITOR.define( 'plugin!ui-library/appchrome', [ 'plugin!ui-library/chrome' ], 
 			/**
 			 * The template of this AppChrome.
 			 */
-			this.template.attributes.class.push( 'ck-app-chrome' );
+			this.template.attrs.class.push( 'ck-app-chrome' );
 		}
 	}
 

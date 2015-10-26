@@ -26,7 +26,7 @@ CKEDITOR.define( 'plugin!toolbar/editortoolbar', [ 'plugin!ui-library/toolbar', 
 			/**
 			 * The template of this EditorToolbar.
 			 */
-			this.template.attributes.class.push( 'ck-editortoolbar' );
+			this.template.attrs.class.push( 'ck-editortoolbar' );
 
 			this.regions.add( new Region( 'toolbar', this.el ) );
 		}

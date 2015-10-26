@@ -30,15 +30,14 @@ CKEDITOR.define( 'plugin!ui-library/button', [ 'ui/view' ], function( View ) {
 				tag: 'span',
 				text: this.bind( 'count',
 					( el, value ) => model.label + ' (' + value + ')' ),
-				attributes: {
+				attrs: {
 					'class': this.bind( 'state',
 						( el, value ) => 'ck-button ' + 'ck-button-' + value )
+				},
+				on: {
+					click: 'click'
 				}
 			};
-
-			this.listeners.push(
-				() => this.domListener( this.el, 'click', 'click' )
-			);
 		}
 	}
 

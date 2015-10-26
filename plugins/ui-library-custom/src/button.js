@@ -16,7 +16,7 @@ CKEDITOR.define( 'plugin!ui-library-custom/button', [ 'plugin!ui-library/button'
 		constructor( model ) {
 			super( model );
 
-			this.template.attributes.class = this.bind( 'state',
+			this.template.attrs.class = this.bind( 'state',
 				( el, value ) => 'ck-button ck-button-custom ' + 'ck-button-' + value );
 		}
 	}

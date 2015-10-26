@@ -19,7 +19,7 @@ CKEDITOR.define( 'plugin!ui-library/framededitable', [ 'ui/view' ], function( Vi
 
 			this.template = {
 				tag: 'iframe',
-				attributes: {
+				attrs: {
 					'class': [ 'ck-framededitable' ],
 					sandbox: 'allow-same-origin'
 				}

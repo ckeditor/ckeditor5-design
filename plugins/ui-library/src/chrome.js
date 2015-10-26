@@ -28,7 +28,7 @@ CKEDITOR.define( 'plugin!ui-library/chrome', [ 'ui/view' ], function( View ) {
 			 */
 			this.template = {
 				tag: 'div',
-				attributes: {
+				attrs: {
 					'class': [ 'ck-chrome' ]
 				}
 			};

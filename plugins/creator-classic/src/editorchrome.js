@@ -19,17 +19,17 @@ CKEDITOR.define( 'plugin!creator-classic/editorchrome', [ 'plugin!ui-library/app
 			/**
 			 * The template of this EditorChrome.
 			 */
-			this.template.attributes.class.push( 'ck-editor-chrome' );
+			this.template.attrs.class.push( 'ck-editor-chrome' );
 			this.template.children = [
 				{
 					tag: 'div',
-					attributes: {
+					attrs: {
 						'class': 'ck-editor-chrome-top'
 					}
 				},
 				{
 					tag: 'div',
-					attributes: {
+					attrs: {
 						'class': 'ck-editor-chrome-editable'
 					}
 				}
