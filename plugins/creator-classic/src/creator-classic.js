@@ -24,26 +24,27 @@ CKEDITOR.define( 'plugin!creator-classic', [
 		create() {
 			var editor = this.editor;
 			var el = editor.element;
-			var framedEditable;
+			var framedEditableController;
 
 			var hideElement = () => el.style.display = 'none';
 
 			function injectChrome() {
-				var editorChrome = new EditorChrome();
+				var editorChromeController = new EditorChrome();
 
 				var toolbar = editor.plugins.get( 'toolbar' );
-				editorChrome.regions.get( 'top' ).views.add( toolbar.getView() );
+				editorChromeController.view.regions.get( 'top' ).views.add( toolbar.getView() );
 
-				framedEditable = new FramedEditable();
-				editorChrome.regions.get( 'editable' ).views.add( framedEditable );
+				framedEditableController = new FramedEditable();
+				editorChromeController.view.regions.get( 'editable' ).views.add( framedEditableController.view );
+				// editorChromeController.addSub( 'editable', framedEditableController );
 
 				var mainRegion = new Region( 'main' );
-				mainRegion.views.add( editorChrome );
+				mainRegion.views.add( editorChromeController.view );
 				editor.regions = {
 					main: mainRegion
 				};
 
-				document.body.appendChild( editorChrome.el );
+				document.body.appendChild( editorChromeController.view.el );
 			}
 
 			function initEditable() {
@@ -63,3 +64,49 @@ CKEDITOR.define( 'plugin!creator-classic', [
 
 	return ClassicCreatorPlugin;
 } );
+
+class Controller extends Model {
+	constructor() {
+		super();
+
+		/**
+		 * @readonly
+		 */
+		this.set( 'subs', new Collection() );
+	}
+
+	init() {
+		var that = this;
+
+		return Promise.resolve()
+			.then( initView )
+			.then( initSubControllers );
+
+		function initView() {
+			return that.view.init();
+		}
+
+		function initSubControllers() {
+			return Promise.all( that.subs.map( sub => sub.init() ) );
+		}
+	}
+
+	addSub( regionName, subController ) {
+		this.view.addSub( regionName, subController.view );
+		this.subs.add( subController );
+	}
+
+	destroy() {
+		this.subs.forEach( sub => sub.destroy() );
+	}
+}
+
+class View {
+	init() {
+		return Promise.all( this.regions.map( view => view.init() ) );
+	}
+
+	addSub( regionName, subView ) {
+		this.regions.get( regionName, subView );
+	}
+}
