@@ -36,7 +36,7 @@ CKEDITOR.define( 'plugin!creator-classic', [
 		constructor( model ) {
 			super( model );
 
-			this.view = new ClassicCreatorView();
+			this.view = new ClassicCreatorView( model );
 		}
 
 		init() {
@@ -46,18 +46,16 @@ CKEDITOR.define( 'plugin!creator-classic', [
 			this.model.editor.regions = this.view.regions;
 
 			return super.init()
-				.then( hideElement )
 				.then( injectChrome )
 				.then( initEditable );
-
-			function hideElement() {
-				editor.element.style.display = 'none';
-			}
 
 			function injectChrome() {
 				var editorChrome = new Controller( {}, new EditorChromeView() );
 
-				return that.append( editorChrome, 'root' )
+				return that.append( editorChrome, 'chrome' )
+					.then( () => {
+						document.body.appendChild( editorChrome.view.el );
+					} )
 					.then( injectToolbar )
 					.then( injectEditable );
 
@@ -86,10 +84,14 @@ CKEDITOR.define( 'plugin!creator-classic', [
 	}
 
 	class ClassicCreatorView extends View {
-		constructor() {
-			super();
+		constructor( model ) {
+			super( model );
 
-			this.regions.add( new Region( 'root', document.body ) );
+			this.regions.add( new Region( 'chrome' ) );
+		}
+
+		init() {
+			this.model.editor.element.style.display = 'none';
 		}
 	}
 
