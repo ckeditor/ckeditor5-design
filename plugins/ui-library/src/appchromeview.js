@@ -12,8 +12,10 @@
  * @extends Chrome
  */
 
-CKEDITOR.define( 'plugin!ui-library/appchrome', [ 'plugin!ui-library/chrome' ], function( Chrome ) {
-	class AppChrome extends Chrome {
+CKEDITOR.define( 'plugin!ui-library/appchromeview', [
+	'plugin!ui-library/chromeview'
+], function( ChromeView ) {
+	class AppChromeView extends ChromeView {
 		/**
 		 * Creates an instance of the {@link AppChrome} class.
 		 *
@@ -30,5 +32,5 @@ CKEDITOR.define( 'plugin!ui-library/appchrome', [ 'plugin!ui-library/chrome' ], 
 		}
 	}
 
-	return AppChrome;
+	return AppChromeView;
 } );

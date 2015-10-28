@@ -12,8 +12,8 @@
  * @extends View
  */
 
-CKEDITOR.define( 'plugin!ui-library/chrome', [ 'ui/view' ], function( View ) {
-	class Chrome extends View {
+CKEDITOR.define( 'plugin!ui-library/chromeview', [ 'ui/view' ], function( View ) {
+	class ChromeView extends View {
 		/**
 		 * Creates an instance of the {@link Chrome} class.
 		 *
@@ -33,7 +33,10 @@ CKEDITOR.define( 'plugin!ui-library/chrome', [ 'ui/view' ], function( View ) {
 				}
 			};
 		}
+
+		init() {
+		}
 	}
 
-	return Chrome;
+	return ChromeView;
 } );

@@ -10,55 +10,87 @@
 CKEDITOR.define( 'plugin!creator-classic', [
 	'creator',
 	'ui/region',
-	'plugin!ui-library/appchrome',
-	'plugin!ui-library/button',
-	'plugin!ui-library/framededitable',
-	'plugin!creator-classic/editorchrome',
+	'ui/controller',
+	'ui/view',
+	'plugin!ui-library/framededitableview',
+	'plugin!creator-classic/editorchromeview',
 	'plugin!toolbar'
-], function( Creator, Region, AppChrome, Button, FramedEditable, EditorChrome ) {
+], function( Creator, Region, Controller, View, FramedEditableView, EditorChromeView ) {
 	class ClassicCreatorPlugin extends Creator {
 		constructor( editor ) {
 			super( editor );
 		}
 
 		create() {
-			var editor = this.editor;
-			var el = editor.element;
-			var framedEditable;
+			var controller = new ClassicCreatorController( {
+				editor: this.editor
+			} );
 
-			var hideElement = () => el.style.display = 'none';
-
-			function injectChrome() {
-				var editorChrome = new EditorChrome();
-
-				var toolbar = editor.plugins.get( 'toolbar' );
-				editorChrome.regions.get( 'top' ).views.add( toolbar.getView() );
-
-				framedEditable = new FramedEditable();
-				editorChrome.regions.get( 'editable' ).views.add( framedEditable );
-
-				var mainRegion = new Region( 'main' );
-				mainRegion.views.add( editorChrome );
-				editor.regions = {
-					main: mainRegion
-				};
-
-				document.body.appendChild( editorChrome.el );
-			}
-
-			function initEditable() {
-				// This is totally wrong. It is not supposed to be the way to initialize the editable.
-				var iframe = framedEditable.el;
-				iframe.contentDocument.body.contentEditable = true;
-			}
-
-			return Promise.resolve()
-				.then( hideElement )
-				.then( injectChrome )
-				.then( initEditable );
+			return controller.init();
 		}
 
 		destroy() {}
+	}
+
+	class ClassicCreatorController extends Controller {
+		constructor( model ) {
+			super( model );
+
+			this.view = new ClassicCreatorView();
+		}
+
+		init() {
+			var editor = this.model.editor;
+			var that = this;
+
+			this.model.editor.regions = this.view.regions;
+
+			return super.init()
+				.then( hideElement )
+				.then( injectChrome )
+				.then( initEditable );
+
+			function hideElement() {
+				editor.element.style.display = 'none';
+			}
+
+			function injectChrome() {
+				var editorChrome = new Controller( {}, new EditorChromeView() );
+
+				return that.append( editorChrome, 'root' )
+					.then( injectToolbar )
+					.then( injectEditable );
+
+				function injectEditable() {
+					return Promise.resolve( new Controller( {}, new FramedEditableView() ) )
+						.then( framedEditable => {
+							return editorChrome.append( framedEditable, 'editable' );
+						} );
+				}
+
+				function injectToolbar() {
+					var toolbarPlugin = editor.plugins.get( 'toolbar' );
+
+					return Promise.resolve( toolbarPlugin.getController() )
+						.then( toolbar => {
+							return editorChrome.append( toolbar, 'top' );
+						} );
+				}
+			}
+
+			function initEditable( framedEditable ) {
+				var iframe = framedEditable.view.el;
+				iframe.contentDocument.body.contentEditable = true;
+			}
+		}
+	}
+
+	class ClassicCreatorView extends View {
+		constructor() {
+			super();
+
+			this.regions.add( new Region( 'root', document.body ) );
+		}
 	}
 
 	return ClassicCreatorPlugin;

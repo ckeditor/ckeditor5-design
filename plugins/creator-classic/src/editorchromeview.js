@@ -5,14 +5,17 @@
 
 'use strict';
 
-CKEDITOR.define( 'plugin!creator-classic/editorchrome', [ 'plugin!ui-library/appchrome', 'ui/region' ], function( AppChrome, Region ) {
+CKEDITOR.define( 'plugin!creator-classic/editorchromeview', [
+	'plugin!ui-library/appchromeview',
+	'ui/region'
+], function( AppChromeView, Region ) {
 	/**
 	 * Creates an instance of the {@link EditorChrome} class.
 	 *
 	 * @param {Model} mode (View)Model of this EditorChrome.
 	 * @constructor
 	 */
-	class EditorChrome extends AppChrome {
+	class EditorChromeView extends AppChromeView {
 		constructor( model ) {
 			super( model );
 
@@ -35,13 +38,10 @@ CKEDITOR.define( 'plugin!creator-classic/editorchrome', [ 'plugin!ui-library/app
 				}
 			];
 
-			var topRegion = new Region( 'top', this.el.firstChild );
-			var editableRegion = new Region( 'editable', this.el.lastChild );
-
-			this.regions.add( topRegion );
-			this.regions.add( editableRegion );
+			this.regions.add( new Region( 'top', this.el.firstChild ) );
+			this.regions.add( new Region( 'editable', this.el.lastChild ) );
 		}
 	}
 
-	return EditorChrome;
+	return EditorChromeView;
 } );

@@ -12,12 +12,12 @@
  * @extends View
  */
 
-CKEDITOR.define( 'plugin!ui-library/button', [ 'ui/view' ], function( View ) {
-	class Button extends View {
+CKEDITOR.define( 'plugin!ui-library/button/view', [ 'ui/view' ], function( View ) {
+	class ButtonView extends View {
 		/**
-		 * Creates an instance of the {@link Button} class.
+		 * Creates an instance of the {@link ButtonView} class.
 		 *
-		 * @param {Model} mode (View)Model of this Button.
+		 * @param {Model} mode (View)Model of this ButtonView.
 		 * @constructor
 		 */
 		constructor( model ) {
@@ -41,5 +41,5 @@ CKEDITOR.define( 'plugin!ui-library/button', [ 'ui/view' ], function( View ) {
 		}
 	}
 
-	return Button;
+	return ButtonView;
 } );

@@ -12,8 +12,8 @@
  * @extends View
  */
 
-CKEDITOR.define( 'plugin!ui-library/toolbar', [ 'ui/view' ], function( View ) {
-	class Toolbar extends View {
+CKEDITOR.define( 'plugin!ui-library/toolbarview', [ 'ui/view' ], function( View ) {
+	class ToolbarView extends View {
 		/**
 		 * Creates an instance of the {@link Toolbar} class.
 		 *
@@ -35,5 +35,5 @@ CKEDITOR.define( 'plugin!ui-library/toolbar', [ 'ui/view' ], function( View ) {
 		}
 	}
 
-	return Toolbar;
+	return ToolbarView;
 } );

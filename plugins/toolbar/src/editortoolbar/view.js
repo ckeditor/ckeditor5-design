@@ -3,6 +3,8 @@
  * For licensing, see LICENSE.md.
  */
 
+ /* global setTimeout */
+
 'use strict';
 
 /**
@@ -12,14 +14,17 @@
  * @extends Toolbar
  */
 
-CKEDITOR.define( 'plugin!toolbar/editortoolbar', [ 'plugin!ui-library/toolbar', 'ui/region' ], function( Toolbar, Region ) {
+CKEDITOR.define( 'plugin!toolbar/editortoolbar/view', [
+	'plugin!ui-library/toolbarview',
+	'ui/region'
+], function( ToolbarView, Region ) {
 	/**
 	 * Creates an instance of the {@link AppChrome} class.
 	 *
 	 * @param {Model} mode (View)Model of this AppChrome.
 	 * @constructor
 	 */
-	class EditorToolbar extends Toolbar {
+	class EditorToolbarView extends ToolbarView {
 		constructor( model ) {
 			super( model );
 
@@ -30,7 +35,15 @@ CKEDITOR.define( 'plugin!toolbar/editortoolbar', [ 'plugin!ui-library/toolbar', 
 
 			this.regions.add( new Region( 'container', this.el ) );
 		}
+
+		init() {
+			return new Promise( resolve => {
+				setTimeout( function() {
+					resolve();
+				}, 1000 );
+			} );
+		}
 	}
 
-	return EditorToolbar;
+	return EditorToolbarView;
 } );

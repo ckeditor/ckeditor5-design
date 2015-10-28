@@ -3,6 +3,8 @@
  * For licensing, see LICENSE.md.
  */
 
+/* global setTimeout */
+
 'use strict';
 
 /**
@@ -12,8 +14,8 @@
  * @extends View
  */
 
-CKEDITOR.define( 'plugin!ui-library/framededitable', [ 'ui/view' ], function( View ) {
-	class FramedEditable extends View {
+CKEDITOR.define( 'plugin!ui-library/framededitableview', [ 'ui/view' ], function( View ) {
+	class FramedEditableView extends View {
 		constructor( model ) {
 			super( model );
 
@@ -25,7 +27,15 @@ CKEDITOR.define( 'plugin!ui-library/framededitable', [ 'ui/view' ], function( Vi
 				}
 			};
 		}
+
+		init() {
+			return new Promise( resolve => {
+				setTimeout( function() {
+					resolve();
+				}, 2000 );
+			} );
+		}
 	}
 
-	return FramedEditable;
+	return FramedEditableView;
 } );
