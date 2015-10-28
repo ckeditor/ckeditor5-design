@@ -57,7 +57,7 @@ function dopt( siteOps, inOps ) {
 			}
 		}
 
-		applyOperations(ops);
+		applyOperations( ops );
 		var ops = null;
 
 		for ( var j = 0; j < siteOps.length; j++ ) {
@@ -69,14 +69,13 @@ function dopt( siteOps, inOps ) {
 			for ( var k = 0; k < ops.length; k++ ) {
 				ops[ k ] = OT.IT[ siteOps[ j ].type ][ transOps[ j ].type ]( siteOps[ j ], transOps[ j ] );
 
-				// flatten array
 				if ( ops[ k ] instanceof Array ) {
-					var from = k;
-					k += ops[ k ].length;
-					Array.prototype.splice.apply( ops, [ from, 1 ].concat( ops[ from ] ) );
+					for ( var l = 0; l < ops.length; l++ ) {
+						newSiteOps.push( ops[ k ][ l ] );
+					}
+				} else {
+					newSiteOps.push( ops[ k ] );
 				}
-
-				newSiteOps.push( ops[ k ] );
 			}
 		}
 

@@ -2161,28 +2161,25 @@ describe( 'OT', function() {
 
 					var transOp = OT.IT.move.move( inOp, siOp );
 
-
 					assert.equal( transOp instanceof Array, true, "Operation got split" );
 					assert.equal( transOp.length, 2, "Operation got transformed into two operations" );
 
-					// common range first
 					expectOperation( transOp[ 0 ], {
-						type: 'move',
-						fromAddress: docAdr( [ 5 ] ),
-						fromOffset: 1,
-						howMany: 1,
-						toAddress: newToAddress,
-						toOffset: toOffset
-					} );
-
-					// shrunk incoming range second
-					expectOperation( transOp[ 1 ], {
 						type: 'move',
 						fromAddress: newFromAddress,
 						fromOffset: 2,
 						howMany: 1,
 						toAddress: newToAddress,
 						toOffset: toOffset
+					} );
+
+					expectOperation( transOp[ 1 ], {
+						type: 'move',
+						fromAddress: docAdr( [ 5 ] ),
+						fromOffset: 1,
+						howMany: 1,
+						toAddress: newToAddress,
+						toOffset: toOffset + 1
 					} );
 				} );
 			} );
@@ -2223,11 +2220,9 @@ describe( 'OT', function() {
 
 					var transOp = OT.IT.move.move( inOp, siOp );
 
-
 					assert.equal( transOp instanceof Array, true, "Operation got split" );
 					assert.equal( transOp.length, 2, "Operation got transformed into two operations" );
 
-					// shrunk incoming range first
 					expectOperation( transOp[ 0 ], {
 						type: 'move',
 						fromAddress: newFromAddress,
@@ -2237,7 +2232,6 @@ describe( 'OT', function() {
 						toOffset: toOffset
 					} );
 
-					// common range second
 					expectOperation( transOp[ 1 ], {
 						type: 'move',
 						fromAddress: docAdr( [ 5 ] ),
@@ -2291,7 +2285,6 @@ describe( 'OT', function() {
 					assert.equal( transOp instanceof Array, true, "Operation got split" );
 					assert.equal( transOp.length, 2, "Operation got transformed into two operations" );
 
-					// "glued" incoming range first
 					expectOperation( transOp[ 0 ], {
 						type: 'move',
 						fromAddress: newFromAddress,
@@ -2301,7 +2294,6 @@ describe( 'OT', function() {
 						toOffset: toOffset
 					} );
 
-					// common range first
 					expectOperation( transOp[ 1 ], {
 						type: 'move',
 						fromAddress: docAdr( [ 5 ] ),

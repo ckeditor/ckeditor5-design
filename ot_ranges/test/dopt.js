@@ -67,6 +67,13 @@ function makeTest( testName, contextOps, siteOps, inOps, result ) {
 	it( testName + ' - swapped', makeTestScenario( contextOps, inOps, siteOps, result ) );
 }
 
+function makeTestOnly( testName, contextOps, siteOps, inOps, result ) {
+	describe.only( 'this only', function() {
+		it( testName, makeTestScenario( contextOps, siteOps, inOps, result ) );
+		it( testName + ' - swapped', makeTestScenario( contextOps, inOps, siteOps, result ) );
+	} );
+}
+
 function clearTree( root ) {
 	while ( root.getChildrenCount() ) {
 		root.removeChild( 0 );
@@ -278,5 +285,22 @@ describe( 'Scenario', function() {
 			[ 'move 1,0,2 1 1,1,1', 2 ]
 		],
 		'[gy]{}[doc]{[1]{}[2]{xyab}}'
+	);
+
+	makeTest( 'example #5 ranges',
+		[
+			[ 'insert 1,0 block a\0block b', 0 ],
+			[ 'insert 1,0,0 text x\0text y\0text z', 0 ],
+			[ 'insert 1,1,0 text a\0text b\0text c', 0 ]
+		],
+		[
+			[ 'insert 1,1,1 text f\0text o\0text o', 1 ],
+			[ 'move 1,1,3 2 1,0,1', 1 ]
+		],
+		[
+			[ 'change 1,1,0 3 bold 1', 2 ],
+			[ 'move 1,0 2 0,0', 2 ]
+		],
+		'[gy]{[a]{xob<bold:1>yz}[b]{a<bold:1>foc<bold:1>}}[doc]{}'
 	);
 } );

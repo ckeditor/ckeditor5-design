@@ -362,6 +362,104 @@ function combineAddress( a, bFrom, bTo ) {
 	return bTo.address.slice().concat( a.address[ i ] + bTo.offset - bFrom.offset ).concat( a.address.slice( i + 1 ) );
 }
 
+function spreadOperation( a, offset, howMany ) {
+	var prop = a.type == 'move' ? 'fromOffset' : 'offset';
+	var diff = offset - a[ prop ];
+
+	var a1 = copyOperation( a );
+	a1.howMany = diff;
+
+	var a2 = copyOperation( a );
+	a2[ prop ] = offset + howMany;
+	a2.howMany = a.howMany - diff;
+
+	return [ a1, a2 ];
+}
+
+function intoEachOther( a, b ) {
+	var aPathOffset = a.toAddress[ b.fromAddress.length ];
+	var bPathOffset = b.toAddress[ a.fromAddress.length ];
+
+	if ( compare( a.toAddress, b.fromAddress ) == PREFIX && compare( b.toAddress, a.fromAddress ) == PREFIX ) {
+		return ( b.fromOffset <= aPathOffset && aPathOffset < b.fromOffset + b.howMany ) &&
+			( a.fromOffset <= bPathOffset && bPathOffset < a.fromOffset + a.howMany )
+	}
+
+	return false;
+}
+
+function getRemoveFromMove( o ) {
+	return createOperation( 'remove', {
+		address: copyAddress( o.fromAddress ),
+		offset: o.fromOffset,
+		howMany: o.howMany,
+		site: o.site
+	} );
+}
+
+function getInsertFromMove( o ) {
+	return transform( createOperation( 'insert', {
+		address: copyAddress( o.toAddress ),
+		offset: o.toOffset,
+		nodes: null,
+		howMany: o.howMany,
+		site: o.site
+	} ), getRemoveFromMove( o ) ); // ins x rem
+}
+
+function getOpsFromRanges( o, ranges ) {
+	var ops = [];
+	var prop = o.type == 'move' ? 'fromOffset' : 'offset';
+
+	if ( ranges.length == 0 ) {
+		return getNoOp( o );
+	}
+
+	for ( var i = 0; i < ranges.length; i++ ) {
+		var newO = copyOperation( o );
+
+		newO[ prop ] = ranges[ i ].offset;
+		newO.howMany = ranges[ i ].howMany;
+
+		ops.push( newO );
+	}
+
+	if ( ops.length == 1 ) {
+		return ops.pop();
+	} else {
+		return ops;
+	}
+}
+
+function getCombinedOpsFromRanges( a, b1, b2, ranges ) {
+	var ops = [];
+	var propAddress = a.type == 'move' ? 'fromAddress' : 'address';
+	var propOffset = a.type == 'move' ? 'fromOffset' : 'offset';
+	var offsetDiff = a[ propOffset ] - b1.offset;
+	var range;
+
+	var a1 = copyOperation( a );
+	range = ranges.pop();
+
+	a1[ propAddress ] = copyAddress( b2.address );
+	a1[ propOffset ] = b2.offset + Math.max( 0, offsetDiff );
+	a1.howMany = range.howMany;
+
+	ops.push( a1 );
+
+	if ( ranges.length > 0 ) {
+		var a2 = copyOperation( a );
+		range = ranges.pop();
+
+		a2[ propOffset ] = offsetDiff > 0 ? b1.offset : range.offset;
+		a2.howMany = range.howMany;
+
+		ops.push( a2 );
+	}
+
+	return ops;
+}
+
 var IT = {
 	insert: {
 		insert: function( a, b ) {
@@ -411,21 +509,8 @@ var IT = {
 		move: function( a, b ) {
 			a = copyOperation( a );
 
-			var b1 = createOperation( 'remove', {
-				address: copyAddress( b.fromAddress ),
-				offset: b.fromOffset,
-				howMany: b.howMany,
-				site: b.site
-			} );
-
-			var b2 = createOperation( 'insert', {
-				address: copyAddress( b.toAddress ),
-				offset: b.toOffset,
-				nodes: null,
-				howMany: b.howMany,
-				site: b.site
-			} );
-			b2 = transform( b2, b1 ); // ins x rem
+			var b1 = getRemoveFromMove( b );
+			var b2 = getInsertFromMove( b );
 
 			var a1 = transform( a, b1 ); // ins x rem
 
@@ -448,26 +533,7 @@ var IT = {
 				if ( b.offset < a.offset ) {
 					a.offset += b.howMany;
 				} else if ( b.offset < a.offset + a.howMany ) {
-					var diff = b.offset - a.offset;
-
-					return [
-						createOperation( 'change', {
-							address: copyAddress( a.address ),
-							offset: a.offset,
-							howMany: diff,
-							attr: a.attr,
-							value: a.value,
-							site: a.site
-						} ),
-						createOperation( 'change', {
-							address: copyAddress( a.address ),
-							offset: b.offset + b.howMany,
-							howMany: a.howMany - diff,
-							attr: a.attr,
-							value: a.value,
-							site: a.site
-						} )
-					];
+					return spreadOperation( a, b.offset, b.howMany );
 				}
 			} else if ( compare( a.address, b.address ) == PREFIX ) {
 				var i = b.address.length;
@@ -486,26 +552,7 @@ var IT = {
 			// If we change same node and same attr, we have to manage the ranges if they intersect.
 			if ( compare( a.address, b.address ) == SAME && a.attr == b.attr && a.site < b.site && rangesIntersect( a, b ) ) {
 				var ranges = getDiffRanges( a, b, false, false );
-				var ops = [];
-
-				for ( var i = 0; i < ranges.length; i++ ) {
-					ops.push( createOperation( 'change', {
-						address: a.address,
-						offset: ranges[ i ].offset,
-						howMany: ranges[ i ].howMany,
-						attr: a.attr,
-						value: a.value,
-						site: a.site
-					} ) );
-				}
-
-				if ( ops.length == 1 ) {
-					return ops.pop();
-				} else if ( ops.length == 0 ) {
-					return getNoOp( a );
-				} else {
-					return ops;
-				}
+				return getOpsFromRanges( a, ranges );
 			}
 
 			// Ranges do not intersect.
@@ -515,51 +562,15 @@ var IT = {
 		move: function( a, b ) {
 			a = copyOperation( a );
 
-			var b1 = createOperation( 'remove', {
-				address: copyAddress( b.fromAddress ),
-				offset: b.fromOffset,
-				howMany: b.howMany,
-				site: b.site
-			} );
-
-			var b2 = createOperation( 'insert', {
-				address: copyAddress( b.toAddress ),
-				offset: b.toOffset,
-				nodes: null,
-				howMany: b.howMany,
-				site: b.site
-			} );
-			b2 = transform( b2, b1 ); // ins x rem
+			var b1 = getRemoveFromMove( b );
+			var b2 = getInsertFromMove( b );
 
 			if ( compare( a.address, b1.address ) == SAME ) {
 				if ( b1.offset + b1.howMany <= a.offset ) {
 					a.offset -= b1.howMany;
 				} else if ( rangesIntersect( a, b1 ) ) {
 					var ranges = getDiffRanges( a, b1, true, true );
-					var ops = [];
-					var offsetDiff = a.offset - b.fromOffset;
-
-					var commonRange = ranges.pop();
-					ops.push( createOperation( 'change', {
-						address: b2.address,
-						offset: b2.offset + Math.max( 0, offsetDiff ),
-						howMany: commonRange.howMany,
-						attr: a.attr,
-						value: a.value,
-						site: a.site
-					} ) );
-
-					if ( ranges.length > 0 ) {
-						var ownRange = ranges.pop();
-						ops.push( createOperation( 'change', {
-							address: a.address,
-							offset: offsetDiff > 0 ? b.fromOffset : ownRange.offset,
-							howMany: ownRange.howMany,
-							attr: a.attr,
-							value: a.value,
-							site: a.site
-						} ) );
-					}
+					var ops = getCombinedOpsFromRanges( a, b1, b2, ranges );
 
 					return ops.length == 1 ? ops.pop() : ops;
 				}
@@ -582,6 +593,8 @@ var IT = {
 	},
 	move: {
 		insert: function( a, b ) {
+			a = copyOperation( a );
+
 			var a2 = createOperation( 'insert', {
 				address: copyAddress( a.toAddress ),
 				offset: a.toOffset,
@@ -591,6 +604,9 @@ var IT = {
 			} );
 
 			a2 = transform( a2, b ); // ins x ins
+
+			a.toAddress = copyAddress( a2.address );
+			a.toOffset = a2.offset;
 
 			if ( compare( a.fromAddress, b.address ) == PREFIX ) {
 				var i = b.address.length;
@@ -602,55 +618,17 @@ var IT = {
 				if ( b.offset <= a.fromOffset ) {
 					a.fromOffset += b.howMany;
 				} else if ( b.offset < a.fromOffset + a.howMany ) {
-					var diff = b.offset - a.fromOffset;
-
-					return [
-						createOperation( 'move', {
-							fromAddress: copyAddress( a.fromAddress ),
-							fromOffset: a.fromOffset,
-							howMany: diff,
-							toAddress: a2.address,
-							toOffset: a2.offset,
-							site: a.site
-						} ),
-						createOperation( 'move', {
-							fromAddress: copyAddress( a.fromAddress ),
-							fromOffset: b.offset + b.howMany,
-							howMany: a.howMany - diff,
-							toAddress: a2.address,
-							toOffset: a2.offset,
-							site: a.site
-						} )
-					];
+					return spreadOperation( a, b.offset, b.howMany );
 				}
 			}
 
-			return createOperation( 'move', {
-				fromAddress: a.fromAddress,
-				fromOffset: a.fromOffset,
-				howMany: a.howMany,
-				toAddress: a2.address,
-				toOffset: a2.offset,
-				site: a.site
-			} );
+			return a;
 		},
 
 		change: copyOperation,
 
 		move: function( a, b ) {
 			a = copyOperation( a );
-
-			function intoEachOther( a, b ) {
-				var aPathOffset = a.toAddress[ b.fromAddress.length ];
-				var bPathOffset = b.toAddress[ a.fromAddress.length ];
-
-				if ( compare( a.toAddress, b.fromAddress ) == PREFIX && compare( b.toAddress, a.fromAddress ) == PREFIX ) {
-					return ( b.fromOffset <= aPathOffset && aPathOffset < b.fromOffset + b.howMany ) &&
-						( a.fromOffset <= bPathOffset && bPathOffset < a.fromOffset + a.howMany )
-				}
-
-				return false;
-			}
 
 			// Both move operations destinations are inside nodes that are also move operations origins.
 			// So in other words, we move sub-trees into each others.
@@ -668,21 +646,8 @@ var IT = {
 				} );
 			}
 
-			var b1 = createOperation( 'remove', {
-				address: copyAddress( b.fromAddress ),
-				offset: b.fromOffset,
-				howMany: b.howMany,
-				site: b.site
-			} );
-
-			var b2 = createOperation( 'insert', {
-				address: copyAddress( b.toAddress ),
-				offset: b.toOffset,
-				nodes: null,
-				howMany: b.howMany,
-				site: b.site
-			} );
-			b2 = transform( b2, b1 ); // ins x rem
+			var b1 = getRemoveFromMove( b );
+			var b2 = getInsertFromMove( b );
 
 			var rangeFromA = {
 				offset: a.fromOffset,
@@ -691,62 +656,26 @@ var IT = {
 
 			var ops = [];
 
-			var commonOffsetPush = 0;
-
 			// STEP 1: A-REM vs. B-MOV
 
 			if ( compare( a.fromAddress, b1.address ) == SAME ) {
-				if ( b1.offset + b1.howMany <= a.fromOffset) {
+				if ( b1.offset + b1.howMany <= a.fromOffset ) {
 					a.fromOffset -= b1.howMany;
 
 					ops.push( transform( a, b2 ) );
 				} else if ( rangesIntersect( rangeFromA, b1 ) ) {
 					var ranges = getDiffRanges( rangeFromA, b1, true, true );
-					var commonRange = ranges.pop();
-					var commonMove = null, ownMove = null;
-					var offsetDiff = a.fromOffset - b.fromOffset;
+					var combinedOps = getCombinedOpsFromRanges( a, b1, b2, ranges );
+					var commonMove = a.site > b.site ? combinedOps[ 0 ] : null;
+					var ownMove = combinedOps[ 1 ] ? combinedOps[ 1 ] : null;
 
-					if ( a.site > b.site ) {
-						commonMove = createOperation( 'move', {
-							fromAddress: copyAddress( b2.address ),
-							fromOffset: b2.offset + Math.max( 0, offsetDiff ),
-							howMany: commonRange.howMany,
-							toAddress: copyAddress( a.toAddress ),
-							toOffset: a.toOffset,
-							site: a.site
-						} );
-					}
-
-					if ( ranges.length > 0 ) {
-						var ownRange = ranges.pop();
-
-						ownMove = createOperation( 'move', {
-							fromAddress: copyAddress( a.fromAddress ),
-							fromOffset: offsetDiff > 0 ? b1.offset : ownRange.offset,
-							howMany: ownRange.howMany,
-							toAddress: copyAddress( a.toAddress ),
-							toOffset: a.toOffset,
-							site: a.site
-						} );
-					}
-
-					if ( commonMove && ownMove ) {
-						if ( a.fromOffset + a.howMany <= b.fromOffset + b.howMany ) {
-							ops.push( commonMove );
-							ops.push( transform( ownMove, b2 ) );
-						} else {
-							if ( offsetDiff < 0 ) {
-								commonOffsetPush = -offsetDiff;
-							}
-
-							ops.push( transform( ownMove, b2 ) );
-							ops.push( commonMove );
-						}
-					} else if ( commonMove ) {
-						ops.push( commonMove );
-					} else if ( ownMove ) {
+					if ( ownMove ) {
 						ops.push( transform( ownMove, b2 ) );
 					}
+					if ( commonMove ) {
+						ops.push( commonMove );
+					}
+
 				} else {
 					ops.push( transform( a, b2 ) );
 				}
@@ -782,14 +711,15 @@ var IT = {
 					site: a.site
 				} );
 
+				if ( i > 0 ) {
+					var offsetDiff = ops[ i - 1 ].fromOffset - ops[ i ].fromOffset;
+					fakeInsert.offset += ( offsetDiff < 0 ) ? 0 : offsetDiff;
+				}
+
 				var transformed = transform( fakeInsert, b ); // ins x mov
 
 				ops[ i ].toAddress = copyAddress( transformed.address );
 				ops[ i ].toOffset = transformed.offset;
-
-				if ( i == 1 && commonOffsetPush ) {
-					ops[ i ].toOffset += commonOffsetPush;
-				}
 			}
 
 			if ( ops.length == 0 ) {
