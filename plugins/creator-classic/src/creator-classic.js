@@ -20,14 +20,16 @@ CKEDITOR.define( 'plugin!creator-classic', [
 		}
 
 		create() {
-			var controller = new ClassicCreatorController( {
+			this.controller = new ClassicCreatorController( {
 				editor: this.editor
 			} );
 
-			return controller.init();
+			return this.controller.init();
 		}
 
-		destroy() {}
+		destroy() {
+			this.controller.destroy();
+		}
 	}
 
 	class ClassicCreatorController extends Controller {
@@ -93,10 +95,18 @@ CKEDITOR.define( 'plugin!creator-classic', [
 			super( model );
 
 			this.regions.add( new Region( 'chrome' ) );
+
+			this.element = this.model.editor.element;
 		}
 
 		init() {
-			this.model.editor.element.style.display = 'none';
+			this.element.style.display = 'none';
+		}
+
+		destroy() {
+			this.element.style.display = '';
+
+			super.destroy();
 		}
 	}
 
