@@ -3,8 +3,6 @@
  * For licensing, see LICENSE.md.
  */
 
-/* globals Promise, document */
-
 'use strict';
 
 CKEDITOR.define( 'plugin!creator-classic', [
@@ -41,45 +39,52 @@ CKEDITOR.define( 'plugin!creator-classic', [
 
 		init() {
 			var editor = this.model.editor;
-			var that = this;
-
-			this.model.editor.regions = this.view.regions;
+			editor.regions = this.view.regions;
 
 			return super.init()
-				.then( injectChrome )
-				.then( initEditable );
+				.then( this.injectChrome.bind( this ) )
+				.then( this.injectToolbar.bind( this ) )
+				.then( this.injectEditable.bind( this ) )
+				.then( this.initEditable.bind( this ) );
+		}
 
-			function injectChrome() {
-				var editorChrome = new Controller( {}, new EditorChromeView() );
+		injectChrome() {
+			var editor = this.model.editor;
+			var editorChrome = new Controller( {}, new EditorChromeView() );
 
-				return that.append( editorChrome, 'chrome' )
-					.then( () => {
-						document.body.appendChild( editorChrome.view.el );
-					} )
-					.then( injectToolbar )
-					.then( injectEditable );
+			return this.append( editorChrome, 'chrome' )
+				.then( () => {
+					editor.element.parentNode.insertBefore(
+						editorChrome.view.el,
+						editor.element
+					);
 
-				function injectEditable() {
-					return Promise.resolve( new Controller( {}, new FramedEditableView() ) )
-						.then( framedEditable => {
-							return editorChrome.append( framedEditable, 'editable' );
-						} );
-				}
+					return editorChrome;
+				} );
+		}
 
-				function injectToolbar() {
-					var toolbarPlugin = editor.plugins.get( 'toolbar' );
+		injectToolbar( editorChrome ) {
+			var editor = this.model.editor;
+			var toolbarPlugin = editor.plugins.get( 'toolbar' );
 
-					return Promise.resolve( toolbarPlugin.getController() )
-						.then( toolbar => {
-							return editorChrome.append( toolbar, 'top' );
-						} );
-				}
-			}
+			return Promise.resolve( toolbarPlugin.getController() )
+				.then( toolbar => {
+					editorChrome.append( toolbar, 'top' );
 
-			function initEditable( framedEditable ) {
-				var iframe = framedEditable.view.el;
-				iframe.contentDocument.body.contentEditable = true;
-			}
+					return editorChrome;
+				} );
+		}
+
+		injectEditable( editorChrome ) {
+			return Promise.resolve( new Controller( {}, new FramedEditableView() ) )
+				.then( framedEditable => {
+					return editorChrome.append( framedEditable, 'editable' );
+				} );
+		}
+
+		initEditable( framedEditable ) {
+			var iframe = framedEditable.view.el;
+			iframe.contentDocument.body.contentEditable = true;
 		}
 	}
 
