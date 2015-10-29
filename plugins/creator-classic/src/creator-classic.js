@@ -23,7 +23,7 @@ CKEDITOR.define( 'plugin!creator-classic', [
 		}
 
 		destroy() {
-			this.controller.destroy();
+			return this.controller.destroy();
 		}
 	}
 
