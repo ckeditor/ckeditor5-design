@@ -13,10 +13,12 @@
  */
 
 CKEDITOR.define( 'plugin!toolbar', [
+	'model',
+	'collection',
 	'plugin',
 	'ui/region',
 	'plugin!toolbar/editortoolbar/controller'
-], function( Plugin, Region, EditorToolbarController ) {
+], function( Model, Collection, Plugin, Region, EditorToolbarController ) {
 	class Toolbar extends Plugin {
 		constructor( editor ) {
 			super( editor );
@@ -26,7 +28,19 @@ CKEDITOR.define( 'plugin!toolbar', [
 		}
 
 		getController() {
-			return new EditorToolbarController();
+			// Supposing this is config.toolbar.
+			var config = [ 'Bold', 'Italic', 'Underline' ];
+
+			// This is the **feature model**.
+			var model = new Model( {
+				items: new Collection()
+			} );
+
+			// Filling the **feature model** with config data.
+			config.map( c => model.items.add( c ) );
+
+			// Passing the **feature model** to Controller.
+			return new EditorToolbarController( model );
 		}
 	}
 

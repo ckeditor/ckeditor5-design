@@ -6,10 +6,11 @@
 'use strict';
 
 CKEDITOR.define( 'plugin!toolbar/editortoolbar/controller', [
+	'model',
 	'ui/controller',
 	'plugin!toolbar/editortoolbar/view',
 	'plugin!ui-library/button/controller'
-], function( Controller, EditorToolbarView, ButtonController ) {
+], function( Model, Controller, EditorToolbarView, ButtonController ) {
 	class EditorToolbarController extends Controller {
 		/**
 		 * @constructor
@@ -17,23 +18,28 @@ CKEDITOR.define( 'plugin!toolbar/editortoolbar/controller', [
 		constructor( model ) {
 			super( model );
 
-			this.view = new EditorToolbarView( model );
+			this.view = new EditorToolbarView();
 		}
 
 		init() {
-			var buttons = [
-				{ label: 'Bold', state: 'off', count: 0 },
-				{ label: 'Italic', state: 'off', count: 0 },
-				{ label: 'Underline', state: 'off', count: 0 }
-			];
-
-			// TODO: How to deal with parent init()?
 			return super.init()
-				.then(
-					Promise.all( buttons.filter( b => {
-						return this.append( new ButtonController( b ), 'container' );
-					} ) )
-				);
+				.then( this.injectButtons.bind( this ) );
+		}
+
+		createButton( label ) {
+			var model = new Model( {
+				label: label,
+				state: 'off',
+				count: 0
+			} );
+
+			return new ButtonController( model );
+		}
+
+		injectButtons() {
+			return Promise.all( this.model.items.filter( i => {
+				return this.append( this.createButton( i ), 'container' );
+			} ) );
 		}
 	}
 

@@ -6,9 +6,10 @@
 'use strict';
 
 CKEDITOR.define( 'plugin!ui-library/button/controller', [
+	'model',
 	'ui/controller',
 	'plugin!ui-library/button/view',
-], function( Controller, ButtonView ) {
+], function( Model, Controller, ButtonView ) {
 	class ButtonController extends Controller {
 		/**
 		 * @constructor
@@ -16,13 +17,13 @@ CKEDITOR.define( 'plugin!ui-library/button/controller', [
 		constructor( model ) {
 			super( model );
 
-			this.view = new ButtonView( model );
-
-			var viewModel = this.view.model;
+			// Passing Controller model straight as View model.
+			// It is possible because Button is simple.
+			this.view = new ButtonView( this.model );
 
 			this.view.on( 'click', () => {
-				viewModel.state = ( viewModel.state == 'off' ? 'on' : 'off' );
-				viewModel.count++;
+				this.model.state = ( this.model.state == 'off' ? 'on' : 'off' );
+				this.model.count++;
 			} );
 		}
 	}
