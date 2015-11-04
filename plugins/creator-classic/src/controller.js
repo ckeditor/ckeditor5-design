@@ -21,11 +21,11 @@ CKEDITOR.define( 'plugin!creator-classic/controller', [
 			var editor = this.model.editor;
 			editor.regions = this.view.regions;
 
-			return super.init()
+			return Promise.resolve()
 				.then( this.injectChrome.bind( this ) )
 				.then( this.injectToolbar.bind( this ) )
 				.then( this.injectEditable.bind( this ) )
-				.then( this.initEditable.bind( this ) );
+				.then( super.init.bind( this ) );
 		}
 
 		injectChrome() {
@@ -60,11 +60,6 @@ CKEDITOR.define( 'plugin!creator-classic/controller', [
 				.then( framedEditable => {
 					return editorChrome.append( framedEditable, 'editable' );
 				} );
-		}
-
-		initEditable( framedEditable ) {
-			var iframe = framedEditable.view.el;
-			iframe.contentDocument.body.contentEditable = true;
 		}
 	}
 

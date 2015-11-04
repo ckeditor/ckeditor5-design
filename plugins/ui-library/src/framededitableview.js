@@ -30,7 +30,8 @@ CKEDITOR.define( 'plugin!ui-library/framededitableview', [ 'ui/view' ], function
 
 		init() {
 			return new Promise( resolve => {
-				setTimeout( function() {
+				setTimeout( () => {
+					this.el.contentDocument.body.contentEditable = true;
 					resolve();
 				}, 2000 );
 			} );
