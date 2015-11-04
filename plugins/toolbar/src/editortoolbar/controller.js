@@ -16,9 +16,7 @@ CKEDITOR.define( 'plugin!toolbar/editortoolbar/controller', [
 		 * @constructor
 		 */
 		constructor( model ) {
-			super( model );
-
-			this.view = new EditorToolbarView();
+			super( model, new EditorToolbarView() );
 		}
 
 		init() {

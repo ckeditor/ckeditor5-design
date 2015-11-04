@@ -15,11 +15,9 @@ CKEDITOR.define( 'plugin!ui-library/button/controller', [
 		 * @constructor
 		 */
 		constructor( model ) {
-			super( model );
-
 			// Passing Controller model straight as View model.
 			// It is possible because Button is simple.
-			this.view = new ButtonView( this.model );
+			super( model, new ButtonView( model ) );
 
 			this.view.on( 'click', () => {
 				this.model.state = ( this.model.state == 'off' ? 'on' : 'off' );

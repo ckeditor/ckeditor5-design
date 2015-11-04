@@ -14,9 +14,7 @@ CKEDITOR.define( 'plugin!creator-classic/controller', [
 ], function( Controller, FramedEditableView, EditorChromeView, ClassicCreatorView ) {
 	class ClassicCreatorController extends Controller {
 		constructor( model ) {
-			super( model );
-
-			this.view = new ClassicCreatorView( model );
+			super( model, new ClassicCreatorView( model ) );
 		}
 
 		init() {
