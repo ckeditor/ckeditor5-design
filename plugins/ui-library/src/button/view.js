@@ -31,8 +31,9 @@ CKEDITOR.define( 'plugin!ui-library/button/view', [ 'ui/view' ], function( View 
 				text: this.bind( 'count',
 					( el, value ) => model.label + ' (' + value + ')' ),
 				attrs: {
-					'class': this.bind( 'state',
-						( el, value ) => 'ck-button ' + 'ck-button-' + value )
+					'class': this.bind( 'state', ( el, value ) => {
+						return 'ck-button ' + 'ck-button-' + ( value ? 'on' : 'off' );
+					} )
 				},
 				on: {
 					click: 'click'

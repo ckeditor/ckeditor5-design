@@ -20,27 +20,14 @@ CKEDITOR.define( 'plugin!toolbar', [
 	'plugin!toolbar/editortoolbar/controller'
 ], function( Model, Collection, Plugin, Region, EditorToolbarController ) {
 	class Toolbar extends Plugin {
-		constructor( editor ) {
-			super( editor );
-		}
-
-		init() {
-		}
-
 		getController() {
-			// Supposing this is config.toolbar.
-			var config = [ 'Bold', 'Italic', 'Underline' ];
+			var controller = new EditorToolbarController( new Model() );
 
-			// This is the **feature model**.
-			var model = new Model( {
-				items: new Collection()
-			} );
+			this.editor.uiItems
+				.filter( item => item.type.button )
+				.forEach( item => controller.append( item, 'container' ) );
 
-			// Filling the **feature model** with config data.
-			config.map( c => model.items.add( c ) );
-
-			// Passing the **feature model** to Controller.
-			return new EditorToolbarController( model );
+			return controller;
 		}
 	}
 

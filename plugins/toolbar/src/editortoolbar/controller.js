@@ -8,36 +8,11 @@
 CKEDITOR.define( 'plugin!toolbar/editortoolbar/controller', [
 	'model',
 	'ui/controller',
-	'plugin!toolbar/editortoolbar/view',
-	'plugin!ui-library/button/controller'
-], function( Model, Controller, EditorToolbarView, ButtonController ) {
+	'plugin!toolbar/editortoolbar/view'
+], function( Model, Controller, EditorToolbarView ) {
 	class EditorToolbarController extends Controller {
-		/**
-		 * @constructor
-		 */
 		constructor( model ) {
 			super( model, new EditorToolbarView() );
-		}
-
-		init() {
-			return super.init()
-				.then( this.injectButtons.bind( this ) );
-		}
-
-		createButton( label ) {
-			var model = new Model( {
-				label: label,
-				state: 'off',
-				count: 0
-			} );
-
-			return new ButtonController( model );
-		}
-
-		injectButtons() {
-			return Promise.all( this.model.items.filter( i => {
-				return this.append( this.createButton( i ), 'container' );
-			} ) );
 		}
 	}
 
