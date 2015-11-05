@@ -25,7 +25,7 @@ CKEDITOR.define( 'plugin!toolbar', [
 
 			this.editor.uiItems
 				.filter( item => item.type.button )
-				.forEach( item => controller.append( item, 'container' ) );
+				.forEach( item => controller.add( item, 'container' ) );
 
 			return controller;
 		}

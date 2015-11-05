@@ -3,6 +3,8 @@
  * For licensing, see LICENSE.md.
  */
 
+/* global setTimeout, clearTimeout */
+
 'use strict';
 
 CKEDITOR.define( 'plugin!toolbar/editortoolbar/controller', [
@@ -13,6 +15,22 @@ CKEDITOR.define( 'plugin!toolbar/editortoolbar/controller', [
 	class EditorToolbarController extends Controller {
 		constructor( model ) {
 			super( model, new EditorToolbarView() );
+		}
+
+		init() {
+			var containerRegion = this.regions.get( 'container' );
+
+			var shift = () => {
+				// Simply shift UI items.
+				containerRegion.add( containerRegion.remove( 0 ) );
+				this.scrambleTimeout = setTimeout( shift, 1000 );
+			};
+
+			shift();
+		}
+
+		destroy() {
+			clearTimeout( this.scrambleTimeout );
 		}
 	}
 

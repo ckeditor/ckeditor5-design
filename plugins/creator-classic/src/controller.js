@@ -32,7 +32,7 @@ CKEDITOR.define( 'plugin!creator-classic/controller', [
 			var editor = this.model.editor;
 			var editorChrome = new Controller( {}, new EditorChromeView() );
 
-			return this.append( editorChrome, 'chrome' )
+			return this.add( editorChrome, 'chrome' )
 				.then( () => {
 					editor.element.parentNode.insertBefore(
 						editorChrome.view.el,
@@ -49,7 +49,7 @@ CKEDITOR.define( 'plugin!creator-classic/controller', [
 
 			return Promise.resolve( toolbarPlugin.getController() )
 				.then( toolbar => {
-					editorChrome.append( toolbar, 'top' );
+					editorChrome.add( toolbar, 'top' );
 
 					return editorChrome;
 				} );
@@ -58,7 +58,7 @@ CKEDITOR.define( 'plugin!creator-classic/controller', [
 		injectEditable( editorChrome ) {
 			return Promise.resolve( new Controller( {}, new FramedEditableView() ) )
 				.then( framedEditable => {
-					return editorChrome.append( framedEditable, 'editable' );
+					return editorChrome.add( framedEditable, 'editable' );
 				} );
 		}
 	}
