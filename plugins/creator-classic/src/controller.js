@@ -19,7 +19,8 @@ CKEDITOR.define( 'plugin!creator-classic/controller', [
 
 		init() {
 			var editor = this.model.editor;
-			editor.regions = this.view.regions;
+
+			editor.controller = this;
 
 			return Promise.resolve()
 				.then( this.injectChrome.bind( this ) )
