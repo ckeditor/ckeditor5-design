@@ -18,7 +18,7 @@ CKEDITOR.define( 'plugin!creator-classic/controller', [
 		}
 
 		init() {
-			var editor = this.model.editor;
+			let editor = this.model.editor;
 
 			editor.controller = this;
 
@@ -30,8 +30,8 @@ CKEDITOR.define( 'plugin!creator-classic/controller', [
 		}
 
 		injectChrome() {
-			var editor = this.model.editor;
-			var editorChrome = new Controller( {}, new EditorChromeView() );
+			let editor = this.model.editor;
+			let editorChrome = new Controller( {}, new EditorChromeView() );
 
 			return this.add( editorChrome, 'chrome' )
 				.then( () => {
@@ -45,8 +45,8 @@ CKEDITOR.define( 'plugin!creator-classic/controller', [
 		}
 
 		injectToolbar( editorChrome ) {
-			var editor = this.model.editor;
-			var toolbarPlugin = editor.plugins.get( 'toolbar' );
+			let editor = this.model.editor;
+			let toolbarPlugin = editor.plugins.get( 'toolbar' );
 
 			return Promise.resolve( toolbarPlugin.getController() )
 				.then( toolbar => {

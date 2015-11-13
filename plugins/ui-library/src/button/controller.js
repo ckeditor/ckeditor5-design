@@ -30,7 +30,7 @@ CKEDITOR.define( 'plugin!ui-library/button/controller', [
 		}
 
 		_createViewModel() {
-			var viewModel = new Model();
+			let viewModel = new Model();
 
 			this.model.on( 'change:state', ( evt, value ) => {
 				viewModel.state = value;

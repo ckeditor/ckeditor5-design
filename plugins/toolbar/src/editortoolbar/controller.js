@@ -18,9 +18,9 @@ CKEDITOR.define( 'plugin!toolbar/editortoolbar/controller', [
 		}
 
 		init() {
-			var containerRegion = this.regions.get( 'container' );
+			let containerRegion = this.regions.get( 'container' );
 
-			var shift = () => {
+			let shift = () => {
 				// Simply shift UI items.
 				containerRegion.add( containerRegion.remove( 0 ) );
 				this.scrambleTimeout = setTimeout( shift, 1000 );

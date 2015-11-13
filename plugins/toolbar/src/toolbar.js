@@ -21,7 +21,7 @@ CKEDITOR.define( 'plugin!toolbar', [
 ], function( Model, Collection, Plugin, Region, EditorToolbarController ) {
 	class Toolbar extends Plugin {
 		getController() {
-			var controller = new EditorToolbarController( new Model() );
+			let controller = new EditorToolbarController( new Model() );
 
 			this.editor.uiItems
 				.filter( item => item.type.button )
