@@ -30,18 +30,15 @@ CKEDITOR.define( 'plugin!ui-library/button/controller', [
 		}
 
 		_createViewModel() {
-			let viewModel = new Model();
-
-			this.model.on( 'change:state', ( evt, value ) => {
-				viewModel.state = value;
+			let viewModel = new Model( {
+				count: 0
 			} );
-			this.model.on( 'change:disabled', ( evt, value ) => viewModel.disabled = value );
-			this.model.on( 'change:label', ( evt, value ) => viewModel.label = value );
 
-			viewModel.set( 'state', this.model.state );
-			viewModel.set( 'disabled', this.model.disabled );
-			viewModel.set( 'label', this.model.label );
-			viewModel.set( 'count', 0 );
+			viewModel.bind( this.model, {
+				state: true,
+				disabled: true,
+				label: true
+			} );
 
 			return viewModel;
 		}
