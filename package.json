@@ -1,0 +1,14 @@
+{
+  "name": "ckeditor5-design",
+  "version": "1.0.0",
+  "description": "Foo",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "es6-module-loader": "^0.17.8"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ckeditor/ckeditor5-design.git"
+  }
+}
