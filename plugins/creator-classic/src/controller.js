@@ -18,22 +18,20 @@ CKEDITOR.define( 'plugin!creator-classic/controller', [
 		}
 
 		init() {
-			let editor = this.model.editor;
-
-			editor.controller = this;
-
-			return Promise.resolve()
+			return super.init.call( this )
 				.then( this.injectChrome.bind( this ) )
 				.then( this.injectToolbar.bind( this ) )
 				.then( this.injectEditable.bind( this ) )
-				.then( super.init.bind( this ) );
+				.then( () => {
+					this.model.editor.controller = this;
+				} );
 		}
 
 		injectChrome() {
 			let editor = this.model.editor;
 			let editorChrome = new Controller( {}, new EditorChromeView() );
 
-			return this.add( editorChrome, 'chrome' )
+			return this.addChild( editorChrome, 'chrome' )
 				.then( () => {
 					editor.element.parentNode.insertBefore(
 						editorChrome.view.el,
@@ -50,7 +48,7 @@ CKEDITOR.define( 'plugin!creator-classic/controller', [
 
 			return Promise.resolve( toolbarPlugin.getController() )
 				.then( toolbar => {
-					editorChrome.add( toolbar, 'top' );
+					editorChrome.addChild( toolbar, 'top' );
 
 					return editorChrome;
 				} );
@@ -59,7 +57,7 @@ CKEDITOR.define( 'plugin!creator-classic/controller', [
 		injectEditable( editorChrome ) {
 			return Promise.resolve( new Controller( {}, new FramedEditableView() ) )
 				.then( framedEditable => {
-					return editorChrome.add( framedEditable, 'editable' );
+					return editorChrome.addChild( framedEditable, 'editable' );
 				} );
 		}
 	}

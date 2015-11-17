@@ -33,9 +33,6 @@ CKEDITOR.define( 'plugin!ui-library/chromeview', [ 'ui/view' ], function( View )
 				}
 			};
 		}
-
-		init() {
-		}
 	}
 
 	return ChromeView;

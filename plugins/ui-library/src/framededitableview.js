@@ -29,6 +29,8 @@ CKEDITOR.define( 'plugin!ui-library/framededitableview', [ 'ui/view' ], function
 		}
 
 		init() {
+			super.init();
+
 			return new Promise( resolve => {
 				setTimeout( () => {
 					this.el.contentDocument.body.contentEditable = true;

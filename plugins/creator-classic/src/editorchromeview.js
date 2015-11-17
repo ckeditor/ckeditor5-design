@@ -6,9 +6,8 @@
 'use strict';
 
 CKEDITOR.define( 'plugin!creator-classic/editorchromeview', [
-	'plugin!ui-library/appchromeview',
-	'ui/region'
-], function( AppChromeView, Region ) {
+	'plugin!ui-library/appchromeview'
+], function( AppChromeView ) {
 	/**
 	 * Creates an instance of the {@link EditorChrome} class.
 	 *
@@ -38,8 +37,10 @@ CKEDITOR.define( 'plugin!creator-classic/editorchromeview', [
 				}
 			];
 
-			this.regions.add( new Region( 'top', this.el.firstChild ) );
-			this.regions.add( new Region( 'editable', this.el.lastChild ) );
+			this.regionsDef = {
+				top: el => el.firstChild,
+				editable: el => el.lastChild
+			};
 		}
 	}
 

@@ -16,16 +16,15 @@ CKEDITOR.define( 'plugin!toolbar', [
 	'model',
 	'collection',
 	'plugin',
-	'ui/region',
 	'plugin!toolbar/editortoolbar/controller'
-], function( Model, Collection, Plugin, Region, EditorToolbarController ) {
+], function( Model, Collection, Plugin, EditorToolbarController ) {
 	class Toolbar extends Plugin {
 		getController() {
 			let controller = new EditorToolbarController( new Model() );
 
 			this.editor.uiItems
-				.filter( item => item.type.button )
-				.forEach( item => controller.add( item, 'container' ) );
+				.filter( uiItem => uiItem.type.button )
+				.forEach( uiItem => controller.addChild( uiItem, 'container' ) );
 
 			return controller;
 		}

@@ -6,26 +6,29 @@
 'use strict';
 
 CKEDITOR.define( 'plugin!creator-classic/view', [
-	'ui/view',
-	'ui/region'
-], function( View, Region ) {
+	'ui/view'
+], function( View ) {
 	class ClassicCreatorView extends View {
 		constructor( model ) {
 			super( model );
 
-			this.regions.add( new Region( 'chrome' ) );
+			this.regionsDef = {
+				chrome: true
+			};
 
-			this.element = this.model.editor.element;
+			this.el = document;
 		}
 
 		init() {
-			this.element.style.display = 'none';
+			super.init();
+
+			this.model.editor.element.style.display = 'none';
 		}
 
 		destroy() {
-			this.element.style.display = '';
-
 			super.destroy();
+
+			this.model.editor.element.style.display = '';
 		}
 	}
 

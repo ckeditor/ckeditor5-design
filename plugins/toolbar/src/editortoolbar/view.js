@@ -16,8 +16,7 @@
 
 CKEDITOR.define( 'plugin!toolbar/editortoolbar/view', [
 	'plugin!ui-library/toolbarview',
-	'ui/region'
-], function( ToolbarView, Region ) {
+], function( ToolbarView ) {
 	/**
 	 * Creates an instance of the {@link AppChrome} class.
 	 *
@@ -33,14 +32,16 @@ CKEDITOR.define( 'plugin!toolbar/editortoolbar/view', [
 			 */
 			this.template.attrs.class.push( 'ck-editortoolbar' );
 
-			this.regions.add( new Region( 'container', this.el ) );
+			this.regionsDef = {
+				container: el => el
+			};
 		}
 
 		init() {
+			super.init();
+
 			return new Promise( resolve => {
-				setTimeout( function() {
-					resolve();
-				}, 1000 );
+				setTimeout( resolve, 1000 );
 			} );
 		}
 	}

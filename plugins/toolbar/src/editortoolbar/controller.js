@@ -18,19 +18,23 @@ CKEDITOR.define( 'plugin!toolbar/editortoolbar/controller', [
 		}
 
 		init() {
-			let containerRegion = this.regions.get( 'container' );
+			return super.init().then( () => {
+				let containerRegion = this.regions.get( 'container' );
 
-			let shift = () => {
-				// Simply shift UI items.
-				containerRegion.add( containerRegion.remove( 0 ) );
-				this.scrambleTimeout = setTimeout( shift, 1000 );
-			};
+				let shiftChildren = () => {
+					// Simply shiftChildren UI items.
+					containerRegion.add( containerRegion.remove( 0 ) );
+					this.scrambleTimeout = setTimeout( shiftChildren, 1000 );
+				};
 
-			shift();
+				shiftChildren();
+			} );
 		}
 
 		destroy() {
-			clearTimeout( this.scrambleTimeout );
+			return super.destroy().then( () => {
+				clearTimeout( this.scrambleTimeout );
+			} );
 		}
 	}
 
