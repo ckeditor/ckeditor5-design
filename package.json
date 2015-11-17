@@ -5,7 +5,7 @@
   "main": "index.js",
   "dependencies": {},
   "devDependencies": {
-    "es6-module-loader": "^0.17.8"
+    "systemjs": "^0.19.6"
   },
   "repository": {
     "type": "git",
