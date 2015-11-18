@@ -18,16 +18,16 @@ CKEDITOR.define( 'plugin!creator-classic/controller', [
 		}
 
 		init() {
-			return super.init.call( this )
-				.then( this.injectChrome.bind( this ) )
-				.then( this.injectToolbar.bind( this ) )
-				.then( this.injectEditable.bind( this ) )
+			return super.init()
+				.then( this._injectChrome.bind( this ) )
+				.then( this._injectToolbar.bind( this ) )
+				.then( this._injectEditable.bind( this ) )
 				.then( () => {
 					this.model.editor.controller = this;
 				} );
 		}
 
-		injectChrome() {
+		_injectChrome() {
 			let editor = this.model.editor;
 			let editorChrome = new Controller( {}, new EditorChromeView() );
 
@@ -42,7 +42,7 @@ CKEDITOR.define( 'plugin!creator-classic/controller', [
 				} );
 		}
 
-		injectToolbar( editorChrome ) {
+		_injectToolbar( editorChrome ) {
 			let editor = this.model.editor;
 			let toolbarPlugin = editor.plugins.get( 'toolbar' );
 
@@ -54,7 +54,7 @@ CKEDITOR.define( 'plugin!creator-classic/controller', [
 				} );
 		}
 
-		injectEditable( editorChrome ) {
+		_injectEditable( editorChrome ) {
 			return Promise.resolve( new Controller( {}, new FramedEditableView() ) )
 				.then( framedEditable => {
 					return editorChrome.addChild( framedEditable, 'editable' );
