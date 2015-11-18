@@ -6,7 +6,15 @@ import proof from './src/proof.js';
 proof();
 
 const CKEDITOR = {
-	create: create
+	create: create,
+
+	checkCircularRef() {
+		console.log( Editor.circularCKEDITORRef() );
+	},
+
+	toJSON() {
+		return 'I am stringified CKEDITOR object';
+	}
 };
 
 export function create( config ) {

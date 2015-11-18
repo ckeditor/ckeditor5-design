@@ -25,6 +25,8 @@ System.import( 'ckeditor.js' ).then( ( CKEDITOR ) => {
 	CKEDITOR.create( {
 		features: [ 'basicstyles/bold', 'basicstyles/italic', 'classiccreator' ]
 	} );
+
+	CKEDITOR.checkCircularRef();
 } );
 
 	</script>
