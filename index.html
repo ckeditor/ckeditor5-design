@@ -19,11 +19,13 @@ System.config( {
 	}
 } );
 
-System.import( 'ckeditor.js' ).then( ( CKEDITOR ) => {
-	CKEDITOR = CKEDITOR.default;
+System.import( 'ckeditor.js' ).then( ( CKEDITORModule ) => {
+	const CKEDITOR = CKEDITORModule.default;
 
 	CKEDITOR.create( {
-		features: [ 'basicstyles/bold', 'basicstyles/italic', 'classiccreator' ]
+		features: [ 'basicstyles/bold', 'basicstyles/italic', 'classiccreator', 'image/imagecaption' ]
+	} ).then( ( editor ) => {
+		debugger;
 	} );
 } );
 
