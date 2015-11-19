@@ -2,23 +2,18 @@
 <html>
 <head>
 	<title>PoC</title>
-	<!-- <script src="node_modules/systemjs/node_modules/babel-core/browser.js"></script> -->
-	<script src="node_modules/systemjs/dist/system.js"></script>
+	<script src="node_modules/es6-module-loader/node_modules/babel-core/browser.js"></script>
+	<script src="node_modules/es6-module-loader/dist/es6-module-loader-dev.js"></script>
 	<script>
 
 'use strict';
 
 System.transpiler = 'babel';
 
-System.config( {
-	map: {
-		babel: 'node_modules/systemjs/node_modules/babel-core/browser.js'
-	},
-	paths: {
-		// 'ckeditor5-button/*': 'ckeditor5-superbutton/*'
-	}
-} );
+// This mapping does not work...
+System.paths[ 'ckeditor5-*' ] = 'foofoo-*';
 
+// Remove this block and see that the paths mapping will work.
 ( () => {
 	// Store the old normalization function.
 	const systemNormalize = System.normalize;
@@ -31,13 +26,13 @@ System.config( {
 
 		let ret = systemNormalize.call( this, normalizedName, parentName, parentAddress );
 
-		ret = ret.then( ( url ) => {
+		return ret;
+
+		return ret.then( function( url ) {
 			console.log( `\t\tnormalized name: ${ normalizedName }, resolved name: ${ url }` );
 
 			return url;
 		} );
-
-		return ret;
 	};
 } )();
 
@@ -46,11 +41,11 @@ System.import( 'ckeditor.js' ).then( ( CKEDITORModule ) => {
 
 	CKEDITOR.create( {
 		features: [
-			'basicstyles/bold',
-			'basicstyles/italic',
-			'classiccreator',
-			'image/imagecaption',
-			'button'
+			// 'basicstyles/bold',
+			// 'basicstyles/italic',
+			// 'classiccreator',
+			// 'image/imagecaption',
+			// 'button'
 		]
 	} ).then( ( editor ) => {
 		// debugger;
