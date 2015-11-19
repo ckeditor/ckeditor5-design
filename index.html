@@ -15,15 +15,44 @@ System.config( {
 		babel: 'node_modules/systemjs/node_modules/babel-core/browser.js'
 	},
 	paths: {
-		'ckeditor5-*': 'node_modules/ckeditor5-*'
+		// 'ckeditor5-*': 'node_modules/ckeditor5-*',
+		// 'ckeditor5-button/*': 'ckeditor5-superbutton/*'
 	}
 } );
+
+( () => {
+	// Store the old normalization function.
+	const systemNormalize = System.normalize;
+
+	// Override the normalization function.
+	System.normalize = function( name, parentName, parentAddress ) {
+		let normalizedName = name.replace( /ckeditor5-/, 'node_modules/ckeditor5-' );
+
+		console.log( `\t\tname: ${ name }, normalized name: ${ normalizedName }` );
+
+		var ret = systemNormalize.call( this, normalizedName, parentName, parentAddress );
+
+		ret = ret.then( ( url ) => {
+			console.log( `\t\tnormalized name: ${ normalizedName }, resolved name: ${ url }` );
+
+			return url;
+		} );
+
+		return ret;
+	};
+} )();
 
 System.import( 'ckeditor.js' ).then( ( CKEDITORModule ) => {
 	const CKEDITOR = CKEDITORModule.default;
 
 	CKEDITOR.create( {
-		features: [ 'basicstyles/bold', 'basicstyles/italic', 'classiccreator', 'image/imagecaption' ]
+		features: [
+			'basicstyles/bold',
+			'basicstyles/italic',
+			'classiccreator',
+			'image/imagecaption',
+			'button'
+		]
 	} ).then( ( editor ) => {
 		// debugger;
 	} );
