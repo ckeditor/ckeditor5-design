@@ -34,11 +34,7 @@ CKEDITOR.define( 'plugin!ui-library/button/controller', [
 				count: 0
 			} );
 
-			viewModel.bind( this.model, {
-				state: true,
-				disabled: true,
-				label: true
-			} );
+			viewModel.bind( 'state', 'disabled', 'label' ).with( this.model );
 
 			return viewModel;
 		}
