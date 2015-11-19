@@ -5,8 +5,10 @@
   "main": "index.js",
   "dependencies": {},
   "devDependencies": {
-    "systemjs": "^0.19.6",
-    "systemjs-builder": "^0.14.11"
+    "del": "^2.1.0",
+    "gulp": "^3.9.0",
+    "gulp-rename": "^1.2.2",
+    "rollup": "^0.21.0"
   },
   "repository": {
     "type": "git",

@@ -1,7 +1,7 @@
 'use strict';
 
-import Editor from 'ckeditor5-core/editor.js';
-import proof from 'ckeditor5/proof.js';
+import Editor from './ckeditor5-core/editor';
+import proof from './ckeditor5/proof';
 
 proof( 'Calling from ckeditor.js' );
 

@@ -1,3 +1,8 @@
 node_modules/.bin/
-node_modules/systemjs
-node_modules/systemjs-builder
+node_modules/systemjs/
+node_modules/systemjs-builder/
+node_modules/rollup/
+node_modules/gulp/
+node_modules/gulp-rename/
+node_modules/del/
+.tmp/

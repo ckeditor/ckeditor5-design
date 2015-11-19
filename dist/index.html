@@ -2,26 +2,20 @@
 <html>
 <head>
 	<title>PoC</title>
-	<script src="../node_modules/systemjs/node_modules/traceur/bin/traceur-runtime.js"></script>
-	<script src="../node_modules/systemjs/dist/system.src.js"></script>
-	<script src="ckeditor.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.21/require.js"></script>
 	<script>
 
 'use strict';
 
-System.import( 'ckeditor' ).then( ( CKEDITORModule ) => {
-	const CKEDITOR = CKEDITORModule.default;
-
+require( [ './ckeditor5-amd.js' ], ( CKEDITOR ) => {
 	CKEDITOR.create( {
-		features: [
-			'basicstyles/bold',
-			'basicstyles/italic',
-			'classiccreator',
-			'image/imagecaption',
-			'button'
-		]
-	} ).then( ( editor ) => {
+		features: CKEDITOR.features
+	} )
+	.then( ( editor ) => {
 		// debugger;
+	} )
+	.catch( ( err ) => {
+		console.error( err );
 	} );
 } );
 
