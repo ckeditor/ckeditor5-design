@@ -15,7 +15,6 @@ System.config( {
 		babel: 'node_modules/systemjs/node_modules/babel-core/browser.js'
 	},
 	paths: {
-		// 'ckeditor5-*': 'node_modules/ckeditor5-*',
 		// 'ckeditor5-button/*': 'ckeditor5-superbutton/*'
 	}
 } );
@@ -26,11 +25,11 @@ System.config( {
 
 	// Override the normalization function.
 	System.normalize = function( name, parentName, parentAddress ) {
-		let normalizedName = name.replace( /ckeditor5-/, 'node_modules/ckeditor5-' );
+		let normalizedName = name.replace( /ckeditor5-([^\/]+)\//, 'node_modules/ckeditor5-$1/src/' );
 
 		console.log( `\t\tname: ${ name }, normalized name: ${ normalizedName }` );
 
-		var ret = systemNormalize.call( this, normalizedName, parentName, parentAddress );
+		let ret = systemNormalize.call( this, normalizedName, parentName, parentAddress );
 
 		ret = ret.then( ( url ) => {
 			console.log( `\t\tnormalized name: ${ normalizedName }, resolved name: ${ url }` );

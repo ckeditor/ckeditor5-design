@@ -1,6 +1,6 @@
 'use strict';
 
-import Editor from 'ckeditor5-core/src/editor.js';
+import Editor from 'ckeditor5-core/editor.js';
 import proof from './src/proof.js';
 
 proof();
