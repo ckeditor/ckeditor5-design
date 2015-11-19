@@ -17,7 +17,9 @@
 			console.log( `\t\tInjected ckeditor5-superbutton in place of ckeditor-button. Parent name: ${ parentName }` );
 		}
 
-		normalizedName = normalizedName.replace( /ckeditor5-([^\/]+)\//, 'node_modules/ckeditor5-$1/src/' );
+		normalizedName = normalizedName
+			.replace( /^ckeditor5-([^\/]+)\//, 'node_modules/ckeditor5-$1/src/' )
+			.replace( /ckeditor5\//, 'src/' );
 
 		console.log( `\t\tname: ${ name }, normalized name: ${ normalizedName }` );
 

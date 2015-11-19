@@ -5,7 +5,8 @@
   "main": "index.js",
   "dependencies": {},
   "devDependencies": {
-    "systemjs": "^0.19.6"
+    "systemjs": "^0.19.6",
+    "systemjs-builder": "^0.14.11"
   },
   "repository": {
     "type": "git",

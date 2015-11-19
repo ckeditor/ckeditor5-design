@@ -1,9 +1,9 @@
 'use strict';
 
 import Editor from 'ckeditor5-core/editor.js';
-import proof from './src/proof.js';
+import proof from 'ckeditor5/proof.js';
 
-proof();
+proof( 'Calling from ckeditor.js' );
 
 const CKEDITOR = {
 	create: create

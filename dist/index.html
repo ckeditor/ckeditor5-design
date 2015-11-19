@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>PoC</title>
+	<script src="../node_modules/systemjs/node_modules/traceur/bin/traceur-runtime.js"></script>
+	<script src="../node_modules/systemjs/dist/system.src.js"></script>
+	<script src="ckeditor.js"></script>
+	<script>
+
+'use strict';
+
+System.import( 'ckeditor' ).then( ( CKEDITORModule ) => {
+	const CKEDITOR = CKEDITORModule.default;
+
+	CKEDITOR.create( {
+		features: [
+			'basicstyles/bold',
+			'basicstyles/italic',
+			'classiccreator',
+			'image/imagecaption',
+			'button'
+		]
+	} ).then( ( editor ) => {
+		// debugger;
+	} );
+} );
+
+	</script>
+</head>
+<body>
+</body>
+</html>
