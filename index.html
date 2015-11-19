@@ -33,15 +33,12 @@ System.config( {
 
 		console.log( `\t\tname: ${ name }, normalized name: ${ normalizedName }` );
 
-		let ret = systemNormalize.call( this, normalizedName, parentName, parentAddress );
+		return systemNormalize.call( this, normalizedName, parentName, parentAddress )
+			.then( ( url ) => {
+				console.log( `\t\tnormalized name: ${ normalizedName }, resolved name: ${ url }` );
 
-		ret = ret.then( ( url ) => {
-			console.log( `\t\tnormalized name: ${ normalizedName }, resolved name: ${ url }` );
-
-			return url;
-		} );
-
-		return ret;
+				return url;
+			} );
 	};
 } )();
 
