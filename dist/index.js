@@ -1,9 +1,15 @@
 'use strict';
 
-const CKEDITOR = require( './ckeditor5-cjs.js' );
+const CKEDITOR = require( './cjs/ckeditor.js' );
 
 CKEDITOR.create( {
-	features: CKEDITOR.features
+	features: [
+		'basicstyles/bold',
+		'basicstyles/italic',
+		'classiccreator',
+		'image/imagecaption',
+		'button'
+	]
 } )
 .then( ( editor ) => {
 	// debugger;

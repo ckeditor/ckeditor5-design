@@ -3,10 +3,12 @@
 const gulp = require( 'gulp' );
 const del = require( 'del' );
 const rename = require( 'gulp-rename' );
-const rollup = require( 'rollup' );
+const sourcemaps = require( 'gulp-sourcemaps' );
+const babel = require( 'gulp-babel' );
+const merge = require( 'merge-stream' );
 
 gulp.task( 'clean:dist', () => {
-	return del( [ './dist/ckeditor*' ] );
+	return del( [ './dist/amd', './dist/cjs' ] );
 } );
 
 gulp.task( 'clean:tmp', () => {
@@ -40,22 +42,21 @@ gulp.task( 'copy2tmp:modules', [ 'clean:tmp' ], () => {
 gulp.task( 'copy2tmp', [ 'copy2tmp:main', 'copy2tmp:ckeditor5', 'copy2tmp:modules' ] );
 
 gulp.task( 'build', [ 'clean:dist', 'copy2tmp' ], () => {
-	return build( 'cjs' ).then( build( 'amd' ) );
+	const amdStream = gulp.src( './.tmp/**/*.js' )
+		.pipe( sourcemaps.init() )
+		.pipe( babel( {
+			plugins: [ 'transform-es2015-modules-amd' ]
+		} ) )
+		.pipe( sourcemaps.write( '.' ) )
+		.pipe( gulp.dest( './dist/amd' ) );
+
+	const cjsStream = gulp.src( './.tmp/**' )
+		.pipe( babel( {
+			plugins: [ 'transform-es2015-modules-commonjs' ]
+		} ) )
+		.pipe( gulp.dest( './dist/cjs' ) );
+
+	return merge( amdStream, cjsStream );
 } );
 
 gulp.task( 'default', [ 'build' ] );
-
-function build( format ) {
-	return rollup.rollup( {
-			entry: './.tmp/build-file.js',
-			moduleId: 'ckeditor5',
-			sourceMap: true
-		} )
-		.then( ( bundle ) => {
-			bundle.write( {
-				format: format,
-				dest: `./dist/ckeditor5-${ format }.js`,
-				sourceMap: true
-			} );
-		} );
-}

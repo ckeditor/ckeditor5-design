@@ -7,9 +7,15 @@
 
 'use strict';
 
-require( [ './ckeditor5-amd.js' ], ( CKEDITOR ) => {
+require( [ './amd/ckeditor' ], ( CKEDITOR ) => {
 	CKEDITOR.create( {
-		features: CKEDITOR.features
+		features: [
+			'basicstyles/bold',
+			'basicstyles/italic',
+			'classiccreator',
+			'image/imagecaption',
+			'button'
+		]
 	} )
 	.then( ( editor ) => {
 		// debugger;
