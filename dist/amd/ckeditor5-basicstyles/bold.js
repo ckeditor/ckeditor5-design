@@ -23,4 +23,3 @@ define(['exports', './basicstyle'], function (exports, _basicstyle) {
 
 	exports.default = Bold;
 });
-//# sourceMappingURL=bold.js.map

@@ -1,11 +1,13 @@
 'use strict';
 
-define(['exports', './model'], function (exports, _model) {
+define(['exports', './model', '../ckeditor5/load'], function (exports, _model, _load) {
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
 
 	var _model2 = _interopRequireDefault(_model);
+
+	var _load2 = _interopRequireDefault(_load);
 
 	function _interopRequireDefault(obj) {
 		return obj && obj.__esModule ? obj : {
@@ -40,16 +42,12 @@ define(['exports', './model'], function (exports, _model) {
 				let featurePath;
 
 				if (featureName.indexOf('/') == -1) {
-					featurePath = `ckeditor5-${ featureName }/${ featureName }`;
+					featurePath = `../ckeditor5-${ featureName }/${ featureName }`;
 				} else {
-					featurePath = `ckeditor5-${ featureName }`;
+					featurePath = `../ckeditor5-${ featureName }`;
 				}
 
-				const promise = System.import(featurePath).then(FeatureModule => {
-					const Feature = FeatureModule.default;
-					initFeatureByClass(Feature, featureName);
-				});
-				promises.push(promise);
+				promises.push((0, _load2.default)(featurePath).then(Feature => initFeatureByClass(Feature.default, featureName)));
 			}
 
 			function initFeatureByClass(Feature, featureName) {
@@ -85,4 +83,3 @@ define(['exports', './model'], function (exports, _model) {
 
 	exports.default = Editor;
 });
-//# sourceMappingURL=editor.js.map

@@ -26,4 +26,3 @@ define(['exports', './ckeditor', './ckeditor5-basicstyles/bold', './ckeditor5-ba
   _ckeditor2.default.features = [_bold2.default, _italic2.default, _classiccreator2.default, _imagecaption2.default, _button2.default];
   exports.default = _ckeditor2.default;
 });
-//# sourceMappingURL=build-file.js.map

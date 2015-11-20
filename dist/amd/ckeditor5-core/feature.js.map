@@ -1,1 +1,0 @@
-{"version":3,"sources":["feature.js"],"names":[],"mappings":"AAAA,YAAY,CAAC;;;;;;;OAEQ,OAAO;;;;;;;mBAAP,OAAO","file":"ckeditor5-core/feature.js","sourcesContent":["'use strict';\n\nexport default class Feature {\n\tconstructor() {\n\t\tconsole.log( 'Feature.constructor()' );\n\t}\n}"],"sourceRoot":"/source/"}

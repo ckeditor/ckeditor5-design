@@ -28,4 +28,3 @@ define(['exports', '../ckeditor5-link/link', '../ckeditor5/proof'], function (ex
 
 	exports.default = ClassicCreator;
 });
-//# sourceMappingURL=classiccreator.js.map

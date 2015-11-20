@@ -29,4 +29,3 @@ define(['exports', './ckeditor5-core/editor', './ckeditor5/proof'], function (ex
 
 	exports.default = CKEDITOR;
 });
-//# sourceMappingURL=ckeditor.js.map

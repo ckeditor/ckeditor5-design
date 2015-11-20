@@ -1,1 +1,0 @@
-{"version":3,"sources":["model.js"],"names":[],"mappings":"AAAA,YAAY,CAAC;;;;;;;OAEQ,KAAK;;;;;;;mBAAL,KAAK","file":"ckeditor5-core/model.js","sourcesContent":["'use strict';\n\nexport default class Model {\n\tconstructor() {\n\t\tconsole.log( 'Model.constructor()' );\n\t}\n}"],"sourceRoot":"/source/"}

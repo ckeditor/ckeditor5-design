@@ -23,4 +23,3 @@ define(['exports', '../ckeditor5-button/button.js'], function (exports, _button)
 
 	exports.default = SuperButton;
 });
-//# sourceMappingURL=button.js.map

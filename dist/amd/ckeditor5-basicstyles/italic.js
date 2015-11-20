@@ -23,4 +23,3 @@ define(['exports', './basicstyle'], function (exports, _basicstyle) {
 
 	exports.default = Italic;
 });
-//# sourceMappingURL=italic.js.map

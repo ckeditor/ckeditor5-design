@@ -1,1 +1,0 @@
-{"version":3,"sources":["proof.js"],"names":[],"mappings":"AAAA,YAAY,CAAC;;;;;;mBAEW,KAAK;;UAAL,KAAK","file":"ckeditor5/proof.js","sourcesContent":["'use strict';\n\nexport default function proof( message ) {\n\tconsole.log( `proof( ${ message } );` );\n}"],"sourceRoot":"/source/"}

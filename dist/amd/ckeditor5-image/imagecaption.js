@@ -27,4 +27,3 @@ define(['exports', '../ckeditor5-core/feature.js', './image.js'], function (expo
 	exports.default = ImageCaption;
 	ImageCaption.requires = [_image2.default];
 });
-//# sourceMappingURL=imagecaption.js.map

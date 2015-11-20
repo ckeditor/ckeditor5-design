@@ -8,6 +8,10 @@ var _model = require('./model');
 
 var _model2 = _interopRequireDefault(_model);
 
+var _load = require('../ckeditor5/load');
+
+var _load2 = _interopRequireDefault(_load);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 class Editor extends _model2.default {
@@ -39,18 +43,12 @@ class Editor extends _model2.default {
 			let featurePath;
 
 			if (featureName.indexOf('/') == -1) {
-				featurePath = `ckeditor5-${ featureName }/${ featureName }`;
+				featurePath = `../ckeditor5-${ featureName }/${ featureName }`;
 			} else {
-				featurePath = `ckeditor5-${ featureName }`;
+				featurePath = `../ckeditor5-${ featureName }`;
 			}
 
-			const promise = System.import(featurePath).then(FeatureModule => {
-				const Feature = FeatureModule.default;
-
-				initFeatureByClass(Feature, featureName);
-			});
-
-			promises.push(promise);
+			promises.push((0, _load2.default)(featurePath).then(Feature => initFeatureByClass(Feature.default, featureName)));
 		}
 
 		function initFeatureByClass(Feature, featureName) {

@@ -43,14 +43,17 @@ gulp.task( 'copy2tmp', [ 'copy2tmp:main', 'copy2tmp:ckeditor5', 'copy2tmp:module
 
 gulp.task( 'build', [ 'clean:dist', 'copy2tmp' ], () => {
 	const amdStream = gulp.src( './.tmp/**/*.js' )
-		.pipe( sourcemaps.init() )
+		.pipe( chooseVersion( 'amd' ) )
+		// At least on Chrome source maps totally broke stack traces ;|
+		// .pipe( sourcemaps.init() )
 		.pipe( babel( {
 			plugins: [ 'transform-es2015-modules-amd' ]
 		} ) )
-		.pipe( sourcemaps.write( '.' ) )
+		// .pipe( sourcemaps.write( '.' ) )
 		.pipe( gulp.dest( './dist/amd' ) );
 
-	const cjsStream = gulp.src( './.tmp/**' )
+	const cjsStream = gulp.src( './.tmp/**/*.js' )
+		.pipe( chooseVersion( 'cjs' ) )
 		.pipe( babel( {
 			plugins: [ 'transform-es2015-modules-commonjs' ]
 		} ) )
@@ -60,3 +63,13 @@ gulp.task( 'build', [ 'clean:dist', 'copy2tmp' ], () => {
 } );
 
 gulp.task( 'default', [ 'build' ] );
+
+function chooseVersion( format ) {
+	return rename( ( path ) => {
+		const regexp = new RegExp( `__${ format }$` );
+
+		console.log( path.basename );
+
+		path.basename = path.basename.replace( regexp, '' );
+	} );
+}

@@ -10,4 +10,3 @@ define(['exports'], function (exports) {
 		console.log(`proof( ${ message } );`);
 	}
 });
-//# sourceMappingURL=proof.js.map

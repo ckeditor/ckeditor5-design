@@ -23,4 +23,3 @@ define(['exports', '../ckeditor5-core/feature'], function (exports, _feature) {
 
 	exports.default = Button;
 });
-//# sourceMappingURL=button.js.map

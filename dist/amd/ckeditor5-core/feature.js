@@ -14,4 +14,3 @@ define(['exports'], function (exports) {
 
 	exports.default = Feature;
 });
-//# sourceMappingURL=feature.js.map

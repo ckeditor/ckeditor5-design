@@ -23,4 +23,3 @@ define(['exports', '../ckeditor5-core/feature.js'], function (exports, _feature)
 
 	exports.default = Link;
 });
-//# sourceMappingURL=link.js.map

@@ -14,4 +14,3 @@ define(['exports'], function (exports) {
 
 	exports.default = Model;
 });
-//# sourceMappingURL=model.js.map
