@@ -6,8 +6,10 @@
 'use strict';
 
 CKEDITOR.define( 'plugin!creator-classic/editorchromeview', [
+	'ui/region',
+	'ui/template',
 	'plugin!ui-library/appchromeview'
-], function( AppChromeView ) {
+], function( Region, Template, AppChromeView ) {
 	/**
 	 * Creates an instance of the {@link EditorChrome} class.
 	 *
@@ -37,10 +39,22 @@ CKEDITOR.define( 'plugin!creator-classic/editorchromeview', [
 				}
 			];
 
-			this.regionsDef = {
-				top: el => el.firstChild,
-				editable: el => el.lastChild
-			};
+			// A place to put dialogs, floating elements, etc.
+			const containerEl = new Template( {
+				tag: 'div',
+				attrs: {
+					class: 'ck-editor-chrome-container'
+				}
+			} ).render();
+
+			document.body.appendChild( containerEl );
+
+			this.register( 'top', el => el.firstChild );
+			this.register( new Region( 'editable' ), el => el.lastChild ); // POC
+			this.register( 'container', () => null ); // POC
+			this.register( 'container', () => containerEl, true ); // POC
+
+			this.model.editor.element.style.display = 'none';
 		}
 	}
 

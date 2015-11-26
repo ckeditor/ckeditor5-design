@@ -6,59 +6,30 @@
 'use strict';
 
 CKEDITOR.define( 'plugin!creator-classic/controller', [
+	'collection',
 	'ui/controller',
 	'plugin!ui-library/framededitableview',
 	'plugin!creator-classic/editorchromeview',
-	'plugin!creator-classic/view',
 	'plugin!toolbar'
-], function( Controller, FramedEditableView, EditorChromeView, ClassicCreatorView ) {
+], function( Collection, Controller, FramedEditableView, EditorChromeView ) {
 	class ClassicCreatorController extends Controller {
 		constructor( model ) {
-			super( model, new ClassicCreatorView( model ) );
+			super( model, new EditorChromeView( model ) );
+
+			this.register( 'top', new Collection() );
+			this.register( 'editable', new Collection() );
+
+			// No promise, because it's before init().
+			this.addChild( 'top', model.editor.plugins.get( 'toolbar' ).getController() );
+			this.addChild( 'editable', new Controller( {}, new FramedEditableView() ) );
+
+			this.model.editor.controller = this;
 		}
 
 		init() {
-			return super.init()
-				.then( this._injectChrome.bind( this ) )
-				.then( this._injectToolbar.bind( this ) )
-				.then( this._injectEditable.bind( this ) )
-				.then( () => {
-					this.model.editor.controller = this;
-				} );
-		}
+			document.body.appendChild( this.view.el );
 
-		_injectChrome() {
-			let editor = this.model.editor;
-			let editorChrome = new Controller( {}, new EditorChromeView() );
-
-			return this.addChild( editorChrome, 'chrome' )
-				.then( () => {
-					editor.element.parentNode.insertBefore(
-						editorChrome.view.el,
-						editor.element
-					);
-
-					return editorChrome;
-				} );
-		}
-
-		_injectToolbar( editorChrome ) {
-			let editor = this.model.editor;
-			let toolbarPlugin = editor.plugins.get( 'toolbar' );
-
-			return Promise.resolve( toolbarPlugin.getController() )
-				.then( toolbar => {
-					editorChrome.addChild( toolbar, 'top' );
-
-					return editorChrome;
-				} );
-		}
-
-		_injectEditable( editorChrome ) {
-			return Promise.resolve( new Controller( {}, new FramedEditableView() ) )
-				.then( framedEditable => {
-					return editorChrome.addChild( framedEditable, 'editable' );
-				} );
+			return super.init();
 		}
 	}
 

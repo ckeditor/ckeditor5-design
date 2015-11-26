@@ -9,21 +9,26 @@
 
 CKEDITOR.define( 'plugin!toolbar/editortoolbar/controller', [
 	'model',
+	'collection',
 	'ui/controller',
 	'plugin!toolbar/editortoolbar/view'
-], function( Model, Controller, EditorToolbarView ) {
+], function( Model, Collection, Controller, EditorToolbarView ) {
 	class EditorToolbarController extends Controller {
 		constructor( model ) {
 			super( model, new EditorToolbarView() );
+
+			this.register( 'container', new Collection() );
 		}
 
 		init() {
 			return super.init().then( () => {
-				let containerRegion = this.regions.get( 'container' );
-
 				let shiftChildren = () => {
-					// Simply shiftChildren UI items.
-					containerRegion.add( containerRegion.remove( 0 ) );
+					this.addChild( 'container',
+						this.removeChild(
+							'container',
+							this.getChild( 'container', 0 )
+						)
+					);
 					this.scrambleTimeout = setTimeout( shiftChildren, 1000 );
 				};
 
