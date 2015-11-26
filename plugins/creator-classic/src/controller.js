@@ -27,6 +27,7 @@ CKEDITOR.define( 'plugin!creator-classic/controller', [
 		}
 
 		init() {
+			// Append the element first because iframe body is inaccessible in detached DOM.
 			document.body.appendChild( this.view.el );
 
 			return super.init();
