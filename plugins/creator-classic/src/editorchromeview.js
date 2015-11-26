@@ -40,21 +40,27 @@ CKEDITOR.define( 'plugin!creator-classic/editorchromeview', [
 			];
 
 			// A place to put dialogs, floating elements, etc.
-			const containerEl = new Template( {
+			this._containerEl = new Template( {
 				tag: 'div',
 				attrs: {
 					class: 'ck-editor-chrome-container'
 				}
 			} ).render();
 
-			document.body.appendChild( containerEl );
+			document.body.appendChild( this._containerEl );
 
 			this.register( 'top', el => el.firstChild );
 			this.register( new Region( 'editable' ), el => el.lastChild ); // POC
 			this.register( 'container', () => null ); // POC
-			this.register( 'container', () => containerEl, true ); // POC
+			this.register( 'container', () => this._containerEl, true ); // POC
 
 			this.model.editor.element.style.display = 'none';
+		}
+
+		destroy() {
+			super.destroy();
+
+			this._containerEl.remove();
 		}
 	}
 
