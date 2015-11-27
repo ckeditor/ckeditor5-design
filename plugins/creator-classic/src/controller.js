@@ -6,18 +6,18 @@
 'use strict';
 
 CKEDITOR.define( 'plugin!creator-classic/controller', [
-	'collection',
 	'ui/controller',
+	'ui/controllercollection',
 	'plugin!ui-library/framededitableview',
 	'plugin!creator-classic/editorchromeview',
 	'plugin!toolbar'
-], function( Collection, Controller, FramedEditableView, EditorChromeView ) {
+], function( Controller, ControllerCollection, FramedEditableView, EditorChromeView ) {
 	class ClassicCreatorController extends Controller {
 		constructor( model ) {
 			super( model, new EditorChromeView( model ) );
 
-			this.register( 'top', new Collection() );
-			this.register( 'editable', new Collection() );
+			this.collections.add( new ControllerCollection( 'top' ) );
+			this.collections.add( new ControllerCollection( 'editable' ) );
 
 			// No promise, because it's before init().
 			this.addChild( 'top', model.editor.plugins.get( 'toolbar' ).getController() );

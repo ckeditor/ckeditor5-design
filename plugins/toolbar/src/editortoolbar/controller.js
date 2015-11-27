@@ -9,15 +9,15 @@
 
 CKEDITOR.define( 'plugin!toolbar/editortoolbar/controller', [
 	'model',
-	'collection',
 	'ui/controller',
+	'ui/controllercollection',
 	'plugin!toolbar/editortoolbar/view'
-], function( Model, Collection, Controller, EditorToolbarView ) {
+], function( Model, Controller, ControllerCollection, EditorToolbarView ) {
 	class EditorToolbarController extends Controller {
 		constructor( model ) {
 			super( model, new EditorToolbarView() );
 
-			this.register( 'container', new Collection() );
+			this.collections.add( new ControllerCollection( 'container' ) );
 		}
 
 		init() {
