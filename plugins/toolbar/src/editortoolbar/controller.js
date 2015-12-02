@@ -17,18 +17,14 @@ CKEDITOR.define( 'plugin!toolbar/editortoolbar/controller', [
 		constructor( model ) {
 			super( model, new EditorToolbarView() );
 
-			this.collections.add( new ControllerCollection( 'container' ) );
+			this.containerCollection = new ControllerCollection( 'container' );
+			this.collections.add( this.containerCollection );
 		}
 
 		init() {
 			return super.init().then( () => {
 				let shiftChildren = () => {
-					this.addChild( 'container',
-						this.removeChild(
-							'container',
-							this.getChild( 'container', 0 )
-						)
-					);
+					this.containerCollection.add( this.containerCollection.remove( 0 ) );
 					this.scrambleTimeout = setTimeout( shiftChildren, 1000 );
 				};
 

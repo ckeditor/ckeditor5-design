@@ -16,12 +16,15 @@ CKEDITOR.define( 'plugin!creator-classic/controller', [
 		constructor( model ) {
 			super( model, new EditorChromeView( model ) );
 
-			this.collections.add( new ControllerCollection( 'top' ) );
-			this.collections.add( new ControllerCollection( 'editable' ) );
+			const topCollection = new ControllerCollection( 'top' );
+			const editableCollection = new ControllerCollection( 'editable' );
+
+			this.collections.add( topCollection );
+			this.collections.add( editableCollection );
 
 			// No promise, because it's before init().
-			this.addChild( 'top', model.editor.plugins.get( 'toolbar' ).getController() );
-			this.addChild( 'editable', new Controller( {}, new FramedEditableView() ) );
+			topCollection.add( model.editor.plugins.get( 'toolbar' ).getController() );
+			editableCollection.add( new Controller( {}, new FramedEditableView() ) );
 
 			this.model.editor.controller = this;
 		}
