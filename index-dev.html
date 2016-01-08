@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Bulding – PoC</title>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.22/require.js"></script>
+</head>
+<body>
+
+<h1>Production scenario - switched to dev</h1>
+
+<script>
+/* global require */
+
+'use strict';
+
+// Attempt 1
+// ----------------------------------------------------------------------------
+
+// This doesn't work because Require.JS does a ridiculous thing and tries to load
+// "./core/editor.js" relatively to this index file, not to ckeditor.js file. Apparently
+// that's how paths option is meant to work... let's see mapping.
+
+// require.config( {
+// 	paths: {
+// 		'ckeditor': 'vendor/ckeditor-dev/ckeditor'
+// 	}
+// } );
+
+// require( [ 'ckeditor' ], ( CKEDITOR ) => {
+// 	CKEDITOR.init();
+// } );
+
+// Attempt 2
+// ----------------------------------------------------------------------------
+
+// Hurray! It works!
+
+require.config( {
+	map: {
+		'*': {
+			'ckeditor': 'vendor/ckeditor-dev/ckeditor'
+		}
+	}
+} );
+
+require( [ 'ckeditor' ], ( CKEDITOR ) => {
+	CKEDITOR.init();
+} );
+
+// Attempt 3
+// ----------------------------------------------------------------------------
+
+// Guess what... it fails as well, because AGAIN Require.JS ignores the fact that
+// relative paths where used in define().
+
+// require.config( {
+// 	packages: [
+// 		{
+// 			name: 'ckeditor',
+// 			main: 'ckeditor',
+// 			location: 'vendor/ckeditor-dev/'
+// 		}
+// 	]
+// } );
+
+// require( [ 'ckeditor' ], ( CKEDITOR ) => {
+// 	CKEDITOR.init();
+// } );
+
+// Attempt 4
+// ----------------------------------------------------------------------------
+
+// This works fine. But it's a pity that we need to change the path passed to require().
+
+// require( [ './vendor/ckeditor-dev/ckeditor.js' ], ( CKEDITOR ) => {
+// 	CKEDITOR.init();
+// } );
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Bulding – PoC</title>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.22/require.js"></script>
+</head>
+<body>
+
+<h1>Production scenario</h1>
+
+<script>
+/* global require */
+
+'use strict';
+
+require.config( {
+	paths: {
+		'ckeditor': 'vendor/ckeditor/ckeditor'
+	}
+} );
+
+// I tried to use mapping because that's what was recommended in [1] (I found it when looking what
+// to do with the dev version where paths option doesn't work) but it does not work with named modules ;/.
+
+// require.config( {
+// 	map: {
+// 		'*': {
+// 			'ckeditor': 'vendor/ckeditor/ckeditor.js'
+// 		}
+// 	}
+// } );
+
+require( [ 'ckeditor' ], ( CKEDITOR ) => {
+	CKEDITOR.init();
+} );
+</script>
+
+</body>
+</html>

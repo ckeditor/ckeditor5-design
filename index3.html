@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Bulding – PoC</title>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.22/require.js"></script>
+</head>
+<body>
+
+<h1>Production scenario - loading modules from the bundle (with double load)</h1>
+
+<script>
+/* global require */
+
+'use strict';
+
+require.config( {
+	paths: {
+		'ckeditor': 'vendor/ckeditor/ckeditor'
+	}
+} );
+
+require( [ 'ckeditor' ], ( CKEDITOR ) => {
+	CKEDITOR.init();
+
+	require( [ 'ckeditor5/core/editor' ], ( editor ) => {
+		console.log( 'Loading editor succeeded: ', editor );
+	} );
+} );
+</script>
+
+</body>
+</html>

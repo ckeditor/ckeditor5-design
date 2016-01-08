@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Bulding – PoC</title>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.22/require.js"></script>
+	<!--
+		Preloading module paths so they can be included by their names.
+
+		NOTE: we need the keep the map separately from ckeditor.js because we can't load anonymous
+		module via a script tag (error will be thrown). We could consider naming this one though.
+	-->
+	<script src="vendor/ckeditor-dev/module-map.js"></script>
+</head>
+<body>
+
+<h1>Production scenario - loading modules from the bundle replaced by a dev version (with preloading)</h1>
+
+<script>
+/* global require */
+
+'use strict';
+
+// Just checking that calling require.config() second time does not reset the previous call completely.
+require.config( {
+	map: {
+		'*': {
+			'bar': 'bom'
+		}
+	}
+} );
+
+require( [ 'ckeditor', 'ckeditor5/core/editor' ], ( CKEDITOR, editor ) => {
+	CKEDITOR.init();
+
+	console.log( 'Loading editor succeeded: ', editor );
+} );
+</script>
+
+</body>
+</html>
