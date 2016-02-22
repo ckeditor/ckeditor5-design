@@ -1,4 +1,16 @@
 CKEditor 5 Feature Prototype
 ============================
 
-[TODO: Describe the feature here]
+This branch prototypes architecture of themes in CKEditor 5. To run, execute:
+
+```js
+npm install
+```
+
+then
+
+```js
+gulp
+```
+
+and open `index.html`.
