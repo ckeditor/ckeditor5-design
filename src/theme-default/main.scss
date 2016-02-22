@@ -1,0 +1,14 @@
+// Copyright (c) 2003-2016, CKSource - Frederico Knabben. All rights reserved.
+// For licensing, see LICENSE.md or http://ckeditor.com/license
+
+@import 'base/colors';
+@import 'base/fonts';
+@import 'base/spacing';
+@import 'base/box';
+
+.ck-theme-default {
+	@import 'base/reset';
+
+	@import 'components/button';
+	@import 'components/toolbar';
+}

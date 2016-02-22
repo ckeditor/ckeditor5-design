@@ -1,0 +1,23 @@
+// Copyright (c) 2003-2016, CKSource - Frederico Knabben. All rights reserved.
+// For licensing, see LICENSE.md or http://ckeditor.com/license
+
+$default-colors: (
+	// 'primary': #8e3329,
+	// 'accent': #d98328,
+	// 'secondary': #5a1321,
+	// 'foreground': #191919,
+	'text': #333,
+	'border': #ccc,
+	'background': #f7f7f7
+);
+
+@function get-color( $key: 'background', $level: 0 ) {
+	$color: map-get( $default-colors, $key );
+
+	@if $level > 0 {
+		@return lighten( $color, $level );
+	}
+	@else {
+	  	@return darken( $color, abs( $level ) );
+	}
+}

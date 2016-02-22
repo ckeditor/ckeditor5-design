@@ -1,0 +1,68 @@
+<!doctype html>
+<html>
+	<head>
+		<title>CKEditor 5 - theme architecture</title>
+		<link rel="stylesheet" href="src/ckeditor.css">
+	</head>
+	<body>
+		<h1>CKEditor 5 - theme architecture</h1>
+		<dl>
+			<dt>
+				<h2>UI Components:</h2>
+			</dt>
+			<dd>
+				<dl>
+					<dt>
+						<h3>Button:</h3>
+					</dt>
+					<dd>
+						<div class="ck-reset-all ck-theme-default">
+							<div class="ck-reset-all">
+								<div class="ck-button">A button</div>
+								<div class="ck-button ck-button-disabled">Disabled button</div>
+							</div>
+						</div>
+					</dd>
+				</dl>
+			</dd>
+
+			<dt>
+				<h2>CKEditor@ckeditor-theme-base:</h2>
+			</dt>
+			<dd>
+				<div class="ck ck-reset ck-editor-container">
+					<div class="ck-editor-inner">
+						<div class="ck-editor-top ck-reset-all">
+							<div class="ck-toolbar ck-editor-toolbar">
+								<div class="ck-button ck-editor-button">Bold</div>
+								<div class="ck-button ck-button-disabled ck-editor-button">Italic</div>
+								<div class="ck-button ck-editor-button">Underline</div>
+							</div>
+						</div>
+						<div class="ck-editor-editable">
+							<div contenteditable="true" class="ck-editable">
+								<h1>Hello world!</h1>
+								<p>I&#39;m an instance of <a href="http://ckeditor.com">CKEditor</a>.</p>
+							</div>
+						</div>
+						<div class="ck-editor-bottom ck-reset-all">
+							Some stuff in bottomspace.
+						</div>
+					</div>
+				</div>
+			</dd>
+
+			<dt>
+				<h2>CKEditor@ckeditor-theme-[default editor]:</h2>
+			</dt>
+			<dd>
+			</dd>
+		</dl>
+
+		<script>
+			const clone = document.querySelector( '.ck-editor-container' ).cloneNode( 1 );
+			document.querySelector( 'body > dl > dd:last-child' ).appendChild( clone );
+			clone.setAttribute( 'class', clone.getAttribute( 'class' ) + ' ck-theme-default ck-theme-editor' );
+		</script>
+	</body>
+</html>

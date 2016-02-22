@@ -1,0 +1,29 @@
+// Copyright (c) 2003-2016, CKSource - Frederico Knabben. All rights reserved.
+// For licensing, see LICENSE.md or http://ckeditor.com/license
+
+// Reset for single elements, not their children.
+.ck-reset {
+	// Do not include inheritable rules here.
+	width: auto;
+	height: auto;
+	position: static;
+}
+
+// Reset for elements and their children.
+.ck-reset-all {
+	&, *, a, textarea {
+		float: none;
+
+		// The following must be identical to .ck-reset.
+		@extend .ck-reset;
+	}
+
+	// Defaults for some elements.
+	textarea {
+		white-space: pre-wrap;
+	}
+
+	table {
+		table-layout: auto;
+	}
+}

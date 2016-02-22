@@ -1,0 +1,16 @@
+// Copyright (c) 2003-2016, CKSource - Frederico Knabben. All rights reserved.
+// For licensing, see LICENSE.md or http://ckeditor.com/license
+
+@mixin ck-box {
+	overflow: hidden;
+}
+
+// Dev
+// *[class*="ck-"]:hover:after {
+// 	content: 'class="'attr(class)'"';
+// 	font-size: 12px;
+// 	background: #eee;
+// 	padding: 1px 3px;
+// 	border: 1px solid #aaa;
+// 	position: absolute;
+// }
