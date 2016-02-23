@@ -46,4 +46,8 @@ a.ck-button {
 			text-shadow: 0 -1px def-get-color( 'action', -40 );
 		}
 	}
+
+	&-bold {
+		font-weight: bold;
+	}
 }
