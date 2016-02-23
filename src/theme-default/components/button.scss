@@ -6,10 +6,14 @@
 	border: 1px solid def-get-border-color( $background-color );
 
 	&:hover,
-	&:focus,
-	&:active {
+	&:focus {
 		background: def-get-color( $background-color, -10 );
-		border-color: def-get-border-color( $background-color, - 10 );
+		border-color: def-get-border-color( $background-color, -10 );
+	}
+
+	&:active {
+		background: def-get-color( $background-color, -15 );
+		border-color: def-get-border-color( $background-color, -15 );
 	}
 
 	&:focus,
