@@ -19,7 +19,7 @@
 	&, *, a, textarea {
 		// These are rule inherited by all children elements.
 		border-collapse: collapse;
-		font: normal normal normal $default-font-size-base $default-font-face;
+		font: normal normal normal $def-font-size-base $def-font-face;
 		color: #000;
 		text-align: left;
 		white-space: nowrap;

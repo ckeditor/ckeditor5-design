@@ -1,23 +1,35 @@
 // Copyright (c) 2003-2016, CKSource - Frederico Knabben. All rights reserved.
 // For licensing, see LICENSE.md or http://ckeditor.com/license
 
-$default-colors: (
+$def-colors: (
 	// 'primary': #8e3329,
 	// 'accent': #d98328,
 	// 'secondary': #5a1321,
 	// 'foreground': #191919,
+	'white': #fff,
 	'text': #333,
-	'border': #ccc,
-	'background': #f7f7f7
+	// 'border': #eee,
+	'background': #f7f7f7,
+	'focus': #83BFFC,
+	'action': #61B145
 );
 
-@function get-color( $key: 'background', $level: 0 ) {
-	$color: map-get( $default-colors, $key );
+@mixin def-focus-shadow() {
+	outline: 0;
+	box-shadow: 0 0 2px 3px def-get-color( 'focus' );
+}
 
-	@if $level > 0 {
-		@return lighten( $color, $level );
+@function def-get-color( $color-name: 'background', $color-offset: 0 ) {
+	$color: map-get( $def-colors, $color-name );
+
+	@if $color-offset > 0 {
+		@return lighten( $color, $color-offset );
 	}
 	@else {
-	  	@return darken( $color, abs( $level ) );
+	  	@return darken( $color, abs( $color-offset ) );
 	}
+}
+
+@function def-get-border-color( $color, $color-offset: 0 ) {
+	@return def-get-color( $color, $color-offset - 25 );
 }

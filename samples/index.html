@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<!--
+Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
+Licensed under the terms of the MIT license. See LICENSE.md for details.
+-->
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>CKEditor 5 - theme architecture</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link href="css/sample.css" rel="stylesheet">
+	<link href="../src/ckeditor.css"rel="stylesheet" >
+<body>
+	<header class="header-a">
+		<div class="grid-container">
+			<h1 class="header-a-logo grid-width-30">
+				<a href="index.html"><img src="img/logo.png" alt="CKEditor Logo"></a>
+			</h1>
+		</div>
+	</header>
+	<main class="grid-container">
+		<nav class="tree-a tree-a-layout grid-width-30">
+			<h1>Architecture</h1>
+			<h2 class="tree-a-no-sub"><a href="#ui-components">Components</a></h2>
+			<h2 class="tree-a-no-sub"><a href="#ckeditor">CKEditor</a></h2>
+		</nav>
+		<section class="content grid-width-70">
+			<h1>CKEditor 5 - theme architecture</h1>
+
+			<h2 id="ui-components">Components <a href="#ui-components" class="content-heading-anchor" title="Permalink to this headline">&para;</a></h2>
+			<h3>Button</h3>
+
+			<p>
+				<div class="ck-reset-all">
+					<a href="#" class="ck-button">A button</a>
+					<a href="#" class="ck-button ck-button-disabled">Disabled button</a>
+					<a href="#" class="ck-button ck-button-active">Active button</a>
+					<a href="#" class="ck-button ck-button-action">Action button</a>
+					<a href="#" class="ck-button ck-rounded">Rounded corners</a>
+				</div>
+			</p>
+
+			<h3>Toolbar</h3>
+
+			<div class="ck-reset-all">
+				<div class="ck-toolbar">
+					<a href="#" class="ck-button">A button</a>
+					<a href="#" class="ck-button ck-button-disabled">Disabled button</a>
+					<a href="#" class="ck-button ck-button-active">Active button</a>
+				</div>
+
+				<h4>Rounded corners</h4>
+
+				<div class="ck-rounded ck-toolbar">
+					<a href="#" class="ck-button">A button which corners are also rounded</a>
+				</div>
+			</div>
+
+			<hr>
+
+			<h2 id="ckeditor">CKEditor <a href="#ckeditor" class="content-heading-anchor" title="Permalink to this headline">&para;</a></h2>
+
+			<div class="ck-reset ck-editor">
+				<div class="ck-editor-top ck-reset-all">
+					<div class="ck-toolbar ck-editor-toolbar">
+						<a href="#" class="ck-button ck-editor-button">Bold</a>
+						<a href="#" class="ck-button ck-button-disabled ck-editor-button">Italic</a>
+						<a href="#" class="ck-button ck-editor-button">Underline</a>
+					</div>
+				</div>
+				<div class="ck-editor-editable">
+					<div contenteditable="true" class="ck-editable">
+						<p>I&#39;m an instance of <a href="http://ckeditor.com">CKEditor</a>.</p>
+					</div>
+				</div>
+				<div class="ck-editor-bottom ck-reset-all">
+					Some stuff in bottomspace.
+				</div>
+			</div>
+
+		</section>
+	</main>
+	<footer class="footer-a grid-container">
+		<div class="grid-container">
+			<p class="grid-width-100">
+				CKEditor &ndash; The text editor for the Internet &ndash; <a href="http://ckeditor.com/">http://ckeditor.com</a>
+			</p>
+			<p class="grid-width-100">
+				Copyright &copy; 2003-2015, <a class="samples" href="http://cksource.com/">CKSource</a> &ndash; Frederico
+				Knabben. <a href="license.html">All rights reserved</a>.
+			</p>
+		</div>
+	</footer>
+	<nav class="navigation-a">
+		<div class="grid-container">
+			<ul class="navigation-a-left grid-width-70">
+				<li><a href="http://ckeditor.com">Project Homepage</a></li>
+			</ul>
+			<ul class="navigation-a-right grid-width-30">
+				<li><a href="http://ckeditor.com/blog-list">CKEditor Blog</a></li>
+			</ul>
+		</div>
+	</nav>
+</body>
+</html>

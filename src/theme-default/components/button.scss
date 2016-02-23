@@ -1,19 +1,44 @@
 // Copyright (c) 2003-2016, CKSource - Frederico Knabben. All rights reserved.
 // For licensing, see LICENSE.md or http://ckeditor.com/license
 
-.ck-button {
-	padding: get-spacing( 1 );
+@mixin get-button( $background-color ) {
+	background: def-get-color( $background-color );
+	border: 1px solid def-get-border-color( $background-color );
+
+	&:hover,
+	&:focus,
+	&:active {
+		background: def-get-color( $background-color, -10 );
+		border-color: def-get-border-color( $background-color, - 10 );
+	}
+}
+
+.ck-button,
+a.ck-button {
+	padding: def-get-spacing( 'medium' ) def-get-spacing();
 	cursor: pointer;
 
-	&:hover {
-		background: get-color( 'background', -5 );
-	}
+	@include get-button( 'white' );
+	@include def-rounded-corners();
 
 	&-disabled {
-		color: get-color( 'text', 25 );
+		@include get-button( 'white' );
+		color: def-get-color( 'text', 50 );
+	}
 
-		&:hover {
-			background: get-color( 'background', -2 );
+	&-active {
+		@include get-button( 'background' );
+	}
+
+	&-action {
+		text-shadow: 0 -1px def-get-color( 'action', -20 );
+		color: def-get-color( 'white' );
+		@include get-button( 'action' );
+
+		&:hover,
+		&:focus,
+		&:active {
+			text-shadow: 0 -1px def-get-color( 'action', -40 );
 		}
 	}
 }

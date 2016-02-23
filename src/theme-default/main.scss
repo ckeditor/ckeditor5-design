@@ -4,11 +4,9 @@
 @import 'base/colors';
 @import 'base/fonts';
 @import 'base/spacing';
+@import 'base/rounded';
 @import 'base/box';
+@import 'base/reset';
 
-.ck-theme-default {
-	@import 'base/reset';
-
-	@import 'components/button';
-	@import 'components/toolbar';
-}
+@import 'components/button';
+@import 'components/toolbar';

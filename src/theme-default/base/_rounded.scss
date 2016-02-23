@@ -1,8 +1,11 @@
 // Copyright (c) 2003-2016, CKSource - Frederico Knabben. All rights reserved.
 // For licensing, see LICENSE.md or http://ckeditor.com/license
 
-.ck-button {
-	display: inline-block;
+$def-border-radius: 2px;
 
-	@include ck-box-base;
+@mixin def-rounded-corners() {
+	&.ck-rounded,
+	.ck-rounded & {
+		border-radius: $def-border-radius;
+	}
 }
