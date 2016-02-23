@@ -11,6 +11,11 @@
 		background: def-get-color( $background-color, -10 );
 		border-color: def-get-border-color( $background-color, - 10 );
 	}
+
+	&:focus,
+	&:active {
+		@include def-focus-shadow();
+	}
 }
 
 .ck-button,
