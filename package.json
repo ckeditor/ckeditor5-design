@@ -6,8 +6,6 @@
     "less": "^2.6.0"
   },
   "devDependencies": {
-    "cksource-samples-framework": "^1.0.1",
-    "grunt": "^0.4.5",
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.0",
     "gulp-concat-util": "^0.5.5",

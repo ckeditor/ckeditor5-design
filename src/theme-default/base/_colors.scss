@@ -22,12 +22,7 @@ $def-colors: (
 @function def-get-color( $color-name: 'background', $color-offset: 0 ) {
 	$color: map-get( $def-colors, $color-name );
 
-	@if $color-offset > 0 {
-		@return lighten( $color, $color-offset );
-	}
-	@else {
-	  	@return darken( $color, abs( $color-offset ) );
-	}
+	@return scale-color( $color, $lightness: $color-offset );
 }
 
 @function def-get-border-color( $color, $color-offset: 0 ) {
