@@ -1,5 +1,5 @@
 %svg-common {
-	background-image: url("../dist/assets/icon-sprite-c7d59bf7.svg");
+	background-image: url("../dist/assets/icon-sprite-cf648e04.svg");
 	background-repeat: no-repeat;
 }
 
@@ -8,8 +8,43 @@
 	background-position: 0 0;
 }
 
+.ck-icon-bulletedlist:before {
+	@extend %svg-common;
+	background-position: 0 12.5%;
+}
+
+.ck-icon-image:before {
+	@extend %svg-common;
+	background-position: 0 25%;
+}
+
+.ck-icon-italic:before {
+	@extend %svg-common;
+	background-position: 0 37.5%;
+}
+
 .ck-icon-link:before {
 	@extend %svg-common;
-	background-position: 100% 0;
+	background-position: 0 50%;
+}
+
+.ck-icon-numberedlist:before {
+	@extend %svg-common;
+	background-position: 0 62.5%;
+}
+
+.ck-icon-source:before {
+	@extend %svg-common;
+	background-position: 0 75%;
+}
+
+.ck-icon-underline:before {
+	@extend %svg-common;
+	background-position: 0 87.5%;
+}
+
+.ck-icon-unlink:before {
+	@extend %svg-common;
+	background-position: 0 100%;
 }
 

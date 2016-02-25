@@ -38,7 +38,6 @@
 
 .ck-button,
 a.ck-button {
-
 	@include get-button( 'white' );
 	@include def-rounded-corners();
 

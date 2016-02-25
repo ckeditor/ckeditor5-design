@@ -30,6 +30,7 @@ gulp.task( 'sprites', () => {
 				sprite: '../dist/assets/icon-sprite.svg',
 				prefix: ".ck-icon-%s:before",
 				dimensions: false,
+				layout: 'vertical',
 				render: {
 					scss: {
 						dest: './theme-default/components/icon-sprite.scss',
