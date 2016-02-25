@@ -1,7 +1,7 @@
 // Copyright (c) 2003-2016, CKSource - Frederico Knabben. All rights reserved.
 // For licensing, see LICENSE.md or http://ckeditor.com/license
 
-@mixin get-button( $background-color ) {
+@mixin def-get-button( $background-color ) {
 	background: def-get-color( $background-color );
 	border: 1px solid def-get-border-color( $background-color );
 	white-space: nowrap;
@@ -36,24 +36,34 @@
 	}
 }
 
+@mixin def-get-button-icon {
+	[class*="ck-icon"] {
+		@content;
+	}
+}
+
 .ck-button,
 a.ck-button {
-	@include get-button( 'white' );
+	@include def-get-button( 'white' );
 	@include def-rounded-corners();
 
 	&-disabled {
-		@include get-button( 'white' );
+		@include def-get-button( 'white' );
 		color: def-get-color( 'text', 50 );
+
+		@include def-get-button-icon {
+			opacity: .6;
+		}
 	}
 
 	&-active {
-		@include get-button( 'background' );
+		@include def-get-button( 'background' );
 	}
 
 	&-action {
 		text-shadow: 0 -1px def-get-color( 'action', -20 );
 		color: def-get-color( 'white' );
-		@include get-button( 'action' );
+		@include def-get-button( 'action' );
 
 		&:hover,
 		&:focus,
@@ -69,7 +79,7 @@ a.ck-button {
 	&.ck-button-notext {
 		padding: def-get-spacing( 'medium' );
 
-		[class*="ck-icon"] {
+		@include def-get-button-icon {
 			margin-left: 0;
 			margin-right: 0;
 		}
