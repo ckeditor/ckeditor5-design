@@ -4,6 +4,12 @@
 @mixin get-button( $background-color ) {
 	background: def-get-color( $background-color );
 	border: 1px solid def-get-border-color( $background-color );
+	white-space: nowrap;
+	cursor: pointer;
+	vertical-align: middle;
+	line-height: 1; // Important for proper icon placement!
+	padding: def-get-spacing( 'medium' ) def-get-spacing();
+	position: relative;
 
 	&:hover,
 	&:focus {
@@ -20,12 +26,18 @@
 	&:active {
 		@include def-focus-shadow();
 	}
+
+	.ck-icon-left {
+		margin-left: -.05em;
+	}
+
+	.ck-icon-right {
+		margin-right: -.05em;
+	}
 }
 
 .ck-button,
 a.ck-button {
-	padding: def-get-spacing( 'medium' ) def-get-spacing();
-	cursor: pointer;
 
 	@include get-button( 'white' );
 	@include def-rounded-corners();
@@ -53,5 +65,14 @@ a.ck-button {
 
 	&-bold {
 		font-weight: bold;
+	}
+
+	&.ck-button-notext {
+		padding: def-get-spacing( 'medium' );
+
+		[class*="ck-icon"] {
+			margin-left: 0;
+			margin-right: 0;
+		}
 	}
 }

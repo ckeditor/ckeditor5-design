@@ -6,44 +6,48 @@ const gulp = require( 'gulp' );
 const sass = require( 'gulp-sass' );
 const sourcemaps = require( 'gulp-sourcemaps' );
 const plumber = require( 'gulp-plumber' );
-const concat = require( 'gulp-concat-util' );
 const watch = require( 'gulp-watch' );
-const headerTemplate = `\n/* ----------------------- <%= file.path %> ----------------------- */\n\n`;
-
-// gulp.task( 'sass:base', () => {
-// 	const sassGlob = './src/theme-base/ckeditor.scss';
-
-// 	return gulp.src( sassGlob )
-// 		.pipe( sourcemaps.init() )
-// 		.pipe( sass( {
-// 			outputStyle: 'expanded'
-// 		} )
-// 		.on( 'error', sass.logError ) )
-// 		.pipe( sourcemaps.write() )
-// 		.pipe( gulp.dest( './src/theme-base/' ) );
-// } );
+const sprite = require( 'gulp-svg-sprite' );
 
 gulp.task( 'sass', () => {
-	const sassGlob = './src/ckeditor.scss';
+	const glob = './src/ckeditor.scss';
 
-	return gulp.src( sassGlob )
+	return gulp.src( glob )
 		.pipe( plumber() )
 		.pipe( sourcemaps.init() )
 		.pipe( sass( {
 			outputStyle: 'expanded'
 		} )
 		.on( 'error', sass.logError ) )
-		// .pipe( concat.header( headerTemplate ) )
-		// .pipe( concat( 'ckeditor.css' ) )
 		.pipe( sourcemaps.write() )
-		.pipe( gulp.dest( './src' ) );
-		// .pipe( gulp.dest( './src' ) );
+		.pipe( gulp.dest( './dist' ) );
 } );
 
-// gulp.task( 'default', [ 'sass:default' ] );
+gulp.task( 'sprites', () => {
+	const config = {
+		mode: {
+			css: {
+				sprite: '../dist/assets/icon-sprite.svg',
+				prefix: ".ck-icon-%s:before",
+				dimensions: false,
+				render: {
+					scss: {
+						dest: './theme-default/components/icon-sprite.scss',
+						template: './src/theme-default/components/icon-sprite-template.tpl',
+					}
+				},
+				dest: '.'
+			},
+		}
+	};
 
-gulp.task( 'default', [ 'sass' ], () => {
-	const sassGlob = './src/**/*.scss';
+	gulp.src( './src/theme-default/assets/*.svg' )
+		.pipe( sprite( config ) )
+		.pipe( gulp.dest( 'src/' ) );
+} );
 
-	return gulp.watch( sassGlob, [ 'sass' ] );
+gulp.task( 'default', [ 'sass', 'sprites' ], () => {
+	const glob = './src/**/*.{scss,svg}';
+
+	return gulp.watch( glob, [ 'sass', 'sprites' ] );
 } );

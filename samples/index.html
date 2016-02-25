@@ -9,7 +9,20 @@ Licensed under the terms of the MIT license. See LICENSE.md for details.
 	<title>CKEditor 5 - theme architecture</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link href="css/sample.css" rel="stylesheet">
-	<link href="../src/ckeditor.css"rel="stylesheet" >
+	<link href="../dist/ckeditor.css"rel="stylesheet" >
+	<style>
+		.sample-scaled-1 .ck-button {
+			font-size: 1.2em;
+		}
+
+		.sample-scaled-2 .ck-button {
+			font-size: 1.5em;
+		}
+
+		.sample-scaled-3 .ck-button {
+			font-size: 2em;
+		}
+	</style>
 <body>
 	<header class="header-a">
 		<div class="grid-container">
@@ -28,18 +41,50 @@ Licensed under the terms of the MIT license. See LICENSE.md for details.
 			<h1>CKEditor 5 - theme architecture</h1>
 
 			<h2 id="ui-components">Components <a href="#ui-components" class="content-heading-anchor" title="Permalink to this headline">&para;</a></h2>
+
 			<h3>Button</h3>
 
-			<p>
-				<div class="ck-reset-all">
-					<a href="#" class="ck-button">A button</a>
-					<a href="#" class="ck-button ck-button-disabled">Disabled button</a>
-					<a href="#" class="ck-button ck-button-active">Active button</a>
-					<a href="#" class="ck-button ck-button-action">Action button</a>
-					<a href="#" class="ck-button ck-rounded">Rounded corners</a>
-					<a href="#" class="ck-button ck-button-bold">Bold text</a>
-				</div>
-			</p>
+			<div class="ck-reset-all">
+				<a href="#" class="ck-button">A button</a>
+				<a href="#" class="ck-button ck-button-disabled">Disabled button</a>
+				<a href="#" class="ck-button ck-button-active">Active button</a>
+				<a href="#" class="ck-button ck-button-action">Action button</a>
+				<a href="#" class="ck-button ck-rounded">Rounded corners</a>
+				<a href="#" class="ck-button ck-button-bold">Bold text</a>
+			</div>
+
+			<h4>Buttons and icons</h4>
+			<div class="ck-reset-all">
+				<a href="#" class="ck-button"><i class="ck-icon-left ck-icon-bold"></i>Icon to the left</a>
+				<a href="#" class="ck-button"><i class="ck-icon-right ck-icon-bold"></i>Icon to the right (RTL)</a>
+				<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-bold"></i><span aria-hidden="false" class="ck-hidden">Button with icon and no text</span></a>
+				<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-link"></i><span aria-hidden="false" class="ck-hidden">Button with icon and no text</span></a>
+			</div>
+
+			<h4>Responsive buttons</h4>
+			<div class="ck-reset-all">
+				<a href="#" class="ck-button">A button</a>
+				<a href="#" class="ck-button"><i class="ck-icon-left ck-icon-bold"></i> Icon</a>
+				<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-link"></i><span aria-hidden="false" class="ck-hidden">Button with icon and no text</span></a>
+			</div>
+			<br />
+			<div class="ck-reset-all sample-scaled-1">
+				<a href="#" class="ck-button">A button</a>
+				<a href="#" class="ck-button"><i class="ck-icon-left ck-icon-bold"></i> Icon</a>
+				<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-link"></i><span aria-hidden="false" class="ck-hidden">Button with icon and no text</span></a>
+			</div>
+			<br />
+			<div class="ck-reset-all sample-scaled-2">
+				<a href="#" class="ck-button">A button</a>
+				<a href="#" class="ck-button"><i class="ck-icon-left ck-icon-bold"></i> Icon</a>
+				<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-link"></i><span aria-hidden="false" class="ck-hidden">Button with icon and no text</span></a>
+			</div>
+			<br />
+			<div class="ck-reset-all sample-scaled-3">
+				<a href="#" class="ck-button">A button</a>
+				<a href="#" class="ck-button"><i class="ck-icon-left ck-icon-bold"></i> Icon</a>
+				<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-link"></i><span aria-hidden="false" class="ck-hidden">Button with icon and no text</span></a>
+			</div>
 
 			<h3>Toolbar</h3>
 
@@ -48,12 +93,14 @@ Licensed under the terms of the MIT license. See LICENSE.md for details.
 					<a href="#" class="ck-button">A button</a>
 					<a href="#" class="ck-button ck-button-disabled">Disabled button</a>
 					<a href="#" class="ck-button ck-button-active">Active button</a>
+					<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-bold"></i><span aria-hidden="false" class="ck-hidden">Button with icon and no text</span></a>
+					<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-link"></i><span aria-hidden="false" class="ck-hidden">Button with icon and no text</span></a>
 				</div>
 
 				<h4>Rounded corners</h4>
 
 				<div class="ck-rounded ck-toolbar">
-					<a href="#" class="ck-button">A button which corners are also rounded</a>
+					<a href="#" class="ck-button">A button which corners are also rounded because of toolbar class</a>
 				</div>
 			</div>
 

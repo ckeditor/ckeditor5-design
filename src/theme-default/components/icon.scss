@@ -1,0 +1,44 @@
+// Copyright (c) 2003-2016, CKSource - Frederico Knabben. All rights reserved.
+// For licensing, see LICENSE.md or http://ckeditor.com/license
+
+$def-icon-size: 20px;
+
+*[class*=ck-icon] {
+	display: inline-block;
+	height: 1em;
+	width: 1em;
+	font-size: 1em;
+	line-height: 1;
+	position: relative;
+}
+
+*[class*=ck-icon]:after {
+	content: "​"; // <- ZWS here!
+}
+
+*[class*=ck-icon]:before {
+	content: "";
+	min-width: $def-icon-size;
+	min-height: $def-icon-size;
+	width: 1.5em;
+	height: 1.5em;
+	background-size: cover;
+	display: inline-block;
+
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translateY(-50%) translateX(-50%);
+}
+
+.ck-icon {
+	&-left {
+		float: left;
+		margin-right: .7em;
+	}
+
+	&-right {
+		float: right;
+		margin-left: .7em;
+	}
+}

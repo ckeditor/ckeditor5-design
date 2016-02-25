@@ -1,0 +1,15 @@
+%svg-common {
+	background-image: url("../dist/assets/icon-sprite-c7d59bf7.svg");
+	background-repeat: no-repeat;
+}
+
+.ck-icon-bold:before {
+	@extend %svg-common;
+	background-position: 0 0;
+}
+
+.ck-icon-link:before {
+	@extend %svg-common;
+	background-position: 100% 0;
+}
+
