@@ -1,26 +1,41 @@
 %svg-common {
-	background-image: url("../dist/assets/icon-sprite-cf648e04.svg");
+	background-image: url("../dist/assets/icon-sprite-86f3bb80.svg");
 	background-repeat: no-repeat;
 }
 
-.ck-icon-bold:before {
+.ck-icon-align-center:before {
 	@extend %svg-common;
 	background-position: 0 0;
 }
 
+.ck-icon-align-left:before {
+	@extend %svg-common;
+	background-position: 0 7.142857142857143%;
+}
+
+.ck-icon-align-right:before {
+	@extend %svg-common;
+	background-position: 0 14.285714285714286%;
+}
+
+.ck-icon-bold:before {
+	@extend %svg-common;
+	background-position: 0 21.428571428571427%;
+}
+
 .ck-icon-bulletedlist:before {
 	@extend %svg-common;
-	background-position: 0 12.5%;
+	background-position: 0 28.571428571428573%;
 }
 
 .ck-icon-image:before {
 	@extend %svg-common;
-	background-position: 0 25%;
+	background-position: 0 35.714285714285715%;
 }
 
 .ck-icon-italic:before {
 	@extend %svg-common;
-	background-position: 0 37.5%;
+	background-position: 0 42.857142857142854%;
 }
 
 .ck-icon-link:before {
@@ -30,17 +45,32 @@
 
 .ck-icon-numberedlist:before {
 	@extend %svg-common;
-	background-position: 0 62.5%;
+	background-position: 0 57.142857142857146%;
+}
+
+.ck-icon-picker:before {
+	@extend %svg-common;
+	background-position: 0 64.28571428571429%;
+}
+
+.ck-icon-quote:before {
+	@extend %svg-common;
+	background-position: 0 71.42857142857143%;
 }
 
 .ck-icon-source:before {
 	@extend %svg-common;
-	background-position: 0 75%;
+	background-position: 0 78.57142857142857%;
+}
+
+.ck-icon-table:before {
+	@extend %svg-common;
+	background-position: 0 85.71428571428571%;
 }
 
 .ck-icon-underline:before {
 	@extend %svg-common;
-	background-position: 0 87.5%;
+	background-position: 0 92.85714285714286%;
 }
 
 .ck-icon-unlink:before {
