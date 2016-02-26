@@ -11,16 +11,18 @@ Licensed under the terms of the MIT license. See LICENSE.md for details.
 	<link href="css/sample.css" rel="stylesheet">
 	<link href="../dist/ckeditor.css"rel="stylesheet" >
 	<style>
-		.sample-scaled-1 .ck-button {
-			font-size: 1.2em;
+		.wrappable {
+			white-space: initial;
+			line-height: 3em;
 		}
 
-		.sample-scaled-2 .ck-button {
-			font-size: 1.5em;
+		#buttons-responsive div {
+			font-size: 1.15em;
+			line-height: 3em;
 		}
 
-		.sample-scaled-3 .ck-button {
-			font-size: 2em;
+		#buttons-responsive div .ck-button {
+			font-size: inherit;
 		}
 	</style>
 <body>
@@ -54,59 +56,78 @@ Licensed under the terms of the MIT license. See LICENSE.md for details.
 			</div>
 
 			<h4>Buttons and icons</h4>
-			<div class="ck-reset-all" style="white-space: initial;">
+			<div class="ck-reset-all" >
 				<a href="#" class="ck-button"><i class="ck-icon-left ck-icon-bold"></i>Icon to the left</a>
 				<a href="#" class="ck-button"><i class="ck-icon-right ck-icon-bold"></i>Icon to the right (RTL)</a>
+
 				<br/>
 				<br/>
 
-				<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-source"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
-				<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-align-center"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
-				<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-align-left"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
-				<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-align-right"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
-				<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-bold"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
-				<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-italic"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
-				<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-underline"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
-				<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-link"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
-				<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-unlink"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
-				<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-bulletedlist"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
-				<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-numberedlist"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
-				<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-image"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
-				<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-picker"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
-				<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-quote"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
-				<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-table"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
+				<div id="button-icons-unnamed"></div>
 
 				<br/>
+
+				<div id="button-icons-named" class="wrappable"></div>
+
 				<br/>
 
 				<a href="#" class="ck-button ck-button-disabled"><i class="ck-icon-left ck-icon-table"></i>Disabled with icon</a>
 				<a href="#" class="ck-button ck-button-disabled ck-button-notext"><i class="ck-icon-left ck-icon-image"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
+
+				<script>
+					var unnamed = document.getElementById( 'button-icons-unnamed' );
+					var named = document.getElementById( 'button-icons-named' );
+					var tmp = document.createElement( 'div' )
+					var icons = [
+						'source', 'align-center', 'align-left', 'align-right', 'bold', 'italic', 'underline',
+						'link', 'unlink', 'bulletedlist', 'numberedlist', 'image', 'picker', 'quote', 'table'
+					];
+
+					icons.forEach( function( i ) {
+						tmp.innerHTML =
+							'<a href="#" class="ck-button ck-button-notext">' +
+								'<i class="ck-icon-left ck-icon-' + i + '"></i>' +
+								'<span aria-hidden="false" class="ck-hidden">No text</span>' +
+							'</a>';
+
+						unnamed.appendChild( tmp.firstChild );
+						unnamed.appendChild( new Text( ' ' ) );
+
+						tmp.innerHTML =
+							'<a href="#" class="ck-button">' +
+								'<i class="ck-icon-left ck-icon-' + i + '"></i>' +
+								i[ 0 ].toUpperCase() + i.slice( 1 ) +
+							'</a>';
+
+						named.appendChild( tmp.firstChild );
+						named.appendChild( new Text( ' ' ) );
+					} );
+				</script>
 			</div>
 
 			<h4>Responsive buttons</h4>
-			<div class="ck-reset-all">
-				<a href="#" class="ck-button">A button</a>
-				<a href="#" class="ck-button"><i class="ck-icon-left ck-icon-bold"></i> Icon</a>
-				<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-link"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
+
+
+			<div id="buttons-responsive" class="ck-reset-all">
+				<div>
+					<a href="#" class="ck-button">Button</a>
+					<a href="#" class="ck-button ck-button-action">OK</a>
+					<a href="#" class="ck-button"><i class="ck-icon-left ck-icon-bold"></i> Bold</a>
+					<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-link"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
+					<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-table"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
+				</div>
 			</div>
-			<br />
-			<div class="ck-reset-all sample-scaled-1">
-				<a href="#" class="ck-button">A button</a>
-				<a href="#" class="ck-button"><i class="ck-icon-left ck-icon-bold"></i> Icon</a>
-				<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-link"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
-			</div>
-			<br />
-			<div class="ck-reset-all sample-scaled-2">
-				<a href="#" class="ck-button">A button</a>
-				<a href="#" class="ck-button"><i class="ck-icon-left ck-icon-bold"></i> Icon</a>
-				<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-link"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
-			</div>
-			<br />
-			<div class="ck-reset-all sample-scaled-3">
-				<a href="#" class="ck-button">A button</a>
-				<a href="#" class="ck-button"><i class="ck-icon-left ck-icon-bold"></i> Icon</a>
-				<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-link"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
-			</div>
+
+			<script>
+				var responsive = document.getElementById( 'buttons-responsive' );
+				var current = responsive.firstElementChild;
+
+				for ( var i = 0; i < 6; i++ ) {
+					var clone = current.cloneNode( 1 );
+					current.appendChild( clone );
+					current = clone;
+				}
+			</script>
 
 			<h3>Toolbar</h3>
 
