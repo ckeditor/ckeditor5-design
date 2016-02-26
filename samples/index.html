@@ -16,9 +16,9 @@ Licensed under the terms of the MIT license. See LICENSE.md for details.
 			line-height: 3em;
 		}
 
-		#buttons-responsive div {
-			font-size: 1.15em;
-			line-height: 3em;
+		#buttons-responsive div > div {
+			font-size: 1.2em;
+			line-height: 2.8em;
 		}
 
 		#buttons-responsive div .ck-button {
@@ -56,9 +56,11 @@ Licensed under the terms of the MIT license. See LICENSE.md for details.
 			</div>
 
 			<h4>Buttons and icons</h4>
+			<p>Icons like <i class="ck-icon-quote"></i> and <i class="ck-icon-bold"></i> in a plain paragraph.</p>
 			<div class="ck-reset-all" >
 				<a href="#" class="ck-button"><i class="ck-icon-left ck-icon-bold"></i>Icon to the left</a>
 				<a href="#" class="ck-button"><i class="ck-icon-right ck-icon-bold"></i>Icon to the right (RTL)</a>
+				<a href="#" class="ck-button" style="border-radius: 100px; border: 0"><i class="ck-icon-left ck-icon-image"></i>Some custom style</a>
 
 				<br/>
 				<br/>
@@ -77,7 +79,7 @@ Licensed under the terms of the MIT license. See LICENSE.md for details.
 				<script>
 					var unnamed = document.getElementById( 'button-icons-unnamed' );
 					var named = document.getElementById( 'button-icons-named' );
-					var tmp = document.createElement( 'div' )
+					var tmp = document.createElement( 'div' );
 					var icons = [
 						'source', 'align-center', 'align-left', 'align-right', 'bold', 'italic', 'underline',
 						'link', 'unlink', 'bulletedlist', 'numberedlist', 'image', 'picker', 'quote', 'table'
@@ -122,7 +124,7 @@ Licensed under the terms of the MIT license. See LICENSE.md for details.
 				var responsive = document.getElementById( 'buttons-responsive' );
 				var current = responsive.firstElementChild;
 
-				for ( var i = 0; i < 6; i++ ) {
+				for ( var i = 0; i < 5; i++ ) {
 					var clone = current.cloneNode( 1 );
 					current.appendChild( clone );
 					current = clone;
@@ -166,7 +168,7 @@ Licensed under the terms of the MIT license. See LICENSE.md for details.
 					</div>
 				</div>
 				<div class="ck-editor-editable">
-					<div contenteditable="true" class="ck-editable">
+					<div contenteditable="true" class="ck-editable" style="height: 8em">
 						<p>I&#39;m an instance of <a href="http://ckeditor.com">CKEditor</a>.</p>
 					</div>
 				</div>
