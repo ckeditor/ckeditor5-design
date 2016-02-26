@@ -2,4 +2,16 @@
 // For licensing, see LICENSE.md or http://ckeditor.com/license
 
 .ck-toolbar {
+	&-separator {
+		width: 1px;
+		height: calc( 1em + 2 * #{def-get-spacing( 'medium' )};
+		vertical-align: middle;
+		display: inline-block;
+	}
+
+	&-newline {
+		display: block;
+		clear: left;
+		height: def-get-spacing( 'small' );
+	}
 }

@@ -2,10 +2,15 @@
 // For licensing, see LICENSE.md or http://ckeditor.com/license
 
 .ck-toolbar {
-	line-height: 0;
+	line-height: 1;
 	padding: def-get-spacing( 'small' );
 	border: 1px solid def-get-border-color( 'white' );
 	white-space: initial;
 
 	@include def-rounded-corners();
+
+	&-separator {
+		background: def-get-border-color( 'background' );
+		margin: 0 def-get-spacing( 'tiny' );
+	}
 }

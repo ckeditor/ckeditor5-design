@@ -134,18 +134,65 @@ Licensed under the terms of the MIT license. See LICENSE.md for details.
 			<h3>Toolbar</h3>
 
 			<div class="ck-reset-all">
+				<h4>Text–only</h4>
+
+				<div class="ck-toolbar">
+					Just text and some <i class="ck-icon-link"></i> icon.
+				</div>
+
+				<h4>Standard</h4>
+
 				<div class="ck-toolbar">
 					<a href="#" class="ck-button">A button</a>
 					<a href="#" class="ck-button ck-button-disabled">Disabled button</a>
 					<a href="#" class="ck-button ck-button-active">Active button</a>
 					<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-bold"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
 					<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-link"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
+					And some text.
 				</div>
 
 				<h4>Rounded corners</h4>
 
 				<div class="ck-rounded ck-toolbar">
 					<a href="#" class="ck-button">A button which corners are also rounded because of toolbar class</a>
+					<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-bold"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
+				</div>
+
+				<h4>Wrap long line</h4>
+
+				<div class="ck-toolbar" style="width: 80px">
+					<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-bold"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
+					<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-italic"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
+					<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-underline"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
+				</div>
+
+				<h4>Separators</h4>
+
+				<div class="ck-toolbar">
+					<a href="#" class="ck-button">First</a>
+					<a href="#" class="ck-button">Second</a>
+					<s class="ck-toolbar-separator"></s>
+					<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-bold"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
+					<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-italic"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
+					<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-underline"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
+					<s class="ck-toolbar-separator"></s>
+					<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-link"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
+					<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-image"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
+				</div>
+
+				<h4>Controlled multi–row</h4>
+
+				<div class="ck-toolbar">
+					<a href="#" class="ck-button">First row</a>
+					<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-bold"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
+					<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-italic"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
+					<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-underline"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
+					<s class="ck-toolbar-newline"></s>
+					<a href="#" class="ck-button">Second row</a>
+					<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-link"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
+					<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-image"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
+					<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-table"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
+					<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-source"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
 				</div>
 			</div>
 
@@ -157,12 +204,18 @@ Licensed under the terms of the MIT license. See LICENSE.md for details.
 				<div class="ck-editor-top ck-reset-all">
 					<div class="ck-toolbar ck-editor-toolbar">
 						<a href="#" class="ck-button ck-editor-button"><i class="ck-icon-left ck-icon-source"></i> Source</a>
+						<s class="ck-toolbar-separator"></s>
 						<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-bold"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
+						<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-italic"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
+						<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-underline"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
+						<s class="ck-toolbar-separator"></s>
 						<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-link"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
 						<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-unlink"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
+						<s class="ck-toolbar-separator"></s>
 						<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-image"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
 						<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-bulletedlist"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
 						<a href="#" class="ck-button ck-button-notext"><i class="ck-icon-left ck-icon-numberedlist"></i><span aria-hidden="false" class="ck-hidden">No text</span></a>
+						<s class="ck-toolbar-separator"></s>
 						<a href="#" class="ck-button ck-button-disabled ck-editor-button">Disabled</a>
 						<a href="#" class="ck-button ck-editor-button">Just text</a>
 					</div>

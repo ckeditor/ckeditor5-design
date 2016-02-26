@@ -6,7 +6,8 @@ $def-spacings: (
 	'large': 1.5,
 	'standard': 1,
 	'medium': .8,
-	'small': .5
+	'small': .5,
+	'tiny': .25
 );
 
 @function def-get-spacing( $spacing: 'standard' ) {
