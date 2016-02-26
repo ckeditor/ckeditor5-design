@@ -1,7 +1,7 @@
 // Copyright (c) 2003-2016, CKSource - Frederico Knabben. All rights reserved.
 // For licensing, see LICENSE.md or http://ckeditor.com/license
 
-$def-icon-size: 20px;
+$ck-icon-size: 20px;
 
 *[class*=ck-icon] {
 	display: inline-block;
@@ -18,8 +18,8 @@ $def-icon-size: 20px;
 
 *[class*=ck-icon]:before {
 	content: "";
-	min-width: $def-icon-size;
-	min-height: $def-icon-size;
+	min-width: $ck-icon-size;
+	min-height: $ck-icon-size;
 	width: 1.5em;
 	height: 1.5em;
 	background-size: cover;

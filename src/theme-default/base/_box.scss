@@ -1,11 +1,11 @@
 // Copyright (c) 2003-2016, CKSource - Frederico Knabben. All rights reserved.
 // For licensing, see LICENSE.md or http://ckeditor.com/license
 
-@mixin def-ck-box() {
-	background: def-get-color( 'background' );
-	border: 1px solid def-get-border-color( 'background' );
+@mixin ck-box() {
+	background: ck-color( 'background' );
+	border: 1px solid ck-border-color( 'background' );
 }
 
 // .ck-box {
-// 	@include def-ck-box;
+// 	@include ck-box;
 // }

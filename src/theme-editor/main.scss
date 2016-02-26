@@ -6,7 +6,7 @@
 .ck-editor,
 .ck-editor-bottom
 {
-	@include def-ck-box;
+	@include ck-box;
 }
 
 .ck-editor {
@@ -27,7 +27,7 @@
 		border-left: 0;
 		border-right: 0;
 
-		padding: def-get-spacing();
+		padding: ck-spacing();
 	}
 
 	@import 'components/button';

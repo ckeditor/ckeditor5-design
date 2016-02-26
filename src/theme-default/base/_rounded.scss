@@ -3,7 +3,7 @@
 
 $def-border-radius: 3px;
 
-@mixin def-rounded-corners() {
+@mixin ck-rounded() {
 	&.ck-rounded,
 	.ck-rounded & {
 		border-radius: $def-border-radius;

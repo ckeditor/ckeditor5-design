@@ -10,6 +10,6 @@ $def-spacings: (
 	'tiny': .25
 );
 
-@function def-get-spacing( $spacing: 'standard' ) {
+@function ck-spacing( $spacing: 'standard' ) {
 	@return $def-spacing * map-get( $def-spacings, $spacing );
 }

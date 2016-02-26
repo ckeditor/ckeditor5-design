@@ -1,30 +1,30 @@
 // Copyright (c) 2003-2016, CKSource - Frederico Knabben. All rights reserved.
 // For licensing, see LICENSE.md or http://ckeditor.com/license
 
-@mixin def-get-button( $background-color ) {
-	background: def-get-color( $background-color );
-	border: 1px solid def-get-border-color( $background-color );
+@mixin ck-button( $background-color ) {
+	background: ck-color( $background-color );
+	border: 1px solid ck-border-color( $background-color );
 	white-space: nowrap;
 	cursor: pointer;
 	vertical-align: middle;
 	line-height: 1; // Important for proper icon placement!
-	padding: def-get-spacing( 'medium' ) def-get-spacing();
+	padding: ck-spacing( 'medium' ) ck-spacing();
 	position: relative;
 
 	&:hover,
 	&:focus {
-		background: def-get-color( $background-color, -10 );
-		border-color: def-get-border-color( $background-color, -10 );
+		background: ck-color( $background-color, -10 );
+		border-color: ck-border-color( $background-color, -10 );
 	}
 
 	&:active {
-		background: def-get-color( $background-color, -15 );
-		border-color: def-get-border-color( $background-color, -15 );
+		background: ck-color( $background-color, -15 );
+		border-color: ck-border-color( $background-color, -15 );
 	}
 
 	&:focus,
 	&:active {
-		@include def-focus-shadow();
+		@include ck-focus-shadow();
 	}
 
 	.ck-icon-left {
@@ -36,7 +36,7 @@
 	}
 }
 
-@mixin def-get-button-icon {
+@mixin ck-button-icon {
 	[class*="ck-icon"] {
 		@content;
 	}
@@ -44,31 +44,31 @@
 
 .ck-button,
 a.ck-button {
-	@include def-get-button( 'white' );
-	@include def-rounded-corners();
+	@include ck-button( 'white' );
+	@include ck-rounded();
 
 	&-disabled {
-		@include def-get-button( 'white' );
-		color: def-get-color( 'text', 50 );
+		@include ck-button( 'white' );
+		color: ck-color( 'text', 50 );
 
-		@include def-get-button-icon {
+		@include ck-button-icon {
 			opacity: .6;
 		}
 	}
 
 	&-active {
-		@include def-get-button( 'background' );
+		@include ck-button( 'background' );
 	}
 
 	&-action {
-		text-shadow: 0 -1px def-get-color( 'action', -20 );
-		color: def-get-color( 'white' );
-		@include def-get-button( 'action' );
+		text-shadow: 0 -1px ck-color( 'action', -20 );
+		color: ck-color( 'white' );
+		@include ck-button( 'action' );
 
 		&:hover,
 		&:focus,
 		&:active {
-			text-shadow: 0 -1px def-get-color( 'action', -40 );
+			text-shadow: 0 -1px ck-color( 'action', -40 );
 		}
 	}
 
@@ -77,9 +77,9 @@ a.ck-button {
 	}
 
 	&.ck-button-notext {
-		padding: def-get-spacing( 'medium' );
+		padding: ck-spacing( 'medium' );
 
-		@include def-get-button-icon {
+		@include ck-button-icon {
 			margin-left: 0;
 			margin-right: 0;
 		}
