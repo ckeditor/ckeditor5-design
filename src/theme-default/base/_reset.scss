@@ -20,7 +20,7 @@
 		// These are rule inherited by all children elements.
 		border-collapse: collapse;
 		font: normal normal normal $ck-font-size-base $ck-font-face;
-		color: #000;
+		color: ck-color( 'text' );
 		text-align: left;
 		white-space: nowrap;
 		cursor: auto;

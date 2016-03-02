@@ -3,42 +3,39 @@
 
 $ck-icon-size: 20px;
 
-*[class*=ck-icon] {
-	display: inline-block;
-	height: 1em;
-	width: 1em;
-	font-size: 1em;
-	line-height: 1;
-	position: relative;
-}
+#ck-sprite {
+	display: none;
 
-*[class*=ck-icon]:after {
-	content: "​"; // <- ZWS here!
-}
-
-*[class*=ck-icon]:before {
-	content: "";
-	min-width: $ck-icon-size;
-	min-height: $ck-icon-size;
-	width: 1.5em;
-	height: 1.5em;
-	background-size: cover;
-	display: inline-block;
-
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translateY(-50%) translateX(-50%);
+	* {
+		fill: currentColor; // needed by Webkit/Blink
+	}
 }
 
 .ck-icon {
+	min-width: $ck-icon-size;
+	min-height: $ck-icon-size;
+	width: #{$ck-icon-size / $ck-font-size-base}em;
+	height: #{$ck-icon-size / $ck-font-size-base}em;
+	font-size: 1em;
+	vertical-align: middle;
+	color: inherit;
+
 	&-left {
 		float: left;
-		margin-right: .7em;
+		margin-right: ck-spacing( 'small' );
 	}
 
 	&-right {
 		float: right;
-		margin-left: .7em;
+		margin-left: ck-spacing( 'small' );
+	}
+
+	* {
+		fill: currentColor; // needed by FF
+	}
+
+	use {
+		width: $ck-icon-size;
+		height: $ck-icon-size;
 	}
 }

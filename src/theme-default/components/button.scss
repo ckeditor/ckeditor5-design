@@ -7,8 +7,8 @@
 	white-space: nowrap;
 	cursor: pointer;
 	vertical-align: middle;
-	line-height: 1; // Important for proper icon placement!
-	padding: ck-spacing( 'medium' ) ck-spacing();
+	line-height: $ck-icon-size / $ck-font-size-base;
+	padding: ck-spacing( 'small' ) ck-spacing();
 	position: relative;
 
 	&:hover,
@@ -28,11 +28,18 @@
 	}
 
 	.ck-icon-left {
-		margin-left: -.05em;
+		margin-left: - ck-spacing( 'small' );
 	}
 
 	.ck-icon-right {
-		margin-right: -.05em;
+		margin-right: - ck-spacing( 'small' );
+	}
+
+	.ck-icon {
+		use,
+		use * {
+			color: inherit;
+		}
 	}
 }
 
@@ -77,7 +84,7 @@ a.ck-button {
 	}
 
 	&.ck-button-notext {
-		padding: ck-spacing( 'medium' );
+		padding: ck-spacing( 'small' );
 
 		@include ck-button-icon {
 			margin-left: 0;
