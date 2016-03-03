@@ -13,4 +13,4 @@ then
 gulp
 ```
 
-and open `index.html`.
+and open `./dist/index.html`.
