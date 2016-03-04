@@ -8,6 +8,8 @@ const sourcemaps = require( 'gulp-sourcemaps' );
 const plumber = require( 'gulp-plumber' );
 const watch = require( 'gulp-watch' );
 const sprite = require( 'gulp-svg-sprite' );
+const sassdoc = require( 'sassdoc' );
+
 const spritesConfig = {
 	shape: {
 		id: {
@@ -52,6 +54,13 @@ gulp.task( 'sprites', () => {
 	return gulp.src( glob )
 		.pipe( sprite( spritesConfig ) )
 		.pipe( gulp.dest( 'src/' ) );
+} );
+
+gulp.task( 'sassdoc', () => {
+	return gulp.src( './src/**/*.scss' )
+		.pipe( sassdoc( {
+			dest: './dist/docs'
+		} ) );
 } );
 
 gulp.task( 'default', [ 'sass', 'sprites' ], () => {

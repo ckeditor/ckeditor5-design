@@ -7,15 +7,15 @@
 
 .ck-button,
 a.ck-button {
-	@include ck-button-states( 'white' );
+	@include ck-button-states( 'background' );
 
 	&-active {
-		@include ck-button( 'background' );
+		@include ck-button( 'foreground' );
 	}
 
 	&-action {
 		text-shadow: 0 -1px ck-color( 'action', -20 );
-		color: ck-color( 'white' );
+		color: ck-color();
 
 		@include ck-button( 'action' );
 

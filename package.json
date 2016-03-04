@@ -2,9 +2,6 @@
   "name": "CKEditor 5 – theme architecture",
   "version": "0.0.1",
   "scripts": {},
-  "dependencies": {
-    "less": "^2.6.0"
-  },
   "devDependencies": {
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.0",
@@ -16,7 +13,9 @@
     "gulp-svg-sprite": "^1.2.19",
     "gulp-watch": "^4.3.5",
     "i": "^0.3.4",
+    "less": "^2.6.0",
     "node-sass": "^3.4.2",
-    "npm": "^3.7.3"
+    "npm": "^3.7.3",
+    "sassdoc": "^2.1.20"
   }
 }

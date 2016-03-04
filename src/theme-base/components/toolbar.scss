@@ -8,10 +8,10 @@
 .ck-toolbar {
 	line-height: 1;
 	padding: ck-spacing( 'small' );
-	border: 1px solid ck-border-color( 'white' );
+	border: 1px solid ck-border-color();
 	white-space: initial;
 
-	@include ck-rounded();
+	@include ck-rounded-corners();
 
 	&-separator {
 		width: 1px;

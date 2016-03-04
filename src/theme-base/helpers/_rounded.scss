@@ -5,11 +5,11 @@
  * @file theme-base/helpers/_rounded.scss
  */
 
-$def-border-radius: 3px;
+$ck-border-radius: 3px !default;
 
-@mixin ck-rounded() {
-	&.ck-rounded,
-	.ck-rounded & {
-		border-radius: $def-border-radius;
+@mixin ck-rounded-corners() {
+	&.ck-rounded-corners,
+	.ck-rounded-corners & {
+		border-radius: $ck-border-radius;
 	}
 }

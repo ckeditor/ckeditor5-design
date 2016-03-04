@@ -31,6 +31,6 @@
 
 .ck-editor,
 .ck-editor-bottom {
-	background: ck-color();
-	border: 1px solid ck-border-color();
+	background: ck-color( 'foreground' );
+	border: 1px solid ck-border-color( 'foreground' );
 }

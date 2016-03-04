@@ -5,8 +5,8 @@
  * @file theme-base/helpers/_fonts.scss
  */
 
-$ck-font-size-base: 12px;
-$ck-font-face: Helvetica, Arial, Tahoma, Verdana, Sans-Serif;
+$ck-font-size-base: 12px !default;
+$ck-font-face: Helvetica, Arial, Tahoma, Verdana, Sans-Serif !default;
 $ck-font-sizes: (
 	-1: 0.75rem,
 	 0: 1rem,

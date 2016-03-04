@@ -1,10 +1,18 @@
-// Copyright (c) 2003-2016, CKSource - Frederico Knabben. All rights reserved.
-// For licensing, see LICENSE.md or http://ckeditor.com/license
-
 /**
  * @file theme-base/components/button.scss
  */
 
+////
+/// @author CKSource - Frederico Knabben
+/// @group components
+/// @copyright Copyright (c) 2003-2016, CKSource - Frederico Knabben. All rights reserved.
+/// @license For licensing, see LICENSE.md or http://ckeditor.com/license
+////
+
+/// Implements button states.
+///
+/// @access public
+/// @param {String} $color - Background color of the button.
 @mixin ck-button-states( $color ) {
 	&:hover,
 	&:focus {
@@ -23,6 +31,10 @@
 	}
 }
 
+/// Implements a button of given background color.
+///
+/// @access public
+/// @param {String} $color - Background color of the button.
 @mixin ck-button( $color ) {
 	background: ck-color( $color );
 	border: 1px solid ck-border-color( $color );
@@ -51,6 +63,9 @@
 	}
 }
 
+/// A helper to define button–specific icon styles.
+///
+/// @access public
 @mixin ck-button-icon {
 	[class*="ck-icon"] {
 		@content;
@@ -62,8 +77,8 @@ a.ck-button {
 	display: inline-block;
 	overflow: hidden;
 
-	@include ck-button( 'white' );
-	@include ck-rounded();
+	@include ck-button( 'background' );
+	@include ck-rounded-corners();
 
 	&.ck-button-notext {
 		padding: ck-spacing( 'small' );

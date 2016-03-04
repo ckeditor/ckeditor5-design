@@ -5,8 +5,8 @@
  * @file theme-base/helpers/_spacing.scss
  */
 
-$def-spacing: .8em;
-$def-spacings: (
+$ck-def-spacing: .8em !default;
+$ck-def-spacings: (
 	'large': 1.5,
 	'standard': 1,
 	'medium': .8,
@@ -15,5 +15,5 @@ $def-spacings: (
 );
 
 @function ck-spacing( $spacing: 'standard' ) {
-	@return $def-spacing * map-get( $def-spacings, $spacing );
+	@return $ck-def-spacing * map-get( $ck-def-spacings, $spacing );
 }

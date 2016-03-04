@@ -13,4 +13,12 @@ then
 gulp
 ```
 
-and open `./dist/index.html`.
+and open `./samples/index.html`.
+
+## Docs
+
+```js
+gulp sassdoc
+```
+
+and open `./dist/docs`.

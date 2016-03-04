@@ -5,10 +5,4 @@
  * @file theme-default/helpers/_colors.scss
  */
 
-$ck-colors: (
-	'white': #fff,
-	'text': #333,
-	'background': #f7f7f7,
-	'focus': #83BFFC,
-	'action': #61B145
-);
+// @include ck-color-add( ( 'foreground': blue ) );
