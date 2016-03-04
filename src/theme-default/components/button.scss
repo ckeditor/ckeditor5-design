@@ -1,67 +1,13 @@
 // Copyright (c) 2003-2016, CKSource - Frederico Knabben. All rights reserved.
 // For licensing, see LICENSE.md or http://ckeditor.com/license
 
-@mixin ck-button( $background-color ) {
-	background: ck-color( $background-color );
-	border: 1px solid ck-border-color( $background-color );
-	white-space: nowrap;
-	cursor: pointer;
-	vertical-align: middle;
-	line-height: $ck-icon-size / $ck-font-size-base;
-	padding: ck-spacing( 'small' ) ck-spacing();
-	position: relative;
-
-	&:hover,
-	&:focus {
-		background: ck-color( $background-color, -10 );
-		border-color: ck-border-color( $background-color, -10 );
-	}
-
-	&:active {
-		background: ck-color( $background-color, -15 );
-		border-color: ck-border-color( $background-color, -15 );
-	}
-
-	&:focus,
-	&:active {
-		@include ck-focus-shadow();
-	}
-
-	.ck-icon-left {
-		margin-left: - ck-spacing( 'small' );
-	}
-
-	.ck-icon-right {
-		margin-right: - ck-spacing( 'small' );
-	}
-
-	.ck-icon {
-		use,
-		use * {
-			color: inherit;
-		}
-	}
-}
-
-@mixin ck-button-icon {
-	[class*="ck-icon"] {
-		@content;
-	}
-}
+/**
+ * @file theme-default/components/button.scss
+ */
 
 .ck-button,
 a.ck-button {
-	@include ck-button( 'white' );
-	@include ck-rounded();
-
-	&-disabled {
-		@include ck-button( 'white' );
-		color: ck-color( 'text', 50 );
-
-		@include ck-button-icon {
-			opacity: .6;
-		}
-	}
+	@include ck-button-states( 'white' );
 
 	&-active {
 		@include ck-button( 'background' );
@@ -70,25 +16,13 @@ a.ck-button {
 	&-action {
 		text-shadow: 0 -1px ck-color( 'action', -20 );
 		color: ck-color( 'white' );
+
 		@include ck-button( 'action' );
 
 		&:hover,
 		&:focus,
 		&:active {
 			text-shadow: 0 -1px ck-color( 'action', -40 );
-		}
-	}
-
-	&-bold {
-		font-weight: bold;
-	}
-
-	&.ck-button-notext {
-		padding: ck-spacing( 'small' );
-
-		@include ck-button-icon {
-			margin-left: 0;
-			margin-right: 0;
 		}
 	}
 }

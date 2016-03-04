@@ -2,13 +2,13 @@
 // For licensing, see LICENSE.md or http://ckeditor.com/license
 
 /**
- * @file theme-editor/components/button.scss
+ * @file theme-default/helpers/_colors.scss
  */
 
-@include ck-editor {
-	.ck-button,
-	a.ck-button:not(:hover) {
-		border: 0;
-		background: 0;
-	}
-}
+$ck-colors: (
+	'white': #fff,
+	'text': #333,
+	'background': #f7f7f7,
+	'focus': #83BFFC,
+	'action': #61B145
+);

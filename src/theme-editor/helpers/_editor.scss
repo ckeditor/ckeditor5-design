@@ -1,11 +1,12 @@
 // Copyright (c) 2003-2016, CKSource - Frederico Knabben. All rights reserved.
 // For licensing, see LICENSE.md or http://ckeditor.com/license
 
-$def-border-radius: 3px;
+/**
+ * @file theme-editor/helpers/_editor.scss
+ */
 
-@mixin ck-rounded() {
-	&.ck-rounded,
-	.ck-rounded & {
-		border-radius: $def-border-radius;
+@mixin ck-editor {
+	.ck-editor {
+		@content;
 	}
 }

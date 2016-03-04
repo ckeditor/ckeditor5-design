@@ -1,13 +1,17 @@
 // Copyright (c) 2003-2016, CKSource - Frederico Knabben. All rights reserved.
 // For licensing, see LICENSE.md or http://ckeditor.com/license
 
+/**
+ * @file theme-base/helpers/_fonts.scss
+ */
+
 $ck-font-size-base: 12px;
 $ck-font-face: Helvetica, Arial, Tahoma, Verdana, Sans-Serif;
 $ck-font-sizes: (
 	-1: 0.75rem,
-	0: 1rem,
-	1: 1.4rem,
-	2: 1.8rem
+	 0: 1rem,
+	 1: 1.4rem,
+	 2: 1.8rem
 );
 
 @function ck-font-size( $level: 0 ) {

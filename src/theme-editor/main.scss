@@ -1,34 +1,7 @@
 // Copyright (c) 2003-2016, CKSource - Frederico Knabben. All rights reserved.
 // For licensing, see LICENSE.md or http://ckeditor.com/license
 
+@import 'helpers/editor';
 
-// .ck-editor-top,
-.ck-editor,
-.ck-editor-bottom
-{
-	@include ck-box;
-}
-
-.ck-editor {
-	.ck-editor-top .ck-toolbar {
-		border-top: 0;
-		border-left: 0;
-		border-right: 0;
-	}
-
-	.ck-editor-editable {
-		background: #fff;
-		overflow: hidden;
-		padding: 1em;
-	}
-
-	.ck-editor-bottom {
-		border-bottom: 0;
-		border-left: 0;
-		border-right: 0;
-
-		padding: ck-spacing();
-	}
-
-	@import 'components/button';
-}
+@import 'components/button';
+@import 'components/editor';

@@ -1,6 +1,10 @@
 // Copyright (c) 2003-2016, CKSource - Frederico Knabben. All rights reserved.
 // For licensing, see LICENSE.md or http://ckeditor.com/license
 
+/**
+ * @file theme-base/components/reset.scss
+ */
+
 // Reset for single elements, not their children.
 .ck-reset {
 	// Do not include inheritable rules here.
@@ -12,6 +16,9 @@
 	vertical-align: middle;
 	transition: none;
 	box-sizing: border-box;
+	width: auto;
+	height: auto;
+	position: static;
 }
 
 // Reset for elements and their children.
@@ -24,6 +31,7 @@
 		text-align: left;
 		white-space: nowrap;
 		cursor: auto;
+		float: none;
 
 		// The following must be identical to .ck-reset.
 		@extend .ck-reset;

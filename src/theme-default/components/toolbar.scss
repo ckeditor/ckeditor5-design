@@ -1,6 +1,10 @@
 // Copyright (c) 2003-2016, CKSource - Frederico Knabben. All rights reserved.
 // For licensing, see LICENSE.md or http://ckeditor.com/license
 
+/**
+ * @file theme-default/components/toolbar.scss
+ */
+
 .ck-toolbar {
 	line-height: 1;
 	padding: ck-spacing( 'small' );
@@ -10,7 +14,7 @@
 	@include ck-rounded();
 
 	&-separator {
-		background: ck-border-color( 'background' );
+		background: ck-border-color();
 		margin: 0 ck-spacing( 'tiny' );
 	}
 }
