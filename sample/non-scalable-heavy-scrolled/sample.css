@@ -1,0 +1,73 @@
+body {
+	font-family: Helvetica;
+}
+
+html.fullscreen {
+	position: fixed;
+	z-index: 9995;
+	width: 0px;
+	height: 0px;
+}
+
+.fullscreen body {
+	position: static;
+	z-index: 9995;
+	width: 0px;
+	height: 0px;
+}
+
+.editor {
+	background: #eee;
+	border: 5px solid red;
+}
+
+.fullscreen .editor {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+}
+
+.toolbar {
+	height: 50px;
+	line-height: 50px;
+	background: #ccc;
+	padding: 0 .5em;
+}
+
+.toolbar button {
+	font-size: 16px;
+	background: #fff;
+	border: 0;
+	padding: .3em .5em;
+}
+
+.editable {
+	padding: 1em;
+	background: #fff;
+	font-family: Georgia;
+	font-size: 1.2em;
+	border: 5px solid green;
+}
+
+.fullscreen .editable {
+	position: absolute;
+	top: 50px;
+	bottom: 0;
+	overflow: scroll;
+}
+
+.editable:focus {
+	border: 5px solid blue;
+}
+
+::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 7px;
+}
+::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background-color: rgba(0,0,0,.5);
+    -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
+}
