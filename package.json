@@ -1,0 +1,23 @@
+{
+  "name": "ckeditor5-design",
+  "version": "1.0.0",
+  "description": "CKEditor 5 Design Repository ============================",
+  "main": "index.js",
+  "dependencies": {
+    "jsdoc": "^3.4.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ckeditor/ckeditor5-design.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ckeditor/ckeditor5-design/issues"
+  },
+  "homepage": "https://github.com/ckeditor/ckeditor5-design#readme"
+}
