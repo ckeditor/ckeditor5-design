@@ -1,14 +1,15 @@
 {
   "name": "ckeditor5-design",
   "version": "1.0.0",
-  "description": "CKEditor 5 Design Repository ============================",
+  "description": "",
   "main": "index.js",
   "dependencies": {
+    "ink-docstrap": "^1.3.0",
     "jsdoc": "^3.4.0"
   },
   "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "rm -rf out && jsdoc -c jsdoc/config.json --debug ckeditor5"
   },
   "repository": {
     "type": "git",
