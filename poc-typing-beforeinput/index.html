@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>CKEditor&nbsp;5 – Proof of concept of the typing feature using the beforeinput event</title>
+	<script src="./ClassicEditor.js"></script>
+	<link rel="stylesheet" href="./ClassicEditor.css">
+	<style>
+		body {
+			width: 600px;
+			margin: 20px auto;
+		}
+	</style>
+</head>
+<body>
+
+<h1>CKEditor&nbsp;5 – Proof of concept of the typing feature using the beforeinput event</h1>
+
+<p>This is a proof-of-concept of CKEditor 5 <a href="https://github.com/ckeditor/ckeditor5-typing">typing feature</a> implemented using the native <code>beforeinput</code> event. It <strong>requires Chrome Canary</strong> to work and <strong>enabling</strong> the <code>chrome://flags/#enable-experimental-web-platform-features</code> flag.</p>
+
+<p>Read more about this PoC in the <a href="https://github.com/ckeditor/ckeditor5-typing/issues/46">issue</a> and check out the <a href="https://www.w3.org/TR/input-events/">Input Events specification</a>.</p>
+
+<p><strong>Note:</strong> This demo uses CKEditor 5 v0.2.0 (let's say early-alpha) so it has some bugs and missing features: e.g., support for rendering subsequent spaces, stability around IME, no pasting support, etc.</p>
+
+<p>Things which do work:</p>
+
+<ul>
+	<li>Normal typing and deleting.</li>
+	<li>Deleting whole words (and perhaps also deleting whole lines and blocks, but I couldn't test it on MacOS).</li>
+	<li>Composing "á" on Spanish-ISO keyboard using "´" + "a".</li>
+	<li>MacOS's accented letter balloon (see <a href="https://support.apple.com/en-gw/HT201586">https://support.apple.com/en-gw/HT201586</a>).</li>
+	<li>IME (e.g. for Hiragana), but only to some point because CKEditor 5 engine blows up at some point.</li>
+</ul>
+
+<p>Believe me or not, but this is <strong>a lot</strong> :).</p>
+
+<div id="editor">
+	<h2>Heading 1</h2>
+	<h3>Heading 2</h3>
+	<p><em>This</em> is an <strong>editor</strong> instance.</p>
+</div>
+
+<script>
+	'use strict';
+
+	ClassicEditor.create( document.querySelector( '#editor' ), {
+		toolbar: [ 'headings', 'bold', 'italic', 'undo', 'redo' ]
+	} )
+	.then( editor => {
+		window.editor = editor;
+
+		window.setInterval( function() {
+			console.log( editor.getData() );
+		}, 3000 );
+	} )
+	.catch( err => {
+		console.error( err.stack );
+	} );
+</script>
+
+</body>
+</html>

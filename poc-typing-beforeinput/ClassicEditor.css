@@ -1,0 +1,832 @@
+@charset "UTF-8";
+/**
+ * Colors configured by the user.
+ *
+ * @type Map
+ * @access public
+ * @example
+ *		$ck-colors: ( 'foreground': red );
+ * @see $_ck-colors
+ */
+/**
+ * Internal map with default colors.
+ *
+ * @type Map
+ * @access private
+ * @see ck-color-add
+ */
+/**
+ * Returns a color of given name and lightness offset.
+ *
+ * @access public
+ * @param {String} $name [ 'background' ] - Name of the color.
+ * @param {Number} $offset [ 0 ] - Offset of the lightness.
+ * @return {String}
+ * @see $_ck-colors
+ */
+/**
+ * Returns a border–color for a given name and lightness offset.
+ *
+ * @access public
+ * @param {String} $name [ 'background' ] - Name of the color.
+ * @param {Number} $offset [ 0 ] - Offset of the lightness.
+ * @return {String}
+ * @see $ck-color
+ */
+/**
+ * Adds a color to internal color map.
+ *
+ * @access public
+ * @example
+ *		@include ck-color-add( ( 'special': yellow, 'hover': #00FF00 ) );
+ * @param {Map} $map - A map with new colors.
+ * @see $_ck-colors
+ */
+/**
+ * Base font size.
+ *
+ * @access public
+ * @see $ck-font-sizes
+ */
+/**
+ * Base font face.
+ *
+ * @access public
+ */
+/**
+ * Base font sizes for scaling.
+ *
+ * @access public
+ * @see ck-font-size
+ */
+/**
+ * Returns font-size in units for given level.
+ *
+ * @access public
+ * @param {Number} $level [ 0 ] - Size of the font.
+ * @return {String}
+ * @see $ck-font-sizes
+ * @see $ck-font-size-base
+ */
+/**
+ * Default border-radius value.
+ *
+ * @access public
+ */
+/**
+ * Implements rounded corner interface for .ck-rounded-corners class.
+ *
+ * @access public
+ * @see $ck-border-radius
+ */
+/**
+ * Default spacing value ("unit").
+ *
+ * @access public
+ */
+/**
+ * Internal map with default spacings.
+ *
+ * @type Map
+ * @access public
+ * @see ck-spacing
+ */
+/**
+ * Returns a spacing value with units for given name.
+ *
+ * @access public
+ * @param {String} $spacing [ 'standard' ] - Spacing level.
+ * @return {String}
+ * @see $ck-def-spacing
+ * @see $ck-def-spacings
+ */
+/* line 4, /www/ckeditor5/ckeditor5-theme-lark/theme/helpers/_states.scss */
+.ck-hidden {
+  display: none;
+}
+
+/* line 8, /www/ckeditor5/ckeditor5-theme-lark/theme/helpers/_states.scss */
+.ck-disabled {
+  opacity: .5;
+}
+
+/**
+ * Brings visual styling for :focus state.
+ *
+ * @access public
+ */
+/**
+ * Makes element unselectable.
+ *
+ * @access public
+ */
+/**
+ * Wraps (S)CSS into .ck-editor namespace.
+ *
+ * @access public
+ */
+/* line 5, /www/ckeditor5/ckeditor5-theme-lark/theme/components/reset.scss */
+.ck-reset, .ck-reset_all, .ck-reset_all *, .ck-reset_all a, .ck-reset_all textarea {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-decoration: none;
+  vertical-align: middle;
+  transition: none;
+  box-sizing: border-box;
+  width: auto;
+  height: auto;
+  position: static;
+}
+
+/* line 22, /www/ckeditor5/ckeditor5-theme-lark/theme/components/reset.scss */
+.ck-reset_all, .ck-reset_all *, .ck-reset_all a, .ck-reset_all textarea {
+  border-collapse: collapse;
+  font: normal normal normal 12px Helvetica, Arial, Tahoma, Verdana, Sans-Serif;
+  color: #333333;
+  text-align: left;
+  white-space: nowrap;
+  cursor: auto;
+  float: none;
+}
+
+/* line 36, /www/ckeditor5/ckeditor5-theme-lark/theme/components/reset.scss */
+.ck-reset_all .ck-rtl * {
+  text-align: right;
+}
+
+/* line 41, /www/ckeditor5/ckeditor5-theme-lark/theme/components/reset.scss */
+.ck-reset_all iframe {
+  vertical-align: inherit;
+}
+
+/* line 45, /www/ckeditor5/ckeditor5-theme-lark/theme/components/reset.scss */
+.ck-reset_all textarea {
+  white-space: pre-wrap;
+}
+
+/* line 49, /www/ckeditor5/ckeditor5-theme-lark/theme/components/reset.scss */
+.ck-reset_all textarea,
+.ck-reset_all input[type="text"],
+.ck-reset_all input[type="password"] {
+  cursor: text;
+}
+
+/* line 55, /www/ckeditor5/ckeditor5-theme-lark/theme/components/reset.scss */
+.ck-reset_all textarea[disabled],
+.ck-reset_all input[type="text"][disabled],
+.ck-reset_all input[type="password"][disabled] {
+  cursor: default;
+}
+
+/* line 61, /www/ckeditor5/ckeditor5-theme-lark/theme/components/reset.scss */
+.ck-reset_all fieldset {
+  padding: 10px;
+  border: 2px groove #E0DFE3;
+}
+
+/* line 66, /www/ckeditor5/ckeditor5-theme-lark/theme/components/reset.scss */
+.ck-reset_all table {
+  table-layout: auto;
+}
+
+/* line 71, /www/ckeditor5/ckeditor5-theme-lark/theme/components/reset.scss */
+.ck-reset_all button::-moz-focus-inner {
+  padding: 0;
+  border: 0;
+}
+
+/**
+ * Default width/height of an icon.
+ *
+ * @access public
+ */
+/* line 11, /www/ckeditor5/ckeditor5-theme-lark/theme/components/icon.scss */
+.ck-icon-manager__sprite {
+  display: none;
+}
+
+/* line 14, /www/ckeditor5/ckeditor5-theme-lark/theme/components/icon.scss */
+.ck-icon-manager__sprite * {
+  color: inherit;
+  fill: currentColor;
+}
+
+/* line 22, /www/ckeditor5/ckeditor5-theme-lark/theme/components/icon.scss */
+.ck-icon {
+  min-width: 20px;
+  min-height: 20px;
+  width: 1.66667em;
+  height: 1.66667em;
+  font-size: 1em;
+  vertical-align: middle;
+  color: inherit;
+  cursor: inherit;
+}
+
+/* line 34, /www/ckeditor5/ckeditor5-theme-lark/theme/components/icon.scss */
+.ck-icon * {
+  cursor: inherit;
+  color: inherit;
+  fill: currentColor;
+}
+
+/**
+ * Implements a button of given background color.
+ *
+ * @access public
+ * @param {String} $color - Background color of the button.
+ */
+/**
+ * Implements a button of given background color.
+ *
+ * @access public
+ * @param {String} $color - Background color of the button.
+ */
+/**
+ * Implements button states.
+ *
+ * @access public
+ * @param {String} $color - Background color of the button.
+ */
+/**
+ * A helper to define button–specific icon styles.
+ *
+ * @access public
+ */
+/* line 68, /www/ckeditor5/ckeditor5-theme-lark/theme/components/button.scss */
+.ck-button,
+a.ck-button {
+  display: inline-block;
+  overflow: hidden;
+  padding: 0.4em;
+  border: 1px solid;
+  white-space: nowrap;
+  cursor: pointer;
+  vertical-align: middle;
+  line-height: 1.66667;
+  position: relative;
+  background: white;
+  border-color: #bfbfbf;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
+/* line 43, /www/ckeditor5/ckeditor5-theme-lark/theme/components/button.scss */
+.ck-button:not(.ck-disabled):hover, .ck-button:not(.ck-disabled):focus,
+a.ck-button:not(.ck-disabled):hover,
+a.ck-button:not(.ck-disabled):focus {
+  background: #e6e6e6;
+  border-color: #a6a6a6;
+}
+
+/* line 49, /www/ckeditor5/ckeditor5-theme-lark/theme/components/button.scss */
+.ck-button:not(.ck-disabled):active,
+a.ck-button:not(.ck-disabled):active {
+  background: #d9d9d9;
+  border-color: #999999;
+  box-shadow: inset 0 2px 2px #bfbfbf;
+}
+
+/* line 18, /www/ckeditor5/ckeditor5-theme-lark/theme/helpers/_states.scss */
+.ck-button:focus,
+a.ck-button:focus {
+  outline: thin dotted;
+  outline: 5px auto -webkit-focus-ring-color;
+  outline-offset: -2px;
+}
+
+/* line 18, /www/ckeditor5/ckeditor5-theme-lark/theme/helpers/_rounded.scss */
+.ck-button.ck-rounded-corners,
+.ck-rounded-corners .ck-button,
+a.ck-button.ck-rounded-corners,
+.ck-rounded-corners
+a.ck-button {
+  border-radius: 2px;
+}
+
+/* line 63, /www/ckeditor5/ckeditor5-theme-lark/theme/components/button.scss */
+.ck-button .ck-icon,
+a.ck-button .ck-icon {
+  float: left;
+}
+
+/* line 82, /www/ckeditor5/ckeditor5-theme-lark/theme/components/button.scss */
+.ck-button.ck-button_with-text,
+a.ck-button.ck-button_with-text {
+  padding: 0.4em 0.8em;
+}
+
+/* line 63, /www/ckeditor5/ckeditor5-theme-lark/theme/components/button.scss */
+.ck-button.ck-button_with-text .ck-icon,
+a.ck-button.ck-button_with-text .ck-icon {
+  margin-left: -0.4em;
+  margin-right: 0.4em;
+}
+
+/* line 90, /www/ckeditor5/ckeditor5-theme-lark/theme/components/button.scss */
+.ck-button.ck-button_with-text .ck-button__label,
+a.ck-button.ck-button_with-text .ck-button__label {
+  display: block;
+}
+
+/* line 95, /www/ckeditor5/ckeditor5-theme-lark/theme/components/button.scss */
+.ck-button.ck-on,
+a.ck-button.ck-on {
+  border: 1px solid;
+  white-space: nowrap;
+  cursor: pointer;
+  vertical-align: middle;
+  line-height: 1.66667;
+  position: relative;
+  background: #f7f7f7;
+  border-color: #b9b9b9;
+}
+
+/* line 43, /www/ckeditor5/ckeditor5-theme-lark/theme/components/button.scss */
+.ck-button.ck-on:not(.ck-disabled):hover, .ck-button.ck-on:not(.ck-disabled):focus,
+a.ck-button.ck-on:not(.ck-disabled):hover,
+a.ck-button.ck-on:not(.ck-disabled):focus {
+  background: #dedede;
+  border-color: #a1a1a1;
+}
+
+/* line 49, /www/ckeditor5/ckeditor5-theme-lark/theme/components/button.scss */
+.ck-button.ck-on:not(.ck-disabled):active,
+a.ck-button.ck-on:not(.ck-disabled):active {
+  background: #d2d2d2;
+  border-color: #949494;
+  box-shadow: inset 0 2px 2px #b9b9b9;
+}
+
+/* line 18, /www/ckeditor5/ckeditor5-theme-lark/theme/helpers/_states.scss */
+.ck-button.ck-on:focus,
+a.ck-button.ck-on:focus {
+  outline: thin dotted;
+  outline: 5px auto -webkit-focus-ring-color;
+  outline-offset: -2px;
+}
+
+/* line 99, /www/ckeditor5/ckeditor5-theme-lark/theme/components/button.scss */
+.ck-button-action,
+a.ck-button-action {
+  text-shadow: 0 -1px #4e8e37;
+  color: white;
+  border: 1px solid;
+  white-space: nowrap;
+  cursor: pointer;
+  vertical-align: middle;
+  line-height: 1.66667;
+  position: relative;
+  background: #61b145;
+  border-color: #498534;
+}
+
+/* line 43, /www/ckeditor5/ckeditor5-theme-lark/theme/components/button.scss */
+.ck-button-action:not(.ck-disabled):hover, .ck-button-action:not(.ck-disabled):focus,
+a.ck-button-action:not(.ck-disabled):hover,
+a.ck-button-action:not(.ck-disabled):focus {
+  background: #579f3e;
+  border-color: #3f732d;
+}
+
+/* line 49, /www/ckeditor5/ckeditor5-theme-lark/theme/components/button.scss */
+.ck-button-action:not(.ck-disabled):active,
+a.ck-button-action:not(.ck-disabled):active {
+  background: #52963b;
+  border-color: #3a6a29;
+  box-shadow: inset 0 2px 2px #498534;
+}
+
+/* line 18, /www/ckeditor5/ckeditor5-theme-lark/theme/helpers/_states.scss */
+.ck-button-action:focus,
+a.ck-button-action:focus {
+  outline: thin dotted;
+  outline: 5px auto -webkit-focus-ring-color;
+  outline-offset: -2px;
+}
+
+/* line 105, /www/ckeditor5/ckeditor5-theme-lark/theme/components/button.scss */
+.ck-button-action:hover, .ck-button-action:focus, .ck-button-action:active,
+a.ck-button-action:hover,
+a.ck-button-action:focus,
+a.ck-button-action:active {
+  text-shadow: 0 -1px #3a6a29;
+}
+
+/* line 112, /www/ckeditor5/ckeditor5-theme-lark/theme/components/button.scss */
+.ck-button-bold,
+a.ck-button-bold {
+  font-weight: bold;
+}
+
+/* line 117, /www/ckeditor5/ckeditor5-theme-lark/theme/components/button.scss */
+.ck-button .ck-icon use,
+.ck-button .ck-icon use *,
+a.ck-button .ck-icon use,
+a.ck-button .ck-icon use * {
+  color: inherit;
+}
+
+/* line 123, /www/ckeditor5/ckeditor5-theme-lark/theme/components/button.scss */
+.ck-button .ck-button__label,
+a.ck-button .ck-button__label {
+  display: none;
+  float: left;
+  line-height: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+  cursor: inherit;
+}
+
+/* line 4, /www/ckeditor5/ckeditor5-theme-lark/theme/components/toolbar.scss */
+.ck-toolbar {
+  line-height: 1;
+  padding: 0.4em;
+  border: 1px solid #bfbfbf;
+  white-space: initial;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
+/* line 18, /www/ckeditor5/ckeditor5-theme-lark/theme/helpers/_rounded.scss */
+.ck-toolbar.ck-rounded-corners,
+.ck-rounded-corners .ck-toolbar {
+  border-radius: 2px;
+}
+
+/* line 13, /www/ckeditor5/ckeditor5-theme-lark/theme/components/toolbar.scss */
+.ck-toolbar-separator {
+  width: 1px;
+  height: calc( 1em + 2 * 0.64em);
+  vertical-align: middle;
+  display: inline-block;
+  background: #bfbfbf;
+}
+
+/* line 21, /www/ckeditor5/ckeditor5-theme-lark/theme/components/toolbar.scss */
+.ck-toolbar-newline {
+  display: block;
+  clear: left;
+  height: 0.4em;
+}
+
+/* line 28, /www/ckeditor5/ckeditor5-theme-lark/theme/components/toolbar.scss */
+.ck-toolbar > * {
+  margin-right: 0.4em;
+}
+
+/* line 32, /www/ckeditor5/ckeditor5-theme-lark/theme/components/toolbar.scss */
+.ck-toolbar > *:last-child {
+  margin-right: 0;
+}
+
+/* line 4, /www/ckeditor5/ckeditor5-theme-lark/theme/components/dropdown.scss */
+.ck-dropdown {
+  display: inline-block;
+  position: relative;
+}
+
+/* line 10, /www/ckeditor5/ckeditor5-theme-lark/theme/components/dropdown.scss */
+.ck-dropdown__button:after {
+  content: '';
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: .4em .4em 0 .4em;
+  border-color: #707070 transparent;
+  position: relative;
+  top: .9em;
+  margin-left: 0.64em;
+}
+
+/* line 23, /www/ckeditor5/ckeditor5-theme-lark/theme/components/dropdown.scss */
+.ck-dropdown__button .ck-button__label {
+  width: 7em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* line 30, /www/ckeditor5/ckeditor5-theme-lark/theme/components/dropdown.scss */
+.ck-dropdown__panel {
+  border: 1px solid #b9b9b9;
+  display: none;
+  position: absolute;
+  left: 0px;
+  bottom: 2px;
+  transform: translateY(100%);
+  background: white;
+  z-index: 1;
+  box-shadow: 0 0 5px #d2d2d2;
+}
+
+/* line 18, /www/ckeditor5/ckeditor5-theme-lark/theme/helpers/_rounded.scss */
+.ck-dropdown__panel.ck-rounded-corners,
+.ck-rounded-corners .ck-dropdown__panel {
+  border-radius: 2px;
+}
+
+/* line 46, /www/ckeditor5/ckeditor5-theme-lark/theme/components/dropdown.scss */
+.ck-dropdown__panel-visible {
+  display: inline-block;
+}
+
+/* line 4, /www/ckeditor5/ckeditor5-theme-lark/theme/components/list.scss */
+.ck-list {
+  overflow: hidden;
+  list-style-type: none;
+  background: white;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
+/* line 18, /www/ckeditor5/ckeditor5-theme-lark/theme/helpers/_rounded.scss */
+.ck-list.ck-rounded-corners,
+.ck-rounded-corners .ck-list {
+  border-radius: 2px;
+}
+
+/* line 12, /www/ckeditor5/ckeditor5-theme-lark/theme/components/list.scss */
+.ck-list__item {
+  display: block;
+  padding: 0.64em;
+  cursor: pointer;
+  min-width: 12em;
+}
+
+/* line 18, /www/ckeditor5/ckeditor5-theme-lark/theme/components/list.scss */
+.ck-list__item:hover, .ck-list__item:focus {
+  background: #f7f7f7;
+}
+
+/* line 23, /www/ckeditor5/ckeditor5-theme-lark/theme/components/list.scss */
+.ck-list__item:last-of-type {
+  border: none;
+}
+
+/* line 4, /www/ckeditor5/ckeditor5-theme-lark/theme/components/label.scss */
+.ck-label {
+  display: block;
+  font-weight: bold;
+}
+
+/* line 5, /www/ckeditor5/ckeditor5-theme-lark/theme/components/inputtext.scss */
+.ck-input-text {
+  border: 1px solid #b9b9b9;
+  padding: 0.64em;
+  min-width: 250px;
+  box-shadow: 0 2px 3px #e6e6e6 inset;
+}
+
+/* line 18, /www/ckeditor5/ckeditor5-theme-lark/theme/helpers/_rounded.scss */
+.ck-input-text.ck-rounded-corners,
+.ck-rounded-corners .ck-input-text {
+  border-radius: 2px;
+}
+
+/* line 18, /www/ckeditor5/ckeditor5-theme-lark/theme/helpers/_states.scss */
+.ck-input-text:focus {
+  outline: thin dotted;
+  outline: 5px auto -webkit-focus-ring-color;
+  outline-offset: -2px;
+}
+
+/* line 8, /www/ckeditor5/ckeditor5-theme-lark/theme/components/balloonpanel.scss */
+.ck-balloon-panel {
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  box-shadow: 0 0 5px #d2d2d2;
+  min-width: 50px;
+  min-height: 15px;
+  display: none;
+  position: absolute;
+  background: white;
+  border: 1px solid #b9b9b9;
+  z-index: 999;
+}
+
+/* line 18, /www/ckeditor5/ckeditor5-theme-lark/theme/helpers/_rounded.scss */
+.ck-balloon-panel.ck-rounded-corners,
+.ck-rounded-corners .ck-balloon-panel {
+  border-radius: 2px;
+}
+
+/* line 23, /www/ckeditor5/ckeditor5-theme-lark/theme/components/balloonpanel.scss */
+.ck-balloon-panel:before, .ck-balloon-panel:after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-style: solid;
+}
+
+/* line 33, /www/ckeditor5/ckeditor5-theme-lark/theme/components/balloonpanel.scss */
+.ck-balloon-panel:before {
+  z-index: 1;
+}
+
+/* line 37, /www/ckeditor5/ckeditor5-theme-lark/theme/components/balloonpanel.scss */
+.ck-balloon-panel:after {
+  z-index: 2;
+}
+
+/* line 43, /www/ckeditor5/ckeditor5-theme-lark/theme/components/balloonpanel.scss */
+.ck-balloon-panel_arrow_se:before, .ck-balloon-panel_arrow_se:after, .ck-balloon-panel_arrow_sw:before, .ck-balloon-panel_arrow_sw:after {
+  border-width: 0 10px 15px 10px;
+}
+
+/* line 48, /www/ckeditor5/ckeditor5-theme-lark/theme/components/balloonpanel.scss */
+.ck-balloon-panel_arrow_se:before, .ck-balloon-panel_arrow_sw:before {
+  z-index: 1;
+  border-color: transparent transparent #b9b9b9 transparent;
+}
+
+/* line 53, /www/ckeditor5/ckeditor5-theme-lark/theme/components/balloonpanel.scss */
+.ck-balloon-panel_arrow_se:after, .ck-balloon-panel_arrow_sw:after {
+  z-index: 2;
+  border-color: transparent transparent white transparent;
+  margin-top: 2px;
+}
+
+/* line 62, /www/ckeditor5/ckeditor5-theme-lark/theme/components/balloonpanel.scss */
+.ck-balloon-panel_arrow_ne:before, .ck-balloon-panel_arrow_ne:after, .ck-balloon-panel_arrow_nw:before, .ck-balloon-panel_arrow_nw:after {
+  border-width: 15px 10px 0 10px;
+}
+
+/* line 67, /www/ckeditor5/ckeditor5-theme-lark/theme/components/balloonpanel.scss */
+.ck-balloon-panel_arrow_ne:before, .ck-balloon-panel_arrow_nw:before {
+  z-index: 1;
+  border-color: #b9b9b9 transparent transparent;
+}
+
+/* line 72, /www/ckeditor5/ckeditor5-theme-lark/theme/components/balloonpanel.scss */
+.ck-balloon-panel_arrow_ne:after, .ck-balloon-panel_arrow_nw:after {
+  z-index: 2;
+  border-color: white transparent transparent transparent;
+  margin-bottom: 2px;
+}
+
+/* line 80, /www/ckeditor5/ckeditor5-theme-lark/theme/components/balloonpanel.scss */
+.ck-balloon-panel_arrow_se:before, .ck-balloon-panel_arrow_se:after {
+  left: 20px;
+  top: -15px;
+}
+
+/* line 88, /www/ckeditor5/ckeditor5-theme-lark/theme/components/balloonpanel.scss */
+.ck-balloon-panel_arrow_sw:before, .ck-balloon-panel_arrow_sw:after {
+  right: 20px;
+  top: -15px;
+}
+
+/* line 96, /www/ckeditor5/ckeditor5-theme-lark/theme/components/balloonpanel.scss */
+.ck-balloon-panel_arrow_ne:before, .ck-balloon-panel_arrow_ne:after {
+  left: 20px;
+  bottom: -15px;
+}
+
+/* line 104, /www/ckeditor5/ckeditor5-theme-lark/theme/components/balloonpanel.scss */
+.ck-balloon-panel_arrow_nw:before, .ck-balloon-panel_arrow_nw:after {
+  right: 20px;
+  bottom: -15px;
+}
+
+/* line 111, /www/ckeditor5/ckeditor5-theme-lark/theme/components/balloonpanel.scss */
+.ck-balloon-panel_visible {
+  display: block;
+}
+
+/* line 18, /www/ckeditor5/ckeditor5-theme-lark/theme/helpers/_rounded.scss */
+.ck-editor.ck-rounded-corners,
+.ck-rounded-corners .ck-editor {
+  border-radius: 2px;
+}
+
+/* line 9, /www/ckeditor5/ckeditor5-theme-lark/theme/components/editor.scss */
+.ck-editor .ck-editor__top .ck-toolbar {
+  border-top: 0;
+  border-left: 0;
+  border-right: 0;
+}
+
+/* line 16, /www/ckeditor5/ckeditor5-theme-lark/theme/components/editor.scss */
+.ck-editor .ck-editor__main {
+  background: white;
+  overflow: hidden;
+}
+
+/* line 21, /www/ckeditor5/ckeditor5-theme-lark/theme/components/editor.scss */
+.ck-editor .ck-editor__bottom {
+  border-bottom: 0;
+  border-left: 0;
+  border-right: 0;
+  padding: 0.8em;
+}
+
+/* line 29, /www/ckeditor5/ckeditor5-theme-lark/theme/components/editor.scss */
+.ck-editor .ck-editor__editable_inline {
+  overflow: auto;
+  padding: 0 0.8em;
+}
+
+/* line 34, /www/ckeditor5/ckeditor5-theme-lark/theme/components/editor.scss */
+.ck-editor .ck-toolbar {
+  border-radius: 0;
+}
+
+/* line 38, /www/ckeditor5/ckeditor5-theme-lark/theme/components/editor.scss */
+.ck-editor .ck-toolbar .ck-button {
+  border-width: 0;
+}
+
+/* line 42, /www/ckeditor5/ckeditor5-theme-lark/theme/components/editor.scss */
+.ck-editor .ck-toolbar .ck-button:focus {
+  z-index: 1;
+}
+
+/* line 46, /www/ckeditor5/ckeditor5-theme-lark/theme/components/editor.scss */
+.ck-editor .ck-toolbar .ck-button:not(:hover):not(:focus):not(.ck-on), .ck-editor .ck-toolbar .ck-button.ck-disabled {
+  background: #f7f7f7;
+}
+
+/* line 51, /www/ckeditor5/ckeditor5-theme-lark/theme/components/editor.scss */
+.ck-editor .ck-toolbar .ck-button.ck-on {
+  background: #dedede;
+  border-color: #a1a1a1;
+}
+
+/* line 43, /www/ckeditor5/ckeditor5-theme-lark/theme/components/button.scss */
+.ck-editor .ck-toolbar .ck-button.ck-on:not(.ck-disabled):hover, .ck-editor .ck-toolbar .ck-button.ck-on:not(.ck-disabled):focus {
+  background: #c6c6c6;
+  border-color: #888888;
+}
+
+/* line 49, /www/ckeditor5/ckeditor5-theme-lark/theme/components/button.scss */
+.ck-editor .ck-toolbar .ck-button.ck-on:not(.ck-disabled):active {
+  background: #b9b9b9;
+  border-color: #7c7c7c;
+  box-shadow: inset 0 2px 2px #a1a1a1;
+}
+
+/* line 56, /www/ckeditor5/ckeditor5-theme-lark/theme/components/editor.scss */
+.ck-editor .ck-toolbar .ck-dropdown__button {
+  border-width: 1px;
+}
+
+/* line 59, /www/ckeditor5/ckeditor5-theme-lark/theme/components/editor.scss */
+.ck-editor .ck-toolbar .ck-dropdown__button:not(:hover):not(:focus):not(.ck-on) {
+  background: white;
+}
+
+/* line 66, /www/ckeditor5/ckeditor5-theme-lark/theme/components/editor.scss */
+.ck-editor,
+.ck-editor-bottom {
+  background: #f7f7f7;
+  border: 1px solid #b9b9b9;
+}
+
+/* line 5, /www/ckeditor5/ckeditor5-ui-default/theme/components/stickytoolbar.scss */
+.ck-editor .ck-toolbar.ck-toolbar_sticky {
+  position: fixed;
+  top: 0;
+  border: 1px solid #bfbfbf;
+  background: #f7f7f7;
+}
+
+/* line 5, /www/ckeditor5/ckeditor5-link/theme/components/linkballoonpanel.scss */
+.ck-link-balloon-panel {
+  padding: 1.2em;
+}
+
+/* line 8, /www/ckeditor5/ckeditor5-link/theme/components/linkballoonpanel.scss */
+.ck-link-balloon-panel .ck-label {
+  margin-bottom: 0.4em;
+}
+
+/* line 13, /www/ckeditor5/ckeditor5-link/theme/components/linkballoonpanel.scss */
+.ck-link-form__actions {
+  clear: both;
+  padding-top: 1.2em;
+}
+
+/* line 17, /www/ckeditor5/ckeditor5-link/theme/components/linkballoonpanel.scss */
+.ck-link-form__actions .ck-button {
+  float: right;
+}
+
+/* line 20, /www/ckeditor5/ckeditor5-link/theme/components/linkballoonpanel.scss */
+.ck-link-form__actions .ck-button + .ck-button {
+  margin-right: 0.64em;
+}
+
+/* line 23, /www/ckeditor5/ckeditor5-link/theme/components/linkballoonpanel.scss */
+.ck-link-form__actions .ck-button + .ck-button + .ck-button {
+  float: left;
+}
+
+/*# sourceMappingURL=data:application/json;base64,ewoJInZlcnNpb24iOiAzLAoJImZpbGUiOiAic3RkaW4uY3NzIiwKCSJzb3VyY2VzIjogWwoJCSJzdGRpbiIsCgkJIi4uL2NrZWRpdG9yNS10aGVtZS1sYXJrL3RoZW1lL3RoZW1lLnNjc3MiLAoJCSIuLi9ja2VkaXRvcjUtdGhlbWUtbGFyay90aGVtZS9oZWxwZXJzL19jb2xvcnMuc2NzcyIsCgkJIi4uL2NrZWRpdG9yNS10aGVtZS1sYXJrL3RoZW1lL2hlbHBlcnMvX2ZvbnRzLnNjc3MiLAoJCSIuLi9ja2VkaXRvcjUtdGhlbWUtbGFyay90aGVtZS9oZWxwZXJzL19yb3VuZGVkLnNjc3MiLAoJCSIuLi9ja2VkaXRvcjUtdGhlbWUtbGFyay90aGVtZS9oZWxwZXJzL19zcGFjaW5nLnNjc3MiLAoJCSIuLi9ja2VkaXRvcjUtdGhlbWUtbGFyay90aGVtZS9oZWxwZXJzL19zdGF0ZXMuc2NzcyIsCgkJIi4uL2NrZWRpdG9yNS10aGVtZS1sYXJrL3RoZW1lL2hlbHBlcnMvX3ppbmRleC5zY3NzIiwKCQkiLi4vY2tlZGl0b3I1LXRoZW1lLWxhcmsvdGhlbWUvaGVscGVycy9fc2hhZG93LnNjc3MiLAoJCSIuLi9ja2VkaXRvcjUtdGhlbWUtbGFyay90aGVtZS9oZWxwZXJzL19lZGl0b3Iuc2NzcyIsCgkJIi4uL2NrZWRpdG9yNS10aGVtZS1sYXJrL3RoZW1lL2NvbXBvbmVudHMvcmVzZXQuc2NzcyIsCgkJIi4uL2NrZWRpdG9yNS10aGVtZS1sYXJrL3RoZW1lL2NvbXBvbmVudHMvaWNvbi5zY3NzIiwKCQkiLi4vY2tlZGl0b3I1LXRoZW1lLWxhcmsvdGhlbWUvY29tcG9uZW50cy9idXR0b24uc2NzcyIsCgkJIi4uL2NrZWRpdG9yNS10aGVtZS1sYXJrL3RoZW1lL2NvbXBvbmVudHMvdG9vbGJhci5zY3NzIiwKCQkiLi4vY2tlZGl0b3I1LXRoZW1lLWxhcmsvdGhlbWUvY29tcG9uZW50cy9kcm9wZG93bi5zY3NzIiwKCQkiLi4vY2tlZGl0b3I1LXRoZW1lLWxhcmsvdGhlbWUvY29tcG9uZW50cy9saXN0LnNjc3MiLAoJCSIuLi9ja2VkaXRvcjUtdGhlbWUtbGFyay90aGVtZS9jb21wb25lbnRzL2xhYmVsLnNjc3MiLAoJCSIuLi9ja2VkaXRvcjUtdGhlbWUtbGFyay90aGVtZS9jb21wb25lbnRzL2lucHV0dGV4dC5zY3NzIiwKCQkiLi4vY2tlZGl0b3I1LXRoZW1lLWxhcmsvdGhlbWUvY29tcG9uZW50cy9iYWxsb29ucGFuZWwuc2NzcyIsCgkJIi4uL2NrZWRpdG9yNS10aGVtZS1sYXJrL3RoZW1lL2NvbXBvbmVudHMvZWRpdG9yLnNjc3MiLAoJCSIuLi9ja2VkaXRvcjUtdWktZGVmYXVsdC90aGVtZS90aGVtZS5zY3NzIiwKCQkiLi4vY2tlZGl0b3I1LXVpLWRlZmF1bHQvdGhlbWUvY29tcG9uZW50cy9zdGlja3l0b29sYmFyLnNjc3MiLAoJCSIuLi9ja2VkaXRvcjUtbGluay90aGVtZS90aGVtZS5zY3NzIiwKCQkiLi4vY2tlZGl0b3I1LWxpbmsvdGhlbWUvY29tcG9uZW50cy9saW5rYmFsbG9vbnBhbmVsLnNjc3MiCgldLAoJIm1hcHBpbmdzIjogIjtBRUdBOzs7Ozs7OztHQVFHO0FBR0g7Ozs7OztHQU1HO0FBU0g7Ozs7Ozs7O0dBUUc7QUFPSDs7Ozs7Ozs7R0FRRztBQUtIOzs7Ozs7OztHQVFHO0FDOURIOzs7OztHQUtHO0FBR0g7Ozs7R0FJRztBQUdIOzs7OztHQUtHO0FBUUg7Ozs7Ozs7O0dBUUc7QUNwQ0g7Ozs7R0FJRztBQUdIOzs7OztHQUtHO0FDWkg7Ozs7R0FJRztBQUdIOzs7Ozs7R0FNRztBQVNIOzs7Ozs7OztHQVFHOztBQzlCSCxBQUFBLFVBQVUsQ0FBQztFQUNWLE9BQU8sRUFBRSxJQUFLO0NBQ2Q7OztBQUVELEFBQUEsWUFBWSxDQUFDO0VBQ1osT0FBTyxFQUFFLEVBQUc7Q0FDWjs7QUFFRDs7OztHQUlHO0FBV0g7Ozs7R0FJRztBRzNCSDs7OztHQUlHOztBQ0hILEFBQUEsU0FBUyxFQWdCVCxBQWhCQSxhQWdCYSxFQUFiLEFBaEJBLGFBZ0JhLENBQ1QsQ0FBQyxFQURMLEFBaEJBLGFB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 */
