@@ -1,0 +1,4 @@
+{
+    "destination": "./esdoc-out",
+    "source": "./ckeditor5"
+}
