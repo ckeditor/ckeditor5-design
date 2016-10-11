@@ -26,9 +26,15 @@ export default class IndentCommand extends Command {
 		 * @since 4.3.0
 		 * @private
 		 * @readonly
-		 * @member {number} _indentBy
+		 * @type {number}
 		 */
 		this._indentBy = indentDirection == 'forward' ? 1 : -1;
+
+		/**
+		 * Some property which will be defined later.
+		 *
+		 * @type {number} _someOtherProperty
+		 */
 
 		// Refresh command state after selection is changed or changes has been done to the document.
 		this.listenTo( editor.document.selection, 'change:range', () => {
