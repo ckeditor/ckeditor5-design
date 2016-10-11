@@ -11,7 +11,7 @@ export default class Editor {
 	/**
 	 * Executes some command.
 	 *
-	 * @param {ckeditor5/command/command2~Command}
+	 * @param {ckeditor5/command/command2~Command} command
 	 */
 	execute( command ) {
 

@@ -6,6 +6,14 @@
  * The Command class.
  */
 export default class Command {
+	/**
+	 * Executes the command.
+	 *
+	 * @param {CommandParam} param
+	 */
+	execute( param ) {
+
+	}
 }
 
 /**
