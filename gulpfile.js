@@ -21,11 +21,11 @@ gulp.task( 'clean:documentationjs', () => {
 gulp.task( 'build:documentationjs:json' , [ 'clean:documentationjs' ], () => {
 	const destination = path.resolve( __dirname, 'documentationjs', 'out-json' );
 
-	sh.exec( `./node_modules/.bin/documentation build ckeditor5 -f json -o ${ destination }` );
+	sh.exec( `./node_modules/.bin/documentation build ckeditor5/* -f json -o ${ destination }` );
 } );
 
 gulp.task( 'build:documentationjs:html' , [ 'clean:documentationjs' ], () => {
 	const destination = path.resolve( __dirname, 'documentationjs', 'out-html' );
 
-	sh.exec( `./node_modules/.bin/documentation build ckeditor5 -f html -o ${ destination }` );
+	sh.exec( `./node_modules/.bin/documentation build ckeditor5/* -f html -o ${ destination }` );
 } );
