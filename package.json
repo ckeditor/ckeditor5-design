@@ -4,16 +4,19 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "@types/node": "^6.0.45",
+    "del": "^2.2.2",
+    "documentation": "^4.0.0-beta11",
+    "esdoc": "^0.4.8",
+    "gulp": "^3.9.1",
     "ink-docstrap": "^1.3.0",
-    "jsdoc": "^3.4.0"
+    "jsdoc": "^3.4.0",
+    "json-pretty": "0.0.1",
+    "shelljs": "^0.7.4"
   },
   "devDependencies": {
-    "esdoc": "^0.4.8",
-    "gulp": "^3.9.1"
-  },
-  "scripts": {
-    "build": "rm -rf out && jsdoc -c jsdoc/config.json --debug ckeditor5",
-    "test": "rm -rf out-documentationjs && documentation build ckeditor5 -f html -o out-documentationjs"
+    "jscs": "^3.0.7",
+    "jshint": "^2.9.3"
   },
   "repository": {
     "type": "git",

@@ -12,16 +12,12 @@ export {
 
 /**
  * The some1 function.
- *
- * @function module:ckeditor5/e.s1
  */
 function some1() {
 }
 
 /**
  * The some2 function.
- *
- * @function module:ckeditor5/e.s2
  */
 function some2() {
 }
