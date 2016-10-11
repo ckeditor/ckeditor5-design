@@ -5,9 +5,15 @@
 /**
  * The Editor class.
  *
- * @implements ckeditor5/editor/editorinterface~EditorInterface
+ * @implements module:ckeditor5/editor/editorinterface~EditorInterface
  */
 export default class Editor {
+	/**
+	 * This property represents editor name.
+	 *
+	 * @member {string} name Editor name.
+	 */
+
 	/**
 	 * Executes some command.
 	 *

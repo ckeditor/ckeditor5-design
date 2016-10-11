@@ -13,7 +13,7 @@ export default class IndentCommand extends Command {
 	/**
 	 * Creates an instance of the command.
 	 *
-	 * @param {ckeditor5/editor/editor~Editor} editor Editor instance.
+	 * @param {module:ckeditor5/editor/editor~Editor} editor Editor instance.
 	 * @param {'forward'|'backward'} indentDirection Direction of indent. If it is equal to `backward`, the command
 	 * will outdent a list item.
 	 */

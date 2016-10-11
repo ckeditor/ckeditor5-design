@@ -1,7 +1,4 @@
 node_modules
 jsdoc/out
-documentationjs/out
-esdoc/out-html
-esdoc/out-json
 .DS_Store
 .vscode

@@ -1,5 +1,7 @@
 /**
- * @module ckeditor5/command/ver2/command
+ * This is a command module (ver1).
+ *
+ * @module ckeditor5/command/ver1/command
  */
 
 /**
@@ -19,5 +21,5 @@ export default class Command {
 /**
  * Some typedef.
  *
- * @typedef {string|number|ckeditor5/editor/editorinterface~EditorInterface} CommandParam
+ * @typedef {string|number|module:ckeditor5/editor/editorinterface~EditorInterface} module:ckeditor5/command/ver1/command~CommandParam
  */
