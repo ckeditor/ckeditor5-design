@@ -1,5 +1,5 @@
 /**
- * @module ckeditor5/command/command2
+ * @module ckeditor5/command/ver2/command2
  */
 
 /**
@@ -9,7 +9,7 @@ export default class Command {
 	/**
 	 * Executes the command.
 	 *
-	 * @param {ckeditor5/command/command~CommandParam} param
+	 * @param {ckeditor5/command/ver1/command~CommandParam} param
 	 */
 	execute( param ) {
 

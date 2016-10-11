@@ -1,7 +1,7 @@
 /**
  * Indent module.
  *
- * @module ckeditor5/indentcommand
+ * @module ckeditor5/command/indentcommand
  */
 
 import Command from './ver1/command.js';
@@ -13,7 +13,7 @@ export default class IndentCommand extends Command {
 	/**
 	 * Creates an instance of the command.
 	 *
-	 * @param {Editor} editor Editor instance.
+	 * @param {ckeditor5/editor/editor~Editor} editor Editor instance.
 	 * @param {'forward'|'backward'} indentDirection Direction of indent. If it is equal to `backward`, the command
 	 * will outdent a list item.
 	 */
@@ -23,6 +23,7 @@ export default class IndentCommand extends Command {
 		/**
 		 * By how much the command will change list item's indent attribute.
 		 *
+		 * @since 4.3.0
 		 * @private
 		 * @readonly
 		 * @member {number} _indentBy

@@ -1,5 +1,5 @@
 /**
- * @module ckeditor5/command/command
+ * @module ckeditor5/command/ver2/command
  */
 
 /**
