@@ -1,4 +1,6 @@
-/** @module ckeditor5/f */
+/**
+ * @module ckeditor5/f
+ */
 
 const v1 = 1;
 

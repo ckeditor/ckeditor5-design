@@ -1,4 +1,6 @@
-/** @module ckeditor5/b */
+/**
+ * @module ckeditor5/b
+ */
 
 /**
  * The Some1 class.

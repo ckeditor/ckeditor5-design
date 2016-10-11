@@ -1,4 +1,6 @@
-/** @module ckeditor5/c */
+/**
+ * @module ckeditor5/c
+ */
 
 /**
  * The some1 function.
