@@ -10,7 +10,9 @@ const del = require( 'del' );
 const sh = require( 'shelljs' );
 const jsonStringify = require( 'json-pretty' );
 
-gulp.task( 'build:all:json', [ 'build:esdoc:json', 'build:jsdoc:json', 'build:documentationjs:json' ] );
+gulp.task( 'default', [ 'build:all:json' ] );
+
+gulp.task( 'build:all:json', [ 'build:esdoc:json', 'build:jsdoc:html', 'build:documentationjs:json' ] );
 
 /** Create json file using esdoc.json config */
 gulp.task( 'build:esdoc:json', [ 'clean:esdoc' ], ( done ) => {
@@ -42,7 +44,7 @@ gulp.task( 'clean:esdoc', () => {
 gulp.task( 'build:jsdoc:html', () => {
 	return del( './jsdoc/out' )
 		.then( () => {
-			sh.exec( 'jsdoc -c jsdoc/config.json --debug ckeditor5' );
+			sh.exec( 'jsdoc -c jsdoc/config.json --debug ckeditor5 -d jsdoc/out' );
 		} );
 } );
 
