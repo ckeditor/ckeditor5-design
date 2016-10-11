@@ -4,7 +4,7 @@
  * @module ckeditor5/indentcommand
  */
 
-import Command from './command.js';
+import Command from './ver1/command.js';
 
 /**
  * The IndentCommand class.

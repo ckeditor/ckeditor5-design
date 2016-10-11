@@ -1,4 +1,4 @@
 {
-    "destination": "esdoc/out",
-    "source": "ckeditor5"
+    "source": "ckeditor5",
+    "destination": "esdoc/out-html"
 }
