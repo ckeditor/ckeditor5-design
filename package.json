@@ -15,12 +15,18 @@
     "shelljs": "^0.7.4"
   },
   "devDependencies": {
+    "chai": "^3.5.0",
+    "expect": "^1.20.2",
     "jscs": "^3.0.7",
-    "jshint": "^2.9.3"
+    "jshint": "^2.9.3",
+    "mocha": "^3.1.2"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ckeditor/ckeditor5-design.git"
+  },
+  "scripts": {
+	  "test": "mocha tests/**/*.js"
   },
   "author": "",
   "license": "ISC",

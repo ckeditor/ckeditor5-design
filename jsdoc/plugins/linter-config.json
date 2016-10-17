@@ -1,0 +1,4 @@
+{
+	"output": "jsdoc/lint-errors.log",
+	"throwsOnError": false
+}

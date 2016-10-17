@@ -26,7 +26,7 @@ export default class IndentCommand extends Command {
 		 * @since 4.3.0
 		 * @private
 		 * @readonly
-		 * @member {number} _indentBy
+		 * @member {number} module:ckeditor5/wrong_path/_indentBy
 		 */
 		this._indentBy = indentDirection == 'forward' ? 1 : -1;
 
