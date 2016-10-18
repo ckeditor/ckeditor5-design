@@ -4,7 +4,7 @@
 
 const chai = require( 'chai' );
 const expect = chai.expect;
-const DocletLinter = require( '../../jsdoc/plugins/linter.js' ).DocletLinter;
+const DocletLinter = require( '../../jsdoc/plugins/DocletLinter.js' );
 
 describe( 'Linter plugin', () => {
 	it( '_lintMembers()', () => {
