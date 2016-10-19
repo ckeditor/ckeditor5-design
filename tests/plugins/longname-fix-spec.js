@@ -9,34 +9,45 @@ const { formatLinks } = require( '../../jsdoc/plugins/longname-fix/formatters' )
 describe( 'Long name fix plugin', () => {
 	it( 'formatLinks()', () => {
 		const doclet = formatLinks( {
-			comment: '<p>Creates {@link ~EditorInterface} instance',
+			comment: 'Creates {@link ~EditorInterface} instance',
 			memberof: 'module:ckeditor5/editor/editorinterface',
 		} );
 
 		expect( doclet.comment ).to.be.equal(
-			'<p>Creates {@link module:ckeditor5/editor/editorinterface~EditorInterface} instance'
+			'Creates {@link module:ckeditor5/editor/editorinterface~EditorInterface} instance'
 		);
 	} );
 
 	it( 'formatLinks() 2', () => {
 		const doclet = formatLinks( {
-			comment: '<p>Method {@link #create} creates instance',
+			comment: 'Method {@link #create} creates instance',
 			memberof: 'module:ckeditor5/editor/editorinterface~EditorInterface',
 		} );
 
 		expect( doclet.comment ).to.be.equal(
-			'<p>Method {@link module:ckeditor5/editor/editorinterface~EditorInterface#create} creates instance'
+			'Method {@link module:ckeditor5/editor/editorinterface~EditorInterface#create} creates instance'
 		);
 	} );
 
-	it( 'formatLinks() with link description', () => {
+	it( 'formatLinks() with link name', () => {
 		const doclet = formatLinks( {
-			comment: '"/**\n * Creates {@link ~EditorInterface editor} instance with a given name.',
+			comment: 'Creates {@link ~EditorInterface editor} instance with a given name.',
 			memberof: 'module:ckeditor5/editor/editorinterface',
 		} );
 
 		expect( doclet.comment ).to.be.equal(
-			'"/**\n * Creates {@link module:ckeditor5/editor/editorinterface~EditorInterface editor} instance with a given name.'
+			'Creates {@link module:ckeditor5/editor/editorinterface~EditorInterface editor} instance with a given name.'
+		);
+	} );
+
+	it( 'formatLinks() with more complicated path', () => {
+		const doclet = formatLinks( {
+			comment: 'Method {@link ~EditorInterface#create create} creates Editor',
+			memberof: 'module:ckeditor5/editor/editorinterface',
+		} );
+
+		expect( doclet.comment ).to.be.equal(
+			'Method {@link module:ckeditor5/editor/editorinterface~EditorInterface#create create} creates Editor'
 		);
 	} );
 } );

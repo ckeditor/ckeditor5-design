@@ -84,7 +84,7 @@ describe( 'Linter plugin', () => {
 		expect( linter._errors.length ).to.be.equal( 0 );
 	} );
 
-	it( '_lintLinks() 3', () => {
+	it( '_lintLinks() with link name', () => {
 		const linter = new DocletLinter( [ {
 			comment:
 				` {@link module:ckeditor5/a~A classA} `,
