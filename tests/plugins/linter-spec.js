@@ -4,7 +4,7 @@
 
 const chai = require( 'chai' );
 const expect = chai.expect;
-const DocletLinter = require( '../../jsdoc/plugins/DocletLinter.js' );
+const DocletLinter = require( '../../jsdoc/plugins/linter/DocletLinter.js' );
 
 describe( 'Linter plugin', () => {
 	it( '_lintMembers()', () => {
@@ -59,15 +59,14 @@ describe( 'Linter plugin', () => {
 	it( '_lintLinks()', () => {
 		const linter = new DocletLinter( [ {
 			comment:
-				`/** Linking test:\n *\n * * a:\n *  
-				 * {@link module:ckeditor5/a~A} but not {@link module:ckeditor5/a.A}\n
+				`* {@link module:ckeditor5/a~A#method1}
 				 * {@link module:ckeditor5/b~Some1} `,
 			meta: { fileName: '' },
 		} ] );
 
 		linter._lintLinks();
 
-		expect( linter._errors.length ).to.be.equal( 3 );
+		expect( linter._errors.length ).to.be.equal( 2 );
 	} );
 
 	it( '_lintLinks() 2', () => {
@@ -84,5 +83,18 @@ describe( 'Linter plugin', () => {
 
 		expect( linter._errors.length ).to.be.equal( 0 );
 	} );
-} );
 
+	it( '_lintLinks() 3', () => {
+		const linter = new DocletLinter( [ {
+			comment:
+				` {@link module:ckeditor5/a~A classA} `,
+		}, {
+			comment: '',
+			longname: 'module:ckeditor5/a~A',
+		} ] );
+
+		linter._lintLinks();
+
+		expect( linter._errors.length ).to.be.equal( 0 );
+	} );
+} );

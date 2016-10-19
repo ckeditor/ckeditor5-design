@@ -1,6 +1,6 @@
 /* jshint browser: false, node: true, strict: true */
 
-const Collection = require( './utils/Collection' );
+const Collection = require( '../../plugins-utils/Collection' );
 
 /**
  * Main linting class
@@ -109,8 +109,8 @@ class DocletLinter {
 	 * @protected
 	 */
 	_lintLinks() {
-		const allLinkRegExp = /\{\@link *[^}]+ *\}/g;
-		const pathRegExp = /\{\@link *([^}]+) *\}/;
+		const allLinkRegExp = /\{\@link *[^} ]+(\}| )/g;
+		const pathRegExp = /\{\@link *([^} ]+)(\}| )/;
 
 		const typeNames = this._collection.getAll()
 			.map( el => el.longname );

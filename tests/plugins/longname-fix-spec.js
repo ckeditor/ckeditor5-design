@@ -4,7 +4,7 @@
 
 const chai = require( 'chai' );
 const expect = chai.expect;
-const { formatLinks } = require( '../../jsdoc/plugins/formatters' );
+const { formatLinks } = require( '../../jsdoc/plugins/longname-fix/formatters' );
 
 describe( 'Long name fix plugin', () => {
 	it( 'formatLinks()', () => {

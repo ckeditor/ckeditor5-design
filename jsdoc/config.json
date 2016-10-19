@@ -12,8 +12,8 @@
     "plugins": [
         "node_modules/jsdoc/plugins/markdown",
         "jsdoc/plugins/export-fix",
-        "jsdoc/plugins/longname-fix",
-        "jsdoc/plugins/linter"
+        "jsdoc/plugins/longname-fix/longname-fix",
+        "jsdoc/plugins/linter/linter"
     ],
     "tags": {
         "allowUnknownTags": true,

@@ -3,7 +3,7 @@
 'use strict';
 
 const { formatLinks, formatMembers } = require( './formatters' );
-const composeFunctions = require( './utils/composeFunctions' );
+const composeFunctions = require( '../../plugins-utils/composeFunctions' );
 
 exports.handlers = {
 	newDoclet( e ) {
