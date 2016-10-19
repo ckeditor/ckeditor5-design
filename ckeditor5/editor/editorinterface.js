@@ -1,5 +1,5 @@
 /**
- * @module ckeditor5/editor/editorinterface
+ * @module editor/editorinterface
  */
 
 /**
@@ -13,13 +13,12 @@
  *
  * You can later destroy it with {@link ~EditorInterface#destroy}.
  *
- * @method create
- * @memberof module:ckeditor5/editor/editorinterface~EditorInterface
- * @param {string} editorName Editor name.
+ * @method ~EditorInterface#create
+ * @param {String} editorName Editor name.
  */
 
 /**
  * Destroys editor.
  *
- * @method destroy
+ * @method ~EditorInterface#create
  */

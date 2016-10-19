@@ -1,7 +1,7 @@
 /**
  * This is a command module (ver1).
  *
- * @module ckeditor5/command/ver1/command
+ * @module command/ver1/command
  */
 
 /**
@@ -11,7 +11,7 @@ export default class Command {
 	/**
 	 * Executes the command.
 	 *
-	 * @param {module:ckeditor5/command/ver1/command~CommandParam} param
+	 * @param {module:command/ver1/command~CommandParam} param
 	 */
 	execute( param ) {
 
@@ -21,5 +21,5 @@ export default class Command {
 /**
  * Some typedef.
  *
- * @typedef {string|number|module:ckeditor5/editor/editorinterface~EditorInterface} module:ckeditor5/command/ver1/command~CommandParam
+ * @typedef {String|Number|module:editor/editorinterface~EditorInterface} CommandParam
  */

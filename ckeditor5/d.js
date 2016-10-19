@@ -1,5 +1,5 @@
 /**
- * @module ckeditor5/d
+ * @module d
  */
 
 /**

@@ -2,7 +2,7 @@
  * Both of the functions here should automatically be exported as "s1" and "s2", but instead we need to
  * use the `@function` tag.
  *
- * @module ckeditor5/e
+ * @module e
  */
 
 export {
