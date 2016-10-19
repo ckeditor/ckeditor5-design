@@ -1,5 +1,9 @@
 /* jshint browser: false, node: true, strict: true */
 
+/**
+ * @see http://usejsdoc.org/about-plugins.html
+ */
+
 'use strict';
 
 const fs = require( 'fs' );
