@@ -3,18 +3,20 @@
 'use strict';
 
 function formatLinks( doclet ) {
-	const linkRegExp = /\{\@link *((~|#)[^}]+) *\}/;
-
-	return Object.assign( {}, doclet, {
-		comment: doclet.comment
-			.replace( linkRegExp, ( fullLink, linkName ) => {
-				return '{@link ' + doclet.memberof + linkName + '}';
-			} ),
-
-		description: doclet.description ? doclet.description.replace( linkRegExp, ( fullLink, linkName ) => {
+	const linkRegExp = /{@link *([~#][^}]+) *}/;
+	const comment = doclet.comment
+		.replace( linkRegExp, ( fullLink, linkName ) => {
 			return '{@link ' + doclet.memberof + linkName + '}';
-		} ) : undefined,
-	} );
+		} );
+	let description = doclet.description;
+
+	if ( description ) {
+		description = doclet.description.replace( linkRegExp, ( fullLink, linkName ) => {
+			return '{@link ' + doclet.memberof + linkName + '}';
+		} );
+	}
+
+	return Object.assign( {}, doclet, { comment, description } );
 }
 
 function formatMembers( doclet ) {

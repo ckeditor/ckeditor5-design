@@ -4,7 +4,7 @@
 
 const chai = require( 'chai' );
 const expect = chai.expect;
-const composeFunctions = require( '../../jsdoc/plugins-utils/composeFunctions' );
+const composeFunctions = require( '../../jsdoc/plugins/utils/composefunctions' );
 
 describe( 'composeFunctions', () => {
 	it( 'should compose functions', () => {

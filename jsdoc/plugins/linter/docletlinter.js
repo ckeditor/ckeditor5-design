@@ -1,6 +1,6 @@
 /* jshint browser: false, node: true, strict: true */
 
-const Collection = require( '../../plugins-utils/Collection' );
+const Collection = require( '../utils/collection' );
 
 /**
  * Main linting class

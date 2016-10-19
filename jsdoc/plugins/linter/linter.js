@@ -10,7 +10,7 @@ const fs = require( 'fs' );
 const path = require( 'path' );
 const config = require( './linter-config.json' );
 const output = path.resolve( config.output );
-const DocletLinter = require( './DocletLinter' );
+const DocletLinter = require( './docletlinter' );
 
 exports.handlers = {
 	parseComplete( e ) {

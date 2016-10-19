@@ -4,7 +4,7 @@
 
 const chai = require( 'chai' );
 const expect = chai.expect;
-const DocletLinter = require( '../../jsdoc/plugins/linter/DocletLinter.js' );
+const DocletLinter = require( '../../jsdoc/plugins/linter/docletlinter.js' );
 
 describe( 'Linter plugin', () => {
 	it( '_lintMembers()', () => {
@@ -72,7 +72,7 @@ describe( 'Linter plugin', () => {
 	it( '_lintLinks() 2', () => {
 		const linter = new DocletLinter( [ {
 			comment:
-				`/** Linking test:\n *\n * * a:\n *  
+				`/** Linking test:\n *\n * * a:\n *
 				 * {@link module:ckeditor5/a~A} `,
 		}, {
 			comment: '',
