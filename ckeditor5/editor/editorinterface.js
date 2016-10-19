@@ -20,5 +20,5 @@
 /**
  * Destroys editor.
  *
- * @method ~EditorInterface#create
+ * @method ~EditorInterface#destroy
  */

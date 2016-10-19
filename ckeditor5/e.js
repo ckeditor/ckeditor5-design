@@ -12,12 +12,19 @@ export {
 
 /**
  * The some1 function.
+ *
+ * @function s1
+ * @memberOf module:e
  */
 function some1() {
 }
 
 /**
  * The some2 function.
+ *
+ * @function s2
+ * @memberOf module:e
+ * @param {String} foo The foo param.
  */
 function some2() {
 }

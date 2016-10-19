@@ -16,6 +16,14 @@ export default class Command {
 	execute( param ) {
 
 	}
+
+	/**
+	 * Fired when the command is being executed.
+	 *
+	 * This event follows the {@link module:editor/editor~Editor#event:execute} event.
+	 *
+	 * @event ~Command#execute
+	 */
 }
 
 /**
