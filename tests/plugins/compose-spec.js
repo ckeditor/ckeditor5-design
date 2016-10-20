@@ -8,14 +8,14 @@ const composeFunctions = require( '../../jsdoc/plugins/utils/composefunctions' )
 
 describe( 'composeFunctions', () => {
 	it( 'should compose functions', () => {
-		const add1 = x => x + 1;
+		const addTwo = x => x + 2;
 		const multiplyByTwo = x => x * 2;
 
 		expect(
 			composeFunctions(
-				add1,
+				addTwo,
 				multiplyByTwo
-			)( 10 )
-		).to.be.equal( 21 );
+			)( 2 )
+		).to.be.equal( 8 ); // Note that this is not 6!
 	} );
 } );

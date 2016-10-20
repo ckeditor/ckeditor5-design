@@ -7,7 +7,7 @@
  */
 function composeFunctions( ...fns ) {
 	return ( result ) => {
-		for ( const fn of fns.reverse() ) {
+		for ( const fn of fns ) {
 			result = fn( result );
 		}
 

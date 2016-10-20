@@ -6,14 +6,15 @@
 
 'use strict';
 
-const { formatLinks, formatMembers } = require( './formatters' );
+const formatLinks = require( './formatters/format-links' );
+const formatInterfaces = require( './formatters/format-interfaces' );
 const composeFunctions = require( '../utils/composefunctions' );
 
 exports.handlers = {
 	newDoclet( e ) {
 		e.doclet = composeFunctions(
-			formatLinks,
-			formatMembers
+			formatInterfaces,
+			formatLinks
 		)( e.doclet );
 	}
 };

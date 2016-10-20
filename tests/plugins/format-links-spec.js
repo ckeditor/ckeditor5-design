@@ -4,21 +4,25 @@
 
 const chai = require( 'chai' );
 const expect = chai.expect;
-const { formatLinks } = require( '../../jsdoc/plugins/longname-fix/formatters' );
+const formatLinks = require( '../../jsdoc/plugins/longname-fix/formatters/format-links' );
 
-describe( 'Long name fix plugin', () => {
+describe( 'Long name fix plugin - formatLinks()', () => {
 	it( 'formatLinks()', () => {
 		const doclet = formatLinks( {
 			comment: 'Creates {@link ~EditorInterface} instance',
+			description: '<p>Creates {@link ~EditorInterface} instance</p>',
 			memberof: 'module:ckeditor5/editor/editorinterface',
 		} );
 
 		expect( doclet.comment ).to.be.equal(
 			'Creates {@link module:ckeditor5/editor/editorinterface~EditorInterface} instance'
 		);
+		expect( doclet.description ).to.be.equal(
+			'<p>Creates {@link module:ckeditor5/editor/editorinterface~EditorInterface} instance</p>'
+		);
 	} );
 
-	it( 'formatLinks() 2', () => {
+	it( 'formatLinks() hash', () => {
 		const doclet = formatLinks( {
 			comment: 'Method {@link #create} creates instance',
 			memberof: 'module:ckeditor5/editor/editorinterface~EditorInterface',
@@ -48,6 +52,40 @@ describe( 'Long name fix plugin', () => {
 
 		expect( doclet.comment ).to.be.equal(
 			'Method {@link module:ckeditor5/editor/editorinterface~EditorInterface#create create} creates Editor'
+		);
+	} );
+
+	it( 'formatLinks() in description', () => {
+		const doclet = formatLinks( {
+			comment: '',
+			description: 'You can later destroy it with {@link ~EditorInterface#destroy}',
+			memberof: 'module:ckeditor5/editor/editorinterface',
+		} );
+
+		expect( doclet.description ).to.be.equal(
+			'You can later destroy it with {@link module:ckeditor5/editor/editorinterface~EditorInterface#destroy}'
+		);
+	} );
+
+	it( 'formatLinks() multiple links', () => {
+		const doclet = formatLinks( {
+			comment: '{@link #destroy} {@link #destroy}',
+			memberof: 'module:editor/editorinterface',
+		} );
+
+		expect( doclet.comment ).to.be.equal(
+			'{@link module:editor/editorinterface#destroy} {@link module:editor/editorinterface#destroy}'
+		);
+	} );
+
+	it( 'formatLinks() link to parent: class / interface', () => {
+		const doclet = formatLinks( {
+			comment: '{@link ~EditorInterface}',
+			memberof: 'module:editor/editorinterface~EditorInterface',
+		} );
+
+		expect( doclet.comment ).to.be.equal(
+			'{@link module:editor/editorinterface~EditorInterface}'
 		);
 	} );
 } );

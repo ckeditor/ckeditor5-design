@@ -11,14 +11,14 @@
 /**
  * Creates {@link ~EditorInterface editor} instance with a given name.
  *
- * You can later destroy it with {@link ~EditorInterface#destroy}.
+ * You can later destroy it with {@link #destroy}.
  *
- * @method ~EditorInterface#create
+ * @method #create
  * @param {String} editorName Editor name.
  */
 
 /**
  * Destroys editor.
  *
- * @method ~EditorInterface#destroy
+ * @method #destroy
  */
