@@ -12,7 +12,9 @@ exports.handlers = {
 	parseComplete( e ) {
 		const linter = new DocletLinter( e.doclets );
 
-		linter.findErrors()
-			.forEach( error => console.error( error ) );
+		for ( const error of linter.findErrors() ) {
+			console.error( error.message );
+			console.error( `\tat ${ error.file } (line ${ error.line })` );
+		}
 	}
 };

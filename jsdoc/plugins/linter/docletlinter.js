@@ -41,7 +41,7 @@ class DocletLinter {
 
 	/**
 	 * @public
-	 * @returns {string[]}
+	 * @returns {Object[]}
 	 */
 	findErrors() {
 		this._errors = [];
@@ -62,9 +62,7 @@ class DocletLinter {
 		this._collection.get( 'member' )
 			.filter( member => member.name.includes( 'module:' ) )
 			.filter( member => member.scope === 'inner' )
-			.forEach( member => this._errors.push(
-				`Wrong member name: ${ member.name } in ${ member.meta.filename }, ${ member.memberof }`
-			) );
+			.forEach( member => this._addError( member, `Wrong member name: ${ member.name }` ) );
 	}
 
 	/**
@@ -97,9 +95,7 @@ class DocletLinter {
 
 		for ( const paramFullName of paramFullNames ) {
 			if ( paramFullName.includes( 'module:' ) && !typeNames.includes( paramFullName ) ) {
-				this._errors.push(
-					`Wrong param name: ${ paramFullName } in ${ element.meta.filename }, ${ element.longname }`
-				);
+				this._addError( element, `Wrong param name: ${ paramFullName }` );
 			}
 		}
 	}
@@ -121,12 +117,32 @@ class DocletLinter {
 
 			for ( const path of paths ) {
 				if ( !typeNames.includes( path ) ) {
-					this._errors.push(
-						`Wrong link: ${ path } in ${ element.meta.filename }, ${ element.longname }`
-					);
+					this._addError( element, `Wrong link: ${ path }` );
 				}
 			}
 		}
+	}
+
+	/**
+	 * @param {string} errorMessage
+	 * @private
+	 */
+	_addError( doclet, errorMessage ) {
+		this._errors.push( Object.assign( {
+			message: errorMessage,
+		}, this._getErrorData( doclet ) ) );
+	}
+
+	/**
+	 * @param {Object} member
+	 * @private
+	 */
+	_getErrorData( doclet ) {
+		return {
+			parent: doclet.memberof,
+			line: doclet.meta.lineno,
+			file: doclet.meta.path + '/' + doclet.meta.filename,
+		};
 	}
 }
 
