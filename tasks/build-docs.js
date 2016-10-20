@@ -5,10 +5,6 @@
 const gulp = require( 'gulp' );
 const jsdoc = require( 'gulp-jsdoc3' );
 
-class Reporter {
-	// TODO
-}
-
 /**
  * @param {Object} config
  * @returns {Promise}
@@ -40,8 +36,6 @@ function buildDocs( { src, out } ) {
 			monospaceLinks: true,
 			cleverLinks: true
 		},
-
-		reporter: new Reporter(),
 	};
 
 	return new Promise( ( resolve ) => {

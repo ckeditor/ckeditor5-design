@@ -11,7 +11,7 @@ gulp.task( 'default', [ 'build:docs' ] );
 gulp.task( 'build:docs', () => {
 	return del( './jsdoc/out' )
 		.then( () => buildDocs( {
-			src: 'ckeditor5/**/**',
+			src: [ 'README.md', 'ckeditor5/**/*.js' ],
 			out: 'jsdoc/out',
 		} ) );
 } );
