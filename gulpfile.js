@@ -4,15 +4,14 @@
 
 const gulp = require( 'gulp' );
 const del = require( 'del' );
-const sh = require( 'shelljs' );
+const buildDocs = require( './tasks/build-docs' );
 
-gulp.task( 'default', [ 'build:all' ] );
+gulp.task( 'default', [ 'build:docs' ] );
 
-gulp.task( 'build:all', [ 'build:jsdoc:html' ] );
-
-gulp.task( 'build:jsdoc:html', () => {
+gulp.task( 'build:docs', () => {
 	return del( './jsdoc/out' )
-		.then( () => {
-			sh.exec( './node_modules/.bin/jsdoc -c jsdoc/config.json --debug ckeditor5 -d jsdoc/out' );
-		} );
+		.then( () => buildDocs( {
+			src: 'ckeditor5/**/**',
+			out: 'jsdoc/out',
+		} ) );
 } );
