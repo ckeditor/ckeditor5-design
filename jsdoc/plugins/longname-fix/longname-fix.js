@@ -7,14 +7,25 @@
 'use strict';
 
 const formatLinks = require( './formatters/format-links' );
-const formatInterfaces = require( './formatters/format-interfaces' );
+const formatInterfacesAndClasses = require( './formatters/format-interfaces-and-classes' );
 const composeFunctions = require( '../utils/composefunctions' );
+
+let config = {};
+
+function setNewDoclet( doclet ) {
+	return ( config ) => {
+		return Object.assign( {}, config, { doclet } );
+	};
+}
 
 exports.handlers = {
 	newDoclet( e ) {
-		e.doclet = composeFunctions(
-			formatInterfaces,
+		config = composeFunctions(
+			setNewDoclet( e.doclet ),
+			formatInterfacesAndClasses,
 			formatLinks
-		)( e.doclet );
+		)( config );
+
+		e.doclet = config.doclet;
 	}
 };

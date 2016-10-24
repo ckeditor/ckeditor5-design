@@ -2,14 +2,28 @@
 
 'use strict';
 
-function formatLinks( doclet ) {
-	const linkRegExp = /{@link *([~#][^}]+) *}/g;
-	const replacer = ( fullLink, linkName ) => {
-		const [ ref ] = linkName.split( ' ' );
+function formatLinks( config ) {
+	let { doclet } = config;
+	const linkRegExp = /{@link *([~#][^}]+)}/g;
+	const replacer = ( fullLink, linkContent ) => {
+		const [ ref, linkName ] = linkContent.split( ' ' );
+		const [ className, methodName ] = ref.split( '#' );
 
-		return doclet.memberof.includes( ref ) ?
-			'{@link ' + doclet.memberof + '}' :
-			'{@link ' + doclet.memberof + linkName + '}';
+		let result = '{@link ' + doclet.memberof;
+
+		if ( !doclet.memberof.includes( className ) ) {
+			return result + linkContent + '}';
+		}
+
+		if ( methodName ) {
+			result += '#' + methodName;
+		}
+
+		if ( linkName ) {
+			result += ' ' + linkName;
+		}
+
+		return result + '}';
 	};
 
 	const comment = doclet.comment.replace( linkRegExp, replacer );
@@ -20,7 +34,9 @@ function formatLinks( doclet ) {
 		description = doclet.description.replace( linkRegExp, replacer );
 	}
 
-	return Object.assign( {}, doclet, { comment, description } );
+	doclet = Object.assign( {}, doclet, { comment, description });
+
+	return Object.assign( {}, config, { doclet });
 }
 
 module.exports = formatLinks;

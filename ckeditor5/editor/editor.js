@@ -26,7 +26,7 @@ export default class Editor {
 	 * Executes some command.
 	 *
 	 * @fires ~Editor#execute
-	 * @fires command/ver1/command~Command#execute
+	 * @fires module:command/ver1/command~Command#execute
 	 * @param {module:command/ver2/command~Command} command
 	 */
 	execute( command ) {

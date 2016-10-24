@@ -47,6 +47,7 @@ class DocletLinter {
 		this._errors = [];
 
 		this._lintMembers();
+		this._lintMemberofProperty();
 		this._lintParams();
 		this._lintLinks();
 
@@ -60,9 +61,24 @@ class DocletLinter {
 	*/
 	_lintMembers() {
 		this._collection.get( 'member' )
-			.filter( member => member.name.includes( 'module:' ) )
+			.filter( member => member.name.indexOf( 'module:' ) === 0 )
 			.filter( member => member.scope === 'inner' )
 			.forEach( member => this._addError( member, `Wrong member name: ${ member.name }` ) );
+	}
+
+	/**
+	 * protected
+	 */
+	_lintMemberofProperty() {
+		this._collection.getAll()
+			.filter( el => el.memberof && el.memberof.indexOf( 'module:' ) !== 0 )
+			.forEach( el => this._addError( el, `Memberof property should start with 'module:'. Got ${ el.memberof } instead` ) );
+	}
+
+	_lintLongnameProperty() {
+		this._collection.getAll()
+			.filter( el => el.longname && el.longname.indexOf( 'module:' ) !== 0 )
+			.forEach( el => this._addError( el, `Longname property should start with 'module:'. Got ${ el.longname } instead` ) );
 	}
 
 	/**
