@@ -7,24 +7,25 @@ function formatInterfacesAndClasses( object ) {
 	let { doclet, lastInterfaceOrClass } = object;
 
 	if ( doclet.kind === 'interface' || doclet.kind === 'class' ) {
-		return assign( {}, object, { lastInterfaceOrClass: doclet } );
-	}
+		object = assign( {}, object, { lastInterfaceOrClass: doclet } );
 
-	if ( !lastInterfaceOrClass ) {
-		return object;
+		return fixShortNameInEvents( object );
 	}
 
 	if (
+		!lastInterfaceOrClass ||
 		doclet.meta.path !== lastInterfaceOrClass.meta.path ||
 		doclet.meta.filename !== lastInterfaceOrClass.meta.filename
 	) {
 		return object;
 	}
 
-	return fixShortNameIssue( object );
+	object = fixShortNamesInLongnameAndMemeberof( object );
+
+	return fixShortNameInEvents( object );
 }
 
-function fixShortNameIssue( object ) {
+function fixShortNamesInLongnameAndMemeberof( object ) {
 	let { doclet, lastInterfaceOrClass } = object;
 	const firstNameChar = doclet.longname[0];
 
@@ -41,6 +42,28 @@ function fixShortNameIssue( object ) {
 			longname: lastInterfaceOrClass.longname + doclet.longname,
 		} );
 	}
+
+	return assign( {}, object, { doclet } );
+}
+
+function fixShortNameInEvents( object ) {
+	let { doclet } = object;
+
+	if ( !doclet.fires ) {
+		return object;
+	}
+
+	const fires = doclet.fires.map( event => {
+		if ( event.indexOf( 'module:' ) === 0 ) {
+			return event;
+		}
+
+		const paramName = event.split( '#' )[1];
+
+		return doclet.memberof + '#' + paramName;
+	} );
+
+	doclet = assign( {}, doclet, { fires } );
 
 	return assign( {}, object, { doclet } );
 }

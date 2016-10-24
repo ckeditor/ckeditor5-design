@@ -86,8 +86,7 @@ describe( 'Linter plugin', () => {
 
 	it( '_lintLinks() with link name', () => {
 		const linter = new DocletLinter( [ {
-			comment:
-				` {@link module:ckeditor5/a~A classA} `,
+			comment: ` {@link module:ckeditor5/a~A classA} `,
 		}, {
 			comment: '',
 			longname: 'module:ckeditor5/a~A',
@@ -96,5 +95,18 @@ describe( 'Linter plugin', () => {
 		linter._lintLinks();
 
 		expect( linter._errors.length ).to.be.equal( 0 );
+	} );
+
+	it( '_lintEvents', () => {
+		const linter = new DocletLinter( [ {
+			kind: 'class',
+			longname: 'module:abc/SomeClass',
+			fires: ['someEvent'],
+			meta: { fileName: '' },
+		} ] );
+
+		linter._lintEvents();
+
+		expect( linter._errors.length ).to.be.equal( 1 );		
 	} );
 } );

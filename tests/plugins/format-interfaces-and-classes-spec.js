@@ -132,4 +132,64 @@ describe( 'Long name fix plugin - formatInterfaces()', () => {
 		expect( result.doclet.longname ).to.be.equal( 'module:editor~Editor#name' );
 		expect( result.doclet.memberof ).to.be.equal( 'module:editor~Editor' );
 	} );
+
+	it( 'fix class events with ~ reference', () => {
+		let result = formatInterfaces( {
+			lastInterfaceOrClass: {
+				kind: 'class',
+				memberof: 'module:editor',
+				longname: 'module:editor~Editor',
+				name: 'Editor',
+				meta: {
+					path: '/',
+					filename: 'editor.js'
+				},
+			},
+			doclet: {
+				kind: 'function',
+				meta: {
+					path: '/',
+					filename: 'editor.js'
+				},
+				name: 'execute',
+				fires: [ '~Editor#event:execute' ],
+				longname: 'module:editor/editor~Editor#execute',
+				memberof: 'module:editor/editor~Editor'
+			},
+		} );
+
+		expect( result.doclet.fires[0] ).to.be.equal(
+			'module:editor/editor~Editor#event:execute'
+		);
+	} );
+
+	it( 'fix class events with # reference', () => {
+		let result = formatInterfaces( {
+			lastInterfaceOrClass: {
+				kind: 'class',
+				memberof: 'module:editor',
+				longname: 'module:editor~Editor',
+				name: 'Editor',
+				meta: {
+					path: '/',
+					filename: 'editor.js'
+				},
+			},
+			doclet: {
+				kind: 'function',
+				meta: {
+					path: '/',
+					filename: 'editor.js'
+				},
+				name: 'execute',
+				fires: [ '#event:execute' ],
+				longname: 'module:editor/editor~Editor#execute',
+				memberof: 'module:editor/editor~Editor'
+			},
+		} );
+
+		expect( result.doclet.fires[0] ).to.be.equal(
+			'module:editor/editor~Editor#event:execute'
+		);
+	} );
 } );

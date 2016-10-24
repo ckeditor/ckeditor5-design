@@ -50,6 +50,7 @@ class DocletLinter {
 		this._lintMemberofProperty();
 		this._lintParams();
 		this._lintLinks();
+		this._lintEvents();
 
 		return this._errors;
 	}
@@ -137,6 +138,24 @@ class DocletLinter {
 				}
 			}
 		}
+	}
+
+	_lintEvents() {
+		const longNames = this._getAllLongNames();
+
+		for ( const element of this._collection.getAll() ) {
+			for ( const event of element.fires || [] ) {
+				if ( !longNames.includes( event ) ) {
+					this._addError( element, `Wrong event name: ${ event }` );
+				}
+			}
+		}
+	}
+
+
+	_getAllLongNames() {
+		return this._collection.getAll()
+			.map( el => el.longname );
 	}
 
 	/**
