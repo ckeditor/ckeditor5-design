@@ -51,6 +51,7 @@ class DocletLinter {
 		this._lintParams();
 		this._lintLinks();
 		this._lintEvents();
+		this._lintInterfaces();
 
 		return this._errors;
 	}
@@ -147,6 +148,20 @@ class DocletLinter {
 			for ( const event of element.fires || [] ) {
 				if ( !longNames.includes( event ) ) {
 					this._addError( element, `Wrong event name: ${ event }` );
+				}
+			}
+		}
+	}
+
+	_lintInterfaces() {
+		const classes = this._collection.get( 'class' );
+		const interfaceLongNames = this._collection.get( 'interface' )
+			.map( i => i.longname );
+
+		for ( const someClass of classes ) {
+			for ( const someInterface of someClass.implements || [] ) {
+				if ( !interfaceLongNames.includes( someInterface ) ) {
+					this._addError( someClass, `Wrong interface name: ${ someInterface }` );
 				}
 			}
 		}
