@@ -53,3 +53,16 @@ class Editor {
 } 
 ```
 
+## Validation
+
+Second plugin is supposed to validate references in jsdoc comments.
+ 
+During the jsdoc compilation the errors are throwing to the standard output for each invalid reference
+
+References for these tags are validated:
+
+- `@link`
+- `@member`
+- `@fires` - match only events 
+- `@param`
+- `@implements` - match only interfaces
