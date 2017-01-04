@@ -4,7 +4,7 @@ const randomId = require( './randomid' );
 const createForkPool = require( './createforkpool' );
 
 const ids = [];
-const forkPool = createForkPool();
+const forkPool = createForkPool( process.argv[ 2 ] || 'child' );
 
 console.time( 'Processing time:' );
 

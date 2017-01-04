@@ -3,11 +3,11 @@
 const childProcess = require( 'child_process' );
 const genericPool = require( 'generic-pool' );
 
-module.exports = function createForkPool() {
+module.exports = function createForkPool( childPath ) {
 	const forkPoolFactory = {
 		create() {
 			return new Promise( ( resolve ) => {
-				resolve( childProcess.fork( 'child' ) );
+				resolve( childProcess.fork( require( 'path' ).join( __dirname, childPath ) ) );
 			} );
 		},
 
