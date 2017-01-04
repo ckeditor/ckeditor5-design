@@ -1,0 +1,14 @@
+{
+  "name": "cke5-b",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+  	"cke5-c": "*"
+  },
+  "author": "",
+  "license": "ISC"
+}
