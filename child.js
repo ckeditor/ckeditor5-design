@@ -6,9 +6,9 @@ const randomId = require( './randomid' );
 process.on( 'message', ( data ) => {
 	console.log( 'Starting processing: ', data );
 
-	execSh( 'sleep ' + Math.random() * 2, ( err, stdout, stderr ) => {
+	execSh( 'sleep ' + Math.random(), ( err, stdout, stderr ) => {
 		const requires = [];
-		let i = Math.random() * 4;
+		let i = Math.random() * 3;
 
 		while ( --i > 0 ) {
 			requires.push( randomId() );

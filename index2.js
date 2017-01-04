@@ -1,8 +1,7 @@
 'use strict';
 
-const childProcess = require( 'child_process' );
-const genericPool = require( 'generic-pool' );
 const randomId = require( './randomid' );
+const createForkPool = require( './createforkpool' );
 
 const ids = [];
 const forkPool = createForkPool();
@@ -24,16 +23,8 @@ function enqueue( id ) {
 		.then( ( requiredIds ) => {
 			requiredIds.forEach( enqueue );
 
-			if ( !forkPool.pool.pending && !forkPool.pool.borrowed ) {
-				console.log( `Finished processing ${ ids.length } items.` );
-				console.log( ids.sort() );
-
-				return forkPool.pool.drain()
-					.then( () => {
-						forkPool.pool.clear();
-
-						console.timeEnd( 'Processing time:' );
-					} );
+			if ( forkPool.isDone ) {
+				return onDone();
 			}
 		} )
 		.catch( ( err ) => {
@@ -42,41 +33,12 @@ function enqueue( id ) {
 		} );
 }
 
-function createForkPool() {
-	const forkPoolFactory = {
-		create() {
-			return new Promise( ( resolve ) => {
-				resolve( childProcess.fork( 'child' ) );
-			} );
-		},
+function onDone() {
+	return forkPool.killAll()
+		.then( () => {
+			console.log( `Finished processing ${ ids.length } items.` );
+			console.log( ids.sort() );
 
-		destroy( child ) {
-			child.kill();
-		}
-	};
-
-	const pool = genericPool.createPool( forkPoolFactory, {
-		max: 4,
-		min: 3
-	} );
-
-	return {
-		pool: pool,
-
-		enqueue( data ) {
-			return new Promise( ( resolve, reject ) => {
-				pool.acquire()
-					.then( ( child ) => {
-						child.once( 'message', ( returnedData ) => {
-							pool.release( child );
-
-							resolve( returnedData );
-						} );
-
-						child.send( data );
-					} )
-					.catch( reject );
-			} );
-		}
-	};
+			console.timeEnd( 'Processing time:' );
+		} );
 }
