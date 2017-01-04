@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 3);
+/******/ 	return __webpack_require__(__webpack_require__.s = 4);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -75,7 +75,7 @@
 const e = Math.random();
 
 function c() {
-	console.log( 'c', e );
+	console.log( 'c2', e );
 }
 
 
@@ -84,13 +84,12 @@ function c() {
 /***/ function(module, exports, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cke5_b__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_cke5_c__ = __webpack_require__(0);
+/* harmony export (immutable) */ exports["a"] = c;
+const e = Math.random();
 
-
-
-__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0_cke5_b__["a" /* default */])();
-__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1_cke5_c__["a" /* default */])();
+function c() {
+	console.log( 'c1', e );
+}
 
 
 /***/ },
@@ -98,7 +97,24 @@ __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1_cke5_c__["a" /* default */])()
 /***/ function(module, exports, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cke5_c__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cke5_b__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_cke5_c__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_cke5_c_foo__ = __webpack_require__(0);
+
+
+
+
+__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0_cke5_b__["a" /* default */])();
+__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1_cke5_c__["a" /* default */])();
+__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_2_cke5_c_foo__["a" /* default */])();
+
+
+/***/ },
+/* 3 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cke5_c__ = __webpack_require__(1);
 /* harmony export (immutable) */ exports["a"] = b;
 
 
@@ -111,13 +127,18 @@ function b() {
 
 
 /***/ },
-/* 3 */
+/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cke5_a__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cke5_a__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_cke5_c_foo__ = __webpack_require__(0);
 
+
+
+
+__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1_cke5_c_foo__["a" /* default */])();
 
 
 /***/ }
