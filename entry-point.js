@@ -1,5 +1,5 @@
-import 'cke5-a';
+require( 'cke5-a' );
 
-import c2 from 'cke5-c/foo';
+const c2 = require( 'cke5-c/foo' );
 
 c2();

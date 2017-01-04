@@ -1,6 +1,6 @@
-import b1 from 'cke5-b';
-import c1 from 'cke5-c';
-import c2 from 'cke5-c/foo';
+const b1 = require( 'cke5-b' );
+const c1 = require( 'cke5-c' );
+const c2 = require( 'cke5-c/foo' );
 
 b1();
 c1();

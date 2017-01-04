@@ -68,77 +68,56 @@
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
-"use strict";
-/* harmony export (immutable) */ exports["a"] = c;
-const e = Math.random();
-
-function c() {
-	console.log( 'c2', e );
-}
+module.exports = function c2() {
+	console.log( 'c2' );
+};
 
 
 /***/ },
 /* 1 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
-"use strict";
-/* harmony export (immutable) */ exports["a"] = c;
-const e = Math.random();
-
-function c() {
-	console.log( 'c1', e );
-}
+module.exports = function c1() {
+	console.log( 'c1' );
+};
 
 
 /***/ },
 /* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cke5_b__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_cke5_c__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_cke5_c_foo__ = __webpack_require__(0);
+const b1 = __webpack_require__( 3 );
+const c1 = __webpack_require__( 1 );
+const c2 = __webpack_require__( 0 );
 
-
-
-
-__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0_cke5_b__["a" /* default */])();
-__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1_cke5_c__["a" /* default */])();
-__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_2_cke5_c_foo__["a" /* default */])();
+b1();
+c1();
+c2();
 
 
 /***/ },
 /* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cke5_c__ = __webpack_require__(1);
-/* harmony export (immutable) */ exports["a"] = b;
+const c1 = __webpack_require__( 1 );
 
-
-const e = Math.random();
-
-function b() {
-	console.log( 'b', e );
-	c();
-}
+module.exports = function b() {
+	console.log( 'b' );
+	c1();
+};
 
 
 /***/ },
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cke5_a__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_cke5_c_foo__ = __webpack_require__(0);
+__webpack_require__( 2 );
 
+const c2 = __webpack_require__( 0 );
 
-
-
-__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1_cke5_c_foo__["a" /* default */])();
+c2();
 
 
 /***/ }

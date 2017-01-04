@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "browserify": "^13.3.0",
     "lerna": "2.0.0-beta.31",
     "rollup": "^0.40.0",
     "rollup-plugin-node-resolve": "^2.0.0",

@@ -1,5 +1,3 @@
-const e = Math.random();
-
-export default function c() {
-	console.log( 'c2', e );
-}
+module.exports = function c2() {
+	console.log( 'c2' );
+};
