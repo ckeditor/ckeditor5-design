@@ -1,29 +1,6 @@
-CKEditor 5 Design Repository
-============================
+<p align=center>⚠⚠ ⚠⚠ ⚠⚠
 
-The CKEditor 5 prototyping and design playground.
+<p align=center>This repository <a href="https://github.com/ckeditor/ckeditor5-design/issues/186">served in the early days of CKEditor 5 development</a> as a design and prototyping playground. Its contents can be <strong>severely outdated</strong> by now.
 
-## Issues
+<p align=center>Refer to the <a href="http://docs.ckeditor.com/ckeditor5/latest">official CKEditor 5 documentation</a> for up-to-date information and to <a href="https://github.com/ckeditor/ckeditor5">main CKEditor 5 repository</a> in case of bug or feature requests.
 
-Most of the discussion related to the CKEditor 5 design happens at the [GitHub issues pages of this repository](https://github.com/ckeditor/ckeditor5-design/issues). Feel free to join, ask questions and leave your opinion.
-
-## Wiki
-
-The design documentation is available at the [GitHub wiki pages of this repository](https://github.com/ckeditor/ckeditor5-design/wiki).
-
-## Branches
-
-This repository contains [several branches](https://github.com/ckeditor/ckeditor5-design/branches), each dedicated to certain aspects of CKEditor 5. This is a research place so **no production code** should be available here.
-
-A `README.md` file should be available on every branch, with further information about its relative feature.
-
-To easily start a new prototype:
-
-``` bash
-> sh start-new-prototype BRANCHNAME
-
-```
-
----
-
-Copyright &copy; CKSource - Frederico Knabben.
